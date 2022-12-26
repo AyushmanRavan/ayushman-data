@@ -1,0 +1,82 @@
+Read =4
+Write = 2
+Execute =1
+owner: set it to 7, which means 4+2+1 means read+write+execute.
+group: set it to 5, which means 4+1 means read+execute.
+other: set it to 5, which means 4+1 means read+execute.
+
+
+tar command
+--------------------------
+-c
+Create a new archive.
+
+-z
+Compress the archive using gzip package.
+
+-j
+Compress the archive using the bzip2 package.
+
+-v
+Verbose mode means showing the processed files.
+
+-f
+Write the output to a file and not to screen.
+
+-x
+Unpack files from an archive.
+tar –czvf myfiles.tar.gz /myfiles
+tar -xzvf myfiels.tar.gz
+
+
+Bash String Conditions
+Bash string conditions are used to check if two strings are equal or if a string if empty.
+
+Operator	    Description
+str1 = str2	    Checks if strings are equal or not
+str1 != str2	Checks if strings are different
+-z str1	        Checks if str1 is empty
+-n str1	        Checks if str1 is not empty
+
+
+
+
+Bash Number Conditions
+Bash number conditions are used in order to compare two numbers : if they are equal, if one is greater than another or lower than another.
+
+Operator	    Description
+num1 -eq num2	Check if numbers are equal
+num1 -ne num2	Check if numbers are not equal
+num1 -lt num2	Checking if num1 is lower than num2
+num1 -le num2	Lower or equal than num2
+num1 -gt num2	Greater than num2
+num1 -ge num2	Greater or equal than num2
+
+
+
+
+Bash Functions Arguments
+==============================
+#!/bin/bash
+repeat() {
+  echo "You said ${1}"
+}
+repeat "Linux" 
+
+
+
+
+https://earthly.dev/blog/awk-examples/#awk-begin-and-end-actions
+https://devhints.io/bash
+https://www.howtogeek.com/author/davidmckay/
+https://linuxhint.com/bash-programming-guide/
+https://www.2daygeek.com/category/linux-commands/page/5/
+https://likegeeks.com/linux/
+
+
+
+
+find /path/to/search -type d -name "name-of-dir"
+Delete all empty files in a directory (and subdirectories):
+================================================================
+$ find /path/to/search -type f -empty -delete

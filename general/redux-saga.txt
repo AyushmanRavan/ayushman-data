@@ -1,0 +1,38 @@
+https://blog.devgenius.io/reactjs-simple-understanding-redux-with-redux-saga-f635e273e24a
+https://www.blog.duomly.com/implement-redux-saga-with-reactjs-and-redux/
+https://hackernoon.com/redux-saga-tutorial-for-beginners-and-dog-lovers-aa69a17db645
+
+Redux-Saga basically is a middleware for your Redux. Why do I need a middleware for Redux?
+-----------------------------------------------------------------------------------------------
+The answer. With a plain basic Redux, you can only do simple synchronous updates by dispatching an action. Middleware extends the store’s abilities and 
+lets you write async logic that interacts with it. — According to Redux-Thunk docs (Another middleware that Redux has).
+
+
+Why Must Redux-Saga?
+-----------------------
+1) It uses an ES6 feature called Generators to make those asynchronous flows easy to read, write, and test.
+2) You might’ve used redux-thunk before to handle your data fetching. Contrary to redux-thunk, you don't end up in callback hell, you can test your asynchronous 
+   flows easily and your actions stay pure.
+
+Should You Use Redux?
+------------------------
+maybe your app needs a single source of truth for your state, use Redux then.
+
+Installing Dependencies For React Project
+-----------------------------------------------
+npm i --save redux react-redux redux-devtools-extension redux-saga axios
+npm i react-router-dom
+    redux, essentially the Redux itself.
+    react-redux, package that we gonna use to connecting between React and Redux.
+    redux-devtools-extension, it’s just a package that for integrating our React-Redux app to the extension that we install for debugging Redux.
+    redux-saga, of course, this is a package that redux-saga middleware that we gonna use.
+    axios, is just a simple HTTP client to interact with the server.
+
+We have three action types and a single reducer
+----------------------------------------------------
+    **API_CALL_REQUEST** says that we’re beginning the process of fetching a dog from the Dog API.
+
+    **API_CALL_SUCCESS** tells the Store that we successfully retrieved a dog and are therefore no longer in the process of fetching one.
+
+    **API_CALL_FAILURE** tells the Store that something went wrong with our API call. We received an error rather than a new dog.
+

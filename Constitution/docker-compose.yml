@@ -1,0 +1,134 @@
+version: "3.3"
+# https://authguidance.com/log-aggregation-setup/
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    container_name: elasticsearch-demo-elk
+    restart: always
+    environment:
+      - discovery.type: single-node
+      - node.name: elasticsearch-demo-elk
+      - cluster.name: ayushman
+      - bootstrap.memory_lock: true
+      - ES_JAVA_OPTS: -Xms512m -Xmx512m
+      - xpack.security.enabled: false
+      - xpack.security.enrollment.enabled: false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      # nofile:
+      #   soft: 262144 # maximum number of open files for the Elasticsearch user, set to at least 65536 on modern systems
+      #   hard: 262144
+    ports:
+      - 9200:9200
+      - 9300:9300  
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      # - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    container_name: kibana-demo-elk
+    restart: always
+    environment:
+      SERVER_NAME: kibana
+      ELASTICSEARCH_URL: http://elasticsearch-demo-elk:9200 
+      ELASTICSEARCH_HOSTS: '["https://elasticsearch-demo-elk:9200"]'
+    ports:
+      - 5601:5601
+    volumes:
+      - 
+    depends_on:
+      - elasticsearch
+    networks:
+      - elastic
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:${STACK_VERSION}
+    container_name: logstash-demo-elk
+    restart: always
+    ports:
+      - "5044:5044"
+      - "5000:5000/tcp"
+      - "5000:5000/udp"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: -Xmx256m -Xms256m
+    volumes:
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    depends_on:
+      - elasticsearch
+    networks:
+      - elastic
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
+    container_name: filebeat-demo-elk
+    restart: always
+    ports:
+      - 
+    volumes:
+      - ./filebeat/conf/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./filebeat/log:/usr/share/filebeat/log
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # - './filebeat/data:/usr/share/filebeat/data:rw'
+       # This is needed for filebeat to load container log path as specified in filebeat.yml
+      - /var/lib/docker/containers/:/var/lib/docker/containers/:ro
+    user: root
+    # environment:
+    #   - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST:-node1}
+    #   - KIBANA_HOST=${KIBANA_HOST:-node1}
+    #   - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME:-elastic}
+    #   - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD:-changeme}
+    depends_on:
+      - elasticsearch
+      - logstash
+      - kibana
+    networks:
+      - elastic
+
+volumes:
+  elasticsearch-data:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge
+
+
+# We can log in to a container with the following command     docker exec -it elastic8_kibana_1 /bin/bash
+#      We can put the... In the container in the following ways kibana.yml Copy the file out ：
+#     docker cp elastic8_kibana_1:/usr/share/kibana/config/kibana.yml .
+#  how create elastic search index on kibana dashboard : https://adamtheautomator.com/efk-stack/
+
+# Check the Filebeat container logs.
+# docker logs -f filebeat
+
+# Configure Filebeat
+# sudo vim /etc/filebeat/filebeat.yml
+
+# Start Filebeat
+# sudo bin/filebeat -e -c /etc/filebeat/filebeat.yml
+# Or
+# Start the Docker container
+# docker compose up -d filebeat
+
+
+# Elasticsearch – with ports:
+#   9200: Elasticsearch HTTP
+#   9300: Elasticsearch TCP transport
+# Logstash – with ports:
+#   5044: Logstash Beats input
+#   5000: Logstash TCP input
+#   9600: Logstash monitoring API
+# Kibana – with port 5601
+
+
+
+# https://www.youtube.com/watch?v=hvYUwUmHB6M&t=346s
+# $ sudo sysctl -w vm.max_map_count=262144

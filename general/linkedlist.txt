@@ -1,0 +1,261 @@
+https://www.sanfoundry.com/java-program-implement-circular-doubly-linked-list/
+
+https://www.sanfoundry.com/java-program-implement-red-black-tree/
+
+https://blog.contactsunny.com/tech/circular-double-linked-list-implementation-in-java
+
+
+
+
+    private final ClinicalFindingTypeRepository clinicalFindingTypeRepository;
+    private final AllergyTypeRepository allergyTypeRepository;
+    private final  symptomTypeRepository;
+    private final  diagnosisTypeRepository;
+    private final  diagnosticTypeRepository;
+    private final  procedureTypeRepository;
+    private final  adviceRepository;
+
+
+ClinicalFindingTypeRepository clinicalFindingTypeRepository,
+                         AllergyTypeRepository allergyTypeRepository,
+                         SymptomTypeRepository symptomTypeRepository,
+                         DiagnosisTypeRepository diagnosisTypeRepository,
+                         DiagnosticTypeRepository diagnosticTypeRepository,
+                         ProcedureTypeRepository procedureTypeRepository,
+                         AdviceRepository adviceRepository
+
+
+    this.clinicalFindingTypeRepository = clinicalFindingTypeRepository;
+        this.allergyTypeRepository = allergyTypeRepository;
+        this.symptomTypeRepository = symptomTypeRepository;
+        this.diagnosisTypeRepository = diagnosisTypeRepository;
+        this.diagnosticTypeRepository = diagnosticTypeRepository;
+        this.procedureTypeRepository =  procedureTypeRepository;
+        this.adviceRepository = adviceRepository;
+
+
+
+
+
+
+
+
+
+
+
+
+ try{
+  if (CollectionUtils.isEmpty(dtos)) {
+                        log.info("diagnostic database");
+                        dtos.add(findDiagnosticTypeByName(pageable));
+                    }
+                } catch (Exception ex) {
+                    log.error("Exception diagnostic database : {}",ex.getLocalizedMessage());
+                    dtos.add(findDiagnosticTypeByName(pageable));
+                }
+
+
+
+
+  try{  
+  if (CollectionUtils.isEmpty(dtos)) {
+                        log.info("medicine database");
+                        dtos.add(findMedicineByName(pageable));
+                    }
+                } catch (Exception ex) {
+                    log.error("Exception medicine database : {}",ex.getLocalizedMessage());
+                    dtos.add(findMedicineByName(pageable));
+                }
+
+
+
+  try{  
+  if (CollectionUtils.isEmpty(dtos)) {
+                        log.info("procedure database");
+                        dtos.add(findProcedureTypeByName(pageable));
+                    }
+                } catch (Exception ex) {
+                    log.error("Exception procedure database : {}",ex.getLocalizedMessage());
+                    dtos.add(findProcedureTypeByName(pageable));
+                }
+
+
+
+  try{  
+if (CollectionUtils.isEmpty(dtos)) {
+                        log.info("advice database");
+                        dtos.add(findAdviceByName(pageable));
+                    }
+                } catch (Exception ex) {
+                    log.error("Exception advice database : {}",ex.getLocalizedMessage());
+                    dtos.add(findAdviceByName(pageable));
+                }
+
+
+  try{  
+ if (CollectionUtils.isEmpty(dtos)) {
+                        log.info("diagnosis database");
+                        dtos.add(findDiagnosisTypeByName(pageable));
+                    }
+                } catch (Exception ex) {
+                    log.error("Exception diagnosis database : {}",ex.getLocalizedMessage());
+                    dtos.add(findDiagnosisTypeByName(pageable));
+                }
+
+
+
+  try{  
+    if (CollectionUtils.isEmpty(dtos)) {
+                        log.info("symptom database");
+                        dtos.add(findSymptomTypeByNameSearch(pageable));
+                    }
+                } catch (Exception ex) {
+                    log.error("Exception symptom database : {}",ex.getLocalizedMessage());
+                    dtos.add(findSymptomTypeByNameSearch(pageable));
+                }
+
+
+
+  try{  
+if (CollectionUtils.isEmpty(dtos)) {
+                        log.info("allergy database");
+                        dtos.add(findAllergyTypeByName(pageable));
+                    }
+                } catch (Exception ex) {
+                    log.error("Exception allergy database : {}",ex.getLocalizedMessage());
+                    dtos.add(findAllergyTypeByName(pageable));
+                }
+
+
+
+  try{         
+     if (CollectionUtils.isEmpty(dtos)) {
+                        log.info("clinicalFinding database");
+                        dtos.add(findClinicalFindingTypeByNameSearch(pageable));
+                    }
+   } catch (Exception ex) {
+                    log.error("Exception clinicalFinding database : {}",ex.getLocalizedMessage());
+                    dtos.add(findClinicalFindingTypeByNameSearch(pageable));
+                }
+
+
+
+    private SearchContentDto findClinicalFindingTypeByNameSearch(Pageable pageable){
+        Optional<ClinicalFindingType> data = clinicalFindingTypeRepository.findAll(pageable).stream().findFirst();
+        SearchContentDto searchContentDto = null;
+        if(data.isPresent()){
+            searchContentDto = new SearchContentDto();
+            ClinicalFindingType clinicalFindingType = data.get();
+            searchContentDto.setName(clinicalFindingType.getName());
+            searchContentDto.setId(clinicalFindingType.getId());
+            searchContentDto.setLength(clinicalFindingType.getName().length());
+            return searchContentDto;
+        }
+        return this.noDataFound();
+    }
+
+    private SearchContentDto findAllergyTypeByName(Pageable pageable){
+        Optional<AllergyType> data = allergyTypeRepository.findAll(pageable).stream().findFirst();
+        SearchContentDto searchContentDto = null;
+        if(data.isPresent()){
+            searchContentDto = new SearchContentDto();
+            AllergyType allergyType = data.get();
+            searchContentDto.setName(allergyType.getName());
+            searchContentDto.setId(allergyType.getId());
+            searchContentDto.setLength(allergyType.getName().length());
+            return searchContentDto;
+        }
+        return this.noDataFound();
+    }
+
+    private SearchContentDto findSymptomTypeByNameSearch(Pageable pageable){
+        Optional<SymptomType> data = symptomTypeRepository.findAll(pageable).stream().findFirst();
+        SearchContentDto searchContentDto = null;
+        if(data.isPresent()){
+            searchContentDto = new SearchContentDto();
+            SymptomType symptomType = data.get();
+            searchContentDto.setName(symptomType.getName());
+            searchContentDto.setId(symptomType.getId());
+            searchContentDto.setLength(symptomType.getName().length());
+            return searchContentDto;
+        }
+        return this.noDataFound();
+    }
+
+    private SearchContentDto findDiagnosisTypeByName(Pageable pageable){
+      Optional<DiagnosisType> data = diagnosisTypeRepository.findAll(pageable).stream().findFirst();
+        SearchContentDto searchContentDto = null;
+        if(data.isPresent()){
+            searchContentDto = new SearchContentDto();
+            DiagnosisType diagnosisType = data.get();
+            searchContentDto.setName(diagnosisType.getName());
+            searchContentDto.setId(diagnosisType.getId());
+            searchContentDto.setLength(diagnosisType.getName().length());
+            return searchContentDto;
+        }
+        return this.noDataFound();
+    }
+
+    private SearchContentDto findAdviceByName(Pageable pageable){
+       Optional<Advice> data = adviceRepository.findAll(pageable).stream().findFirst();
+        SearchContentDto searchContentDto = null;
+        if(data.isPresent()){
+            searchContentDto = new SearchContentDto();
+            Advice advice = data.get();
+            searchContentDto.setName(advice.getText());
+            searchContentDto.setId(advice.getId());
+            searchContentDto.setLength(advice.getText().length());
+            return searchContentDto;
+        }
+        return this.noDataFound();
+    }
+
+    private SearchContentDto findProcedureTypeByName(Pageable pageable){
+        Optional<ProcedureType> data = procedureTypeRepository.findAll(pageable).stream().findFirst();
+        SearchContentDto searchContentDto = null;
+        if(data.isPresent()){
+            searchContentDto = new SearchContentDto();
+            ProcedureType procedureType = data.get();
+            searchContentDto.setName(procedureType.getName());
+            searchContentDto.setId(procedureType.getId());
+            searchContentDto.setLength(procedureType.getName().length());
+            return searchContentDto;
+        }
+        return this.noDataFound();
+    }
+
+    private SearchContentDto findMedicineByName(Pageable pageable){
+        Optional<Medicine> data = medicineRepository.findAll(pageable).stream().findFirst();
+        SearchContentDto searchContentDto = null;
+        if(data.isPresent()){
+            searchContentDto = new SearchContentDto();
+            Medicine medicine = data.get();
+            searchContentDto.setName(medicine.getName());
+            searchContentDto.setId(medicine.getId());
+            searchContentDto.setLength(medicine.getName().length());
+            return searchContentDto;
+        }
+        return this.noDataFound();
+    }
+
+    private SearchContentDto findDiagnosticTypeByName(Pageable pageable){
+        Optional<DiagnosticType> data =diagnosticTypeRepository.findAll(pageable).stream().findFirst();
+        SearchContentDto searchContentDto = null;
+        if(data.isPresent()){
+            searchContentDto = new SearchContentDto();
+            DiagnosticType diagnosticType = data.get();
+            searchContentDto.setName(diagnosticType.getName());
+            searchContentDto.setId(diagnosticType.getId());
+            searchContentDto.setLength(diagnosticType.getName().length());
+            return searchContentDto;
+        }
+        return this.noDataFound();
+    }
+
+    private SearchContentDto noDataFound(){
+        SearchContentDto searchContentDto = new SearchContentDto();
+        searchContentDto.setName("No Data");
+        searchContentDto.setId(0l);
+        searchContentDto.setLength("No Data".length());
+        return searchContentDto;
+    }

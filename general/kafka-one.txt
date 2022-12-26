@@ -1,0 +1,664 @@
+Apache Kafka CCDAK Exam Notes
+====================================
+https://codingnconcepts.com/post/apache-kafka-ccdak-exam-notes/
+https://codingnconcepts.com/spring-boot/configure-kafka-producer-and-consumer/
+===========https://sudonull.com/post/33037-Apache-Kafka-Spring-Boot-Hello-microservices===================
+==========https://thepracticaldeveloper.com/spring-boot-kafka-config/===============
+
+
+ 
+
+At least once: This is the default processing model of Kafka. In this model, a consumer commits the offsets after processing the batch of messages it receives from Kafka. In case of an error, the consumer will receive the messages again, and hence it needs to be idempotent.
+At most once: In this model, the consumer commits the offsets right after receiving a batch of messages. If, during processing, the consumer encounters an error, the messages will be lost.
+Exactly once: Stream processing applications read data from a Kafka topic, process it, and writes data to another topic. In such applications, we can use the Kafka transaction API to ensure that a message is considered consumed only if it is successfully written to the destination topic.
+
+
+Consumer 
+====================
+Pull a message from a Kafka topic.
+Process the message.
+Commit the message to the Kafka broker.
+
+The following issues may occur during the execution of the workflow:
+======================================================================
+Scenario 1: Consumer crashes before committing the offset. When the consumer restarts, it will receive the same message from the topic.
+Scenario 2: Consumer sends the request to commit the offsets but crashes before it receives a response. Upon restart, the consumer will be indeterminate because it doesn’t know whether it successfully committed the offsets. To resolve its state, it will fetch the messages from the old offset.
+
+group.id: If multiple consumers have the same group ID, Kafka will allocate a subset of partitions to each consumer, and so they will receive a subset of messages. To read all messages from a topic, the consumer should have a unique group ID.
+auto.offset.reset: This parameter controls the offset from which the consumer will start receiving messages when the consumer first starts or when the consumer asks for offsets that don’t exist in the broker. If you set the value to earliest, the consumer will start reading messages from the beginning of the partition. If you set the value to latest, the consumer will start reading messages from the end of the partition.
+enable.auto.commit: For reliable processing of messages, with as few reprocessing of duplicate messages as possible, you should commit the offsets manually in your code. You can inspect the implementation of a reliable consumer in my previous article on Kafka Event Consumers. If you choose to commit offsets manually, it will negate the setting auto.commit.interval.ms, which controls how often the messages are automatically committed. For automatic commits, keeping the value of this setting low ensures that you will not receive many duplicate messages when a consumer abruptly stops.
+
+
+An excellent approach to managing errors in the producer application is to leverage the producer’s retry mechanism, 
+handle the exceptions, store the message in searchable logs or databases, and raise alerts for manual intervention.
+
+
+Order of Messages with Multiple Brokers
+======================================
+Method 1: Round Robin or Spraying (Default)    key is null
+----------------------------------------------------------------------
+
+Method 2 : Hashing Key Partition    (Hash(Key) % Number of partitions -> Partition number)    key is not null
+----------------------------------------------------------------------------------------------------------
+In order to send messages with both keys and values we must set the parse.key and key.separator properties on the command line when running the producer.
+the high latency partition/the low latency partition
+But, the drawback with this method is as it uses random hashing value to pull the data to assigned partition, and it follows overloading of data to single partition.
+
+Method 3 : Custom Partitioner
+----------------------------------------------------------
+We can write our own business logic to decide which message need to be send to which partition.
+
+Retries and Timeouts -
+===================================
+retries =(some integer value) ->   an issue while retrying is that the order of messages/requests may change.
+max.in.flight.requests.per.connection ->   1 means that only one request will be sent at a time thus preserving the message order and hence the ordering issue caused by the retry is solved.
+Recommended values based on Kafka versions → max.in.flight.requests.per.connection = 1 (0.11 >= Kafka < 1.1) OR 5 (Kafka >= 1.1).
+request.timeout.ms -> The amount of time the producer waits for the response of a request. The producer will consider the request as failed if the response is not received before the timeout elapses and begins to retry the request.
+delivery.timeout.ms -> The upper bound on the time to consider the message delivery request a success or failure after a call to send() returns.
+retries.backoff.ms -> The amount of time to wait before attempting to retry a failed request to a given topic partition.
+For achieving 'at-least-once-delivery', it is recommended to set:- acks = all and retries = Integer.MAX_VALUE (provided the replication factor and min.insync.replicas are properly set).
+
+The idempotent producer solves the problem of duplicate messages and provides the 'exactly-once-delivery'.
+enable.idempotence = true
+Enabling idempotency will automatically set the following configurations with the default values-
+acks = all
+retries = Integer.MAX_VALUE
+max.in.flight.requests.per.connection = 1 (0.11 >= Kafka < 1.1) OR 5 (Kafka >= 1.1)
+The configuration acks = all and retries = Integer.MAX_VALUE helps to achieve the ‘at-least-once-delivery’ of the message.
+For Kafka < 0.11 -
+==================
+acks = all (producer level)- Ensures data is properly replicated before an ack is received.
+min.insync.replicas = 2 (broker / topic level)- Ensures two brokers in ISR (In Sync Replicas) have the data after an ack so that if one replica goes down, another replica will be available to get served.
+retries = Integer.MAX_VALUE (producer level)- Ensures transient errors are retried indefinitely.
+max.in.flight.requests.per.connection=1 (producer level)- Ensures only one request is tried at any time, preventing message re-ordering in any case of retries.
+For Kafka >= 0.11 -
+==========================
+enable.idempotence =true (producer level)
+Implies — acks = all , retries = Integer.MAX_VALUE , max.in.flight.requests.per.connection = 1 (0.11 >= Kafka < 1.1) OR 5 (Kafka >= 1.1)
+min.insync.replicas = 2 (broker / topic level)
+
+
+
+As consumers read messages from a partition, they store a pointer to their position in the partition (called offset) within Kafka. Kafka stores this information in a topic named __consumer_offsets. If a consumer resumes processing after a delay due to scheduled shutdowns or application crashes, it can resume processing messages from where it left earlier.
+The Kafka client can automatically record and store offsets periodically in Kafka. We can turn off the automatic offset persistence process by setting the value of the EnableAutoCommit property to false for better control. The automatic offset persistence feature uses an in-memory database to record the offsets. We can safely turn off the database feature by setting the value of the property EnableAutoOffsetStore to false.
+When you start a consumer, you can configure it to start reading data from the last recorded offset, or in its absence, the beginning of the partition. By default, the consumer receives messages queued to its partitions after the consumer process is started. We do not want to lose messages if our consumer crashes, so we will set the value of property AutoOffsetReset to AutoOffsetReset.Earliest.
+FInally, the MaxPollIntervalMs specifies the duration in milliseconds after which you must invoke the IConsumer.Consume method. If this interval is exceeded, Kafka will consider the consumer as failed and it will rebalance the partitions to assign the affected partitions to healthy consumers. Since the consumption of messages is time-sensitive, you must record and store the offsets within the time period that you specify. For processes that may require a variable amount of time to process a message, I recommend that you record the message in database and process it asynchronusly, rather than holding the message and waiting for the processing to complete.
+
+Schema Registry======which stores and enforces schemas between producers and consumers of events
+it to enforce constraints during the message serialization and deserialization processes
+
+
+Employee service: An employee can use this service to submit a leave application. This service submits the leave application received event to the leave-applications Kafka topic.
+Manager service: This service consumes the events from the leave-applications topic and records the manager’s input. The application’s result is sent as an event named leave application processed to the leave-applications-results Kafka topic.
+Result reader service: This service displays the approved or unapproved leave applications by consuming the messages from the leave-applications-results Kafka topic.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+A topic is divided into 1 or more partitions
+you can have fewer consumers than partitions (in which case consumers get messages from multiple partitions), but if you have more consumers than partitions some of the consumers will be “starved” and not receive any messages until the number of consumers drops to (or below) the number of partitions.
+For example, if you have N + 1 consumers for a topic with N partitions, then the first N consumers will be assigned a partition, and the remaining consumer will be idle, unless one of the N consumers fails, then the waiting consumer will be assigned its partition. This is a good strategy to implement a hot failover.
+
+A producer can use a partition key to direct messages to a specific partition.  If a producer doesn’t specify a partition key when producing a record, Kafka will use a round-robin partition assignment. if no partition key is used, the ordering of records can not be guaranteed within a given partition.
+acks=0 is also possible but it has no guarantee of message delivery if the leader fails
+you can have both high durability and high throughput by using acks=all (or idempotent).
+Setting producer acks=all can give comparable or even slightly better throughput compared with the default of acks=1.
+Setting producer acks=all results in higher latencies compared with the default of acks=1.
+Both producer acks=all and idempotence=true have comparable durability, throughput, and latency (i.e. the only practical difference is that idempotence=true guarantees exactly-once semantics for producers).
+
+
+
+Kafka doesn’t push messages to consumers. Instead, consumers have to pull messages off Kafka topic partitions. A consumer connects to a partition in a broker, reads the messages in the order in which they were written.
+he Kafka consumer offset allows processing to continue from where it last left off if the stream application is turned off or if there is an unexpected failure. 
+ou might be wondering at this point how consumers can keep track of the messages in the different partitions of a particular topic. This is handled with what are called offsets.
+The offset of a message works as a consumer side cursor at this point. The consumer keeps track of which messages it has already consumed by keeping track of the offset of messages. After reading a message, the consumer advances its cursor to the next offset in the partition and continues. Advancing and remembering the last read offset within a partition is the responsibility of the consumer.
+A partition can be consumed by one or more consumers, each reading at different offsets.
+
+
+The consumer group concept ensures that a message is only ever read by a single consumer in the group.
+
+
+Kafka broker (a.k.a Kafka server/node) is the server node in the cluster, mainly responsible for hosting partitions of Kafka topics, transferring messages from Kafka producer to Kafka consumer and, providing data replication and partitioning within a Kafka Cluster.
+Events
+===========
+An event represents a fact that happened in the past. Events are immutable and never stay in one place. They always travel from one system to another system, carrying the state changes that happened.Essentially, an event has a key, value, and timestamp.
+
+Streams
+=========
+An event stream represents related events in motion.
+
+replication factor. 
+=============
+The total number of copies of a partition is the replication factor.
+RF=1 means that the leader has the sole copy of the partition (there are no followers);  2 means there are 2 copies of the partition (the leader and a follower), and 3 means there are 3 copies (1 leader and 2 followers). 
+
+
+Note: that the partition leader handles all writes and reads, as followers are purely for failover.   Cleverly, followers just run Consumers to poll the data from the leaders. Partitions and Replication Factor can be configured cluster-wide or set/checked per topic 
+
+
+Message ordering in Kafka is per partition only.
+Message brokers
+============
+Message brokers delete the messages once consumers have consumed them. If a new consumer joins a topic later, it can’t see the past events.
+
+Event broker
+===============
+The event broker accepts events from producers, stores them durably, and then dispatches them to consumers. They are meant to be scalable, high performant, and fault-tolerant.
+
+
+Takeaways
+===========
+The sender of a message can control how long a message should live by setting its Time to Live (TTL) property. If the TTL passes, the message is considered expired and indicates that it should not be processed.
+The messaging system automatically discards expired messages. Optionally, it can be configured to move them to the Dead Letter Queue.
+Setting the TTL can be done at the individual message level and the queue/topic level. A queue/topic will have a default TTL by the time it is created. If you set the message level TTL to a value greater than that, the messaging system silently adjusts the TTL to the default value.
+Extremely low TTL in the order of milliseconds or seconds may cause messages to expire before receiver applications receive them. Consider the highest TTL that works for your application.
+
+Tricky situations
+==============
+If a receiver is locking a message for reading, the expiration doesn’t affect that message. The receiver can process the message as usual. If the lock timeout expires or the message is abandoned (returned to the queue), the expiration takes immediate effect.
+While the message is under lock, the receiver might be reading an expired message. At that point, the receiver has to decide whether to process the message or return it to the queue.
+It is more of an implementation choice.
+
+
+An event-driven API must offer two capabilities to its consumers.
+
+    A mechanism to allow consumers to subscribe to events of their interest.
+    Deliver events to subscribed consumers in an asynchronous manner.
+	
+	
+ZooKeeper and Kafka
+===================
+#1 Controller Election.  The controller is the broker responsible for maintaining the leader/follower relationship for all partitions.  If ever a node shuts down, ZooKeeper ensures that other replicas take up the role of partition leaders replacing the partition leaders in the node that is shutting down.
+#2 Cluster Membership.  ZooKeeper keeps a list of all functioning brokers in the cluster.
+#3 Topic Configuration.  ZooKeeper maintains the configuration of all topics, including the list of existing topics, number of partitions for each topic, location of the replicas, configuration overrides for topics, preferred leader node, among other details.
+#4 Access Control Lists (ACLs).  ZooKeeper also maintains the ACLs for all topics.  This includes who or what is allowed to read/write to each topic, list of consumer groups, members of the groups, and the most recent offset each consumer group received from each partition.
+#5 Quotas.  ZooKeeper accesses how much data each client is allowed to read/write.	
+	
+	
+	
+	
+Start ZooKeeper Server
+Start Kafka Server(broker)
+	
+	
+Finding existing Topics 
+=========================
+kafka-topics.sh --list --zookeeper localhost:2181 
+
+Describe the topic created
+===========================https://blog.knoldus.com/devops-shorts-how-to-increase-the-replication-factor-for-a-kafka-topic/
+kafka-topics.sh  --describe --topic <topic-name> --bootstrap-server localhost:9092
+
+
+--broker-list
+
+
+
+1. Creating a Topic	
+Using default Properties
+================================================================
+kafka-topics.sh --create --topic Testing --bootstrap-server localhost:9092
+(Topic “Testing”, PartitionCount: 1, ReplicationFactor: 1, Partition: 0, Leader: 1, Replicas: 1, Isr: 1) 
+Specifying Properties 
+===============================================================================
+kafka-topics.sh --create --bootstrap-server localhost:9092 --partitions 3 --replication-factor 2 --topic Testing 
+
+
+kafka/bin/kafka-topics.sh \                                                      http://cloudurable.com/blog/kafka-tutorial-kafka-producer-advanced-java-examples/index.html
+    --create \
+    --zookeeper localhost:2181 \
+    --replication-factor 3 \
+    --partitions 3 \
+    --topic stock-prices \
+    --config min.insync.replicas=2
+
+    #--config unclean.leader.election.enable=true \
+    #--config min.insync.replicas=2 \
+    #--config compression.type=producer \
+    #--config cleanup.policy=compact \
+    #--config retention.ms=60000
+
+If you need to alter the number of partitions then you can use the following command
+kafka-topics.sh  --alter --topic Testing --partitions 20 --bootstrap-server localhost:9092 
+
+
+
+
+2. Producing Messages to a Topic.
+Message can be in any format but is always treated as an array of bytes 
+Producing using the console 
+==========================================================
+kafka-console-producer.sh --topic Testing --bootstrap-server localhost:9092 
+Producing from a file 
+=================================================================
+kafka-console-producer.sh --topic Testing  --bootstrap-server localhost:9092 < “FILE_PATH” 
+
+    kafkaProps.put("bootstrap.servers", "localhost:9092,localhost:9093")
+    kafkaProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+    kafkaProps.put("value.serializer", ".SampleMessageSerializer")
+    kafkaProps.put("acks", "all")
+    kafkaProps.put("retries", "3")
+    kafkaProps.put("linger.ms", "5")
+	
+	 private static void setupBootstrapAndSerializers(Properties props) {
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                StockAppConstants.BOOTSTRAP_SERVERS);
+        props.put(ProducerConfig.CLIENT_ID_CONFIG, "StockPriceKafkaProducer");
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+                StringSerializer.class.getName());
+
+
+        //Custom Serializer - config "value.serializer"
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                StockPriceSerializer.class.getName());
+
+        //Set number of acknowledgments - acks - default is all
+        props.put(ProducerConfig.ACKS_CONFIG, "all");
+
+    }
+	
+	private static void setupRetriesInFlightTimeout(Properties props) {
+        //Only two in-flight messages per Kafka broker connection
+        // - max.in.flight.requests.per.connection (default 5)
+        props.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION,
+                1);
+        //Set the number of retries - retries
+        props.put(ProducerConfig.RETRIES_CONFIG, 3);
+
+        //Request timeout - request.timeout.ms
+        props.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 15_000);
+
+        //Only retry after one second.
+        props.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, 1_000);
+    }
+	
+	private static void setupBatchingAndCompression(
+            final Properties props) {
+        props.put(ProducerConfig.LINGER_MS_CONFIG, 100);
+        props.put(ProducerConfig.BATCH_SIZE_CONFIG,  16_384 * 4);
+        props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy");
+    }
+
+3. Consuming Messages from a Topic.
+Consume using the console 
+======================================================================
+kafka-console-consumer.sh --topic Testing --from-beginning --bootstrap-server localhost:9092 
+Consuming from a file 
+========================================================================
+kafka-console-consumer.sh --topic Testing --from-beginning --bootstrap-server localhost:9092 > “FILE_PATH” 
+In this whole process, the consumer keeps consuming all the messages produced by the producer, in case of failure of any of the instances too. As we have created multiple instances, if any one of them fails then others will automatically consume the messages which are being produced by the producer.
+	
+
+Change Consumer Group
+=======================
+Now change the consumer group to be their own consumer group. First stop producer and consumers but leave kafka and zookeeper running.
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic Testing --from-beginning --consumer-property group.id=roygroup
+	
+After that, If you want to delete the existing topic, execute:
+=====================================================
+kafka-topics.sh --zookeeper localhost:2181 --delete --topic Testing
+	
+properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
+properties.put(ConsumerConfig.GROUP_ID_CONFIG, "KafkaExampleNewConsumer")
+properties.put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer")
+properties.put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer")
+properties.put("auto.offset.reset", "latest")
+
+
+
+
+final Properties props = new Properties();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                StockAppConstants.BOOTSTRAP_SERVERS);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG,
+                "KafkaExampleConsumer");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+                StringDeserializer.class.getName());
+        //Custom Deserializer
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                StockDeserializer.class.getName());
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 500);
+
+	Acknowledgment in Kafka
+==========================
+ The ack-value is a producer configuration parameter in Apache Kafka and defines the number of acknowledgments that should be waited for from the in-sync replicas only. It can be set to the following values:
+
+
+ACK=0 [NONE]
+================
+The producer never waits for an ack from the broker when the ack value is set to 0. No guarantee can be made that the broker has received the message. The producer doesn’t try to send the record again since the producer never knows that the record was lost. This setting provides lower latency and higher throughput at the cost of much higher risk of message loss.
+
+ACK=1 [LEADER]
+===============
+When setting the ack value to 1, the producer gets an ack after the leader has received the record. The leader will write the record to its log but will respond without awaiting a full acknowledgment from all followers. The message will be lost only if the leader fails immediately after acknowledging the record, but before the followers have replicated it. This setting is the middle ground for latency, throughput, and durability. It is slower but more durable than acks=0.
+
+ACK= -1 [ALL]
+=============
+Setting the ack value to all means that the producer gets an ack when all in-sync replicas have received the record. The leader will wait for the full set of in-sync replicas to acknowledge the record. This means that it takes a longer time to send a message with ack value all, but it gives the strongest message durability.
+	
+What is ISR?
+=========================	
+Followers replicate data from the leader to themselves by sending Fetch Requests periodically, by default every 500ms.
+If a follower fails, then it will cease sending fetch requests and after the default, 10 seconds will be removed from the ISR. Likewise, if a follower slows down, perhaps a network related issue or constrained server resources, then as soon as it has been lagging behind the leader for more than 10 seconds it is removed from the ISR.
+min.insync.replicas specifies the minimum number of replicas that must acknowledge a write in order to consider this write as successful and therefore, it has an effect on the producer side which is responsible for the writes. This configuration parameter does not have any direct impact on the consumer side and this is why it does not affect Consumers, even if the number of alive brokers is less than the value of min.insync.replicas.
+When a producer sets acks to “all” (or “-1”), min.insync.replicas specify the minimum number of replicas that must acknowledge a write for the write to be considered successful. If this minimum cannot be met, then the producer will raise an exception (either NotEnoughReplicas or NotEnoughReplicasAfterAppend).	
+	
+	
+	Kafka offers serializers and deserializers for only a few data types, such as
+===============================================================
+String
+Long
+Double
+Integer
+Bytes
+we can Custom Serializer/deserializer
+	public interface Serializer extends Closeable {
+  void configure(Map<String, ?> var1, boolean var2);
+
+  byte[] serialize(String var1, T var2);
+
+  void close();
+}
+public interface Deserializer extends Closeable {
+  void configure(Map<String, ?> var1, boolean var2);
+
+  T deserialize(String var1, byte[] var2);
+
+  void close();
+}
+
+
+	
+	
+Replication factor
+A replication factor is the number of copies of data over multiple brokers.
+Topic should have replication-factor >1 (usually 2 or 3) . This helps when a broker is down, so that another can serve the data of a topic. For instance, assume that we have a topic with 2 partitions with a replication-factor set to 2.
+now assume that broker 2 has failed. Broker 1 and 3 can still serve the data for a topic
+
+In-sync replicas
+An in-sync replica is a replica that fully catches up with the leader in the last 10 seconds. The time period can be configured via replica.lag.time.max.ms. If a broker goes down or has network issues, then it couldn’t follow up with the leader and after 10 seconds, this broker will be removed from ISR.
+The default minimum in-sync replica ( min.insync.replicas) is 1. It means that if all the followers go down, then ISR only consists of the leader. Even if acks is set to all, it actually only commits the message to 1 broker (the leader) which makes the message vulnerable.
+	
+Kafka Producer Delivery Semantics
+At Most Once (default Semantics)
+
+For the at-most-Once delivery semantics it is acceptable to deliver a message either one time only or not at all. It is acceptable to lose the message rather than delivering a message twice in this semantic. Failure to deliver a message is typically due to communication error or other disruption.
+
+At Least Once
+
+In at least once delivery semantics it is acceptable to deliver a message more than once but no message should be lost. .Duplication of events can occur due to the combination of disrupted communication and retrying events.
+
+Exactly Once
+
+In exactly once delivery semantics it is acceptable to deliver a message only once and without message loss.
+
+We can achieve delivery semantics in Kafka using Acks property of producer and min.insync.replica property of the broker.
+
+Acks (acknowledgments)
+Acks =0
+
+When Acks=1, you can achieve at most delivery semantics. In this case No response is requested from the broker, so if the broker goes offline or an exception happens, we will not know and will lose data.
+
+Acks =1 (Default)
+
+When Acks=1, you can achieve at least once delivery semantics. The Kafka producer sends the record on the broker and waits for a response from the broker. If no acknowledgment is received for the message sent, then you can let the producer resend messages by configuring retries=n. This is basically the maximum number of retries the producer would do if the commit fails. The default value is 0.
+
+Acks=all
+
+We set acks=all to achieve exactly once delivery semantics. The Kafka producer sends the record to the broker and waits for a response from the broker. The producer will retry sending the messages based on retry config n times until received acknowledgement. The broker sends acknowledgment only after replication based on min.insync.replica property.	
+	
+	
+	
+	
+ConsumerRecords
+=================	
+ConsumerRecords which not only lets you find the offsets but very other useful things.
+	
+	
+	
+	
+	
+	
+
+When to Use RabbitMQ vs Kafka?
+=============================
+To summarize, if you’re looking for a message broker to handle high throughput and provide access to stream history, Kafka is the likely the better choice. If you have complex routing needs and want a built-in GUI to monitor the broker, then RabbitMQ might be best for your application.
+
+
+
+
+
+
+
+
+Configurations to make Kafka Producer more fault tolerant and resilient                        https://blog.knoldus.com/fault-tolerance-and-resiliency-in-apache-kafka/
+Kafka Producer Delivery Semantics
+At Most Once (default Semantics)
+For the at-most-Once delivery semantics it is acceptable to deliver a message either one time only or not at all. It is acceptable to lose the message rather than delivering a message twice in this semantic. Failure to deliver a message is typically due to communication error or other disruption.
+At Least Once
+In at least once delivery semantics it is acceptable to deliver a message more than once but no message should be lost. .Duplication of events can occur due to the combination of disrupted communication and retrying events.
+Exactly Once
+In exactly once delivery semantics it is acceptable to deliver a message only once and without message loss.
+We can achieve delivery semantics in Kafka using Acks property of producer and min.insync.replica property of the broker.
+Acks (acknowledgments)
+Acks =0
+
+When Acks=1, you can achieve at most delivery semantics. In this case No response is requested from the broker, so if the broker goes offline or an exception happens, we will not know and will lose data.
+
+Acks =1 (Default)
+
+When Acks=1, you can achieve at least once delivery semantics. The Kafka producer sends the record on the broker and waits for a response from the broker. If no acknowledgment is received for the message sent, then you can let the producer resend messages by configuring retries=n. This is basically the maximum number of retries the producer would do if the commit fails. The default value is 0.
+
+Acks=all
+
+We set acks=all to achieve exactly once delivery semantics. The Kafka producer sends the record to the broker and waits for a response from the broker. The producer will retry sending the messages based on retry config n times until received acknowledgement. The broker sends acknowledgment only after replication based on min.insync.replica property.
+
+Properties to create a safe producer that ensures minimal data loss.
+Producer properties
+
+Acks = all (default 1) — Ensures replication before acknowledgement
+
+Retries = MAX_INT (default 0) — Retry in case of exceptions
+
+Max.in.flight.requests.per.connection = 5 (default) — Parallel connections to broker
+
+Broker properties
+
+Min.insync.replicas = 2 (at least 2) — Ensures minimum In Sync replica (ISR).
+
+Send messages in order
+max.in.flight.requests.per.connection ( default value 5) represents the number of unacknowledged requests that are buffering on the producer side. If the retries is greater than 1 and the first request fails, but the second request succeeds, then the first request will be resent and messages will be in the wrong order.
+
+If you don’t enable idempotent, but still want to keep messages in order, then you should config this setting to 1
+
+Sending messages too fast
+When the producer calls send(), the messages will not be immediately sent but added to an internal buffer. The default buffer.memory is 32MB. If the producer sends messages faster than they can be transmitted to the broker or there is a network issue, it will exceed buffer.memory then the send() call will be blocked up to max.block.ms (default 1 minute). We can increase the value to mitigate the problem.
+
+linger.ms (default value 0) is the delay time before the batches are ready to be sent. The default value is 0 which means batches will be immediately sent even if there is only 1 message in the batch. Sometimes, people increase linger.ms to reduce the number of requests and improve throughput.
+
+There is an equivalent configuration as linger.ms, which is batch.size. This is the maximum size of a single batch.
+
+Consumer Configurations to make Kafka more fault tolerant and resilient
+fetch.min.bytes (default value 1MB )defines max time to wait before sending data from Kafka to the consumer. This results in up to 500 ms of extra latency in case there is not enough data flowing to the Kafka topic to satisfy the minimum amount of data to return. If you want to limit the potential latency (usually due to SLAs controlling the maximum latency of the application), you can set fetch.max.wait.ms to a lower value. If you set fetch.max.wait.ms to 100 ms and fetch.min.bytes to 1 MB, Kafka will receive a fetch request from the consumer and will respond with data either when it has 1 MB of data to return or after 100 ms, whichever happens first.
+
+Session.timeout.ms (default value 10 seconds)
+Defines how long a consumer can be out of contact with the broker. When session times out consumer is considered lost and rebalance is triggered.while heartbeat.interval.ms define how often poll method should send a heartbeat.
+
+To avoid this from happening often it’s better to set heartbeat.interval.ms value three times higher than session.timeout.ms. By setting a higher value you can avoid unwanted rebalancing and other overheads associated with it.
+
+max.poll.records
+max.poll.records controls the maximum number of records that a single call to poll() will return. This is useful to help control the amount of data your application will need to process in the polling loop.
+
+auto.offset.reset
+This property controls the behavior of the consumer When reading from the broker for the first time, as Kafka may not have any committed offset value, this property defines where to start reading from. You could set “earliest” or “latest”, while “earliest” will read all messages from the beginning “latest” will read only new messages after a consumer has subscribed to the topic. The default value of  auto.offset.reset is “latest.”
+
+In addition to the configuration properties presented above, there are a number of other important configurations that any user of Kafka must know about.
+
+Enable.auto.commit
+request.timeout.ms
+partition.assignment.strategy
+Kafka consumer supports only At most once and at least once delivery semantics.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Preferred Leader Election
+==========================================================================================
+There are two ways to elect a leader from the available replicas in case of any broker failure or network issue.
+
+1)Kafka-preferred-replica-election.shWhen running kafka-preferred-replica-election.sh, it forces the election of the preferred replica for all partitions. 
+2)auto.leader.rebalance.enable
+When you set auto.leader.rebalance.enable to true, the Controller will  regularly check the imbalance (every leader.imbalance.check.interval.seconds). However, to avoid unnecessary load on the cluster, leaders are only automatically rebalanced if the imbalance ratio is above leader.imbalance.per.broker.percentage which defaults to 10%.
+
+The second approach is not recommended due to the unnecessary load on the cluster. Instead, we can do a rolling restart, or if there are a few brokers holding the leaders of other brokers just restart them and check if leadership is balanced.
+
+
+Consumer Rebalancing process
+==============================
+To thoroughly understand the Rebalancing process, we need to know two vital characters here: Group Coordinator and Group Leader.
+Group Coordinator is nothing but one of the brokers which receives heartbeats (or polling for messages) from all consumers of a consumer group. Every consumer group has a group coordinator. If a consumer stops sending heartbeats, the coordinator will consider it DEAD and trigger a rebalance.
+Group Leader is one of the consumers of Consumer Group which is chosen by the Group coordinator and will responsible for making partition assignment decision on behalf of all consumers in a group.
+When a consumer wants to join a consumer group, it sends a JoinGroup request to the group coordinator. The first consumer to join the group becomes the group leader. The leader receives a list of all consumers in the group from the group coordinator (this will include all consumers that sent a heartbeat recently and are therefore considered alive) and it is responsible for assigning a subset of partitions to each consumer. It uses an implementation of the PartitionAssignor interface to decide which partitions should be handled by which consumer. After deciding on the partition assignment, the consumer leader sends the list of assignments to the GroupCoordinator which sends this information to all the consumers. Each consumer only sees his own assignment – the leader is the only client process that has the full list of consumers in the group and their assignments. This process repeats every time a rebalance happens.
+In the rebalancing process, the partition assignment algorithm is executed and decides what partitions should be claimed and claims the partition ownership in Zookeeper. If the claim was successful, the consumer starts fetching his new partitions.
+
+
+
+
+
+
+
+
+Set up Multi-broker Clusters          https://roytuts.com/how-to-setup-and-work-with-publish-subscribe-domain-in-apache-kafka-in-windows-environment/
+==========================
+Copy the file C:\kafka_2.12-2.3.1\config\server.properties twice and rename as server1.properties and server2.properties in the same location as we have server.properties file. So we have now three files for three nodes – server.properties, server1.properties and server2.properties.
+Now open the file server-1.properties and make the following changes:
+
+    Replace broker.id=0 by broker.id=1
+	Add listener port by adding a line listeners=PLAINTEXT://:9093
+	Replace log.dirs=/tmp/kafka-logs by log.dirs=/tmp/kafka-logs-1
+	
+Open the file server-2.properties and make the following changes:
+	Replace broker.id=0 by broker.id=2
+	Add listener port by adding a line listeners=PLAINTEXT://:9094
+	Replace log.dirs=/tmp/kafka-logs by log.dirs=/tmp/kafka-logs-2
+broker.id=0
+port=9092
+log.dirs=./logs/kafka-0
+## Require three replicas to respond
+## before acknowledging send from producer.
+min.insync.replicas=3
+
+compression.type=producer
+auto.create.topics.enable=false
+message.max.bytes=65536
+replica.lag.time.max.ms=5000
+delete.topic.enable=true
+num.network.threads=3
+num.io.threads=8
+socket.send.buffer.bytes=102400
+socket.receive.buffer.bytes=102400
+socket.request.max.bytes=104857600
+num.partitions=1
+num.recovery.threads.per.data.dir=1
+log.retention.hours=168
+log.segment.bytes=1073741824
+log.retention.check.interval.ms=300000
+zookeeper.connect=localhost:2181
+zookeeper.connection.timeout.ms=6000
+
+
+
+
+
+Start Zookeeper Server
+bin/zookeeper-server-start.bat config\zookeeper.properties
+
+Start Kafka Server
+bin/kafka-server-start.sh config/server.properties
+bin/kafka-server-start.bat config\server-1.properties
+bin/kafka-server-start.bat config\server-2.properties
+
+
+how to  kill server(broker)
+ press CTRL+C on the broker window
+ or
+ wmic process where "caption = 'java.exe' and commandline like '%server.properties%'" get processid
+ ProcessId
+12436
+taskkill /F /PID 12436
+
+
+
+
+
+
+
+#============== kafka ===================
+#Specify the Kafka proxy address, which can be multiple
+spring.kafka.bootstrap-servers=192.168.18.136:9092
+
+#=============== provider  =======================
+spring.kafka.producer.retries=0
+#Number of messages sent in bulk each time
+spring.kafka.producer.batch-size=16384
+spring.kafka.producer.buffer-memory=33554432
+
+#Specify the encoding and decoding methods of message key and message body
+spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
+spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringSerializer
+
+#=============== consumer  =======================
+#Specify the default consumer group ID
+spring.kafka.consumer.group-id=test-consumer-group
+
+spring.kafka.consumer.auto-offset-reset=earliest
+spring.kafka.consumer.enable-auto-commit=true
+spring.kafka.consumer.auto-commit-interval=100
+
+#Specify the encoding and decoding methods of message key and message body
+spring.kafka.consumer.key-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+spring.kafka.consumer.value-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+
+#Kafka server list, default localhost
+spring.cloud.stream.kafka.binder.brokers=192.168.18.136:9092
+#The default port of the Kafka server. When there is no port information configured in the brokers attribute, the default port is 9092
+spring.cloud.stream.kafka.binder.defaultBrokerPort=9092
+#The list of zookeeper nodes connected to Kafka server. The default is localhost
+spring.cloud.stream.kafka.binder.zkNodes=192.168.18.136:2181
+#The default port of zookeeper node. When the port information is not configured in the zknodes attribute, the default port is 2181
+spring.cloud.stream.kafka.binder.defaultZkPort=2181
+
+
+Let’s see how Zookeeper is helping Kafka:
+
+Kafka Brokers’ state & quotas: Zookeeper determines the state. That means, it notices, if the Kafka Broker is alive, always when it regularly sends heartbeats requests. Also, while the Broker is the constraint to handle replication, it must be able to follow replication needs. It also keeps track of how much data is each client allowed to read and write.
+Configuration Of Topics: The configuration regarding all the topics including the list of existing topics, the number of partitions for each topic, the location of all the replicas, list of configuration overrides for all topics, and which node is the preferred leader, etc.
+Access Control Lists: Access control lists or ACLs for all the topics are also maintained within Zookeeper. 
+Cluster membership: Zookeeper also maintains a list of all the brokers that are functioning at any given moment and are a part of the cluster. 
+Controller Election: The controller is one of the most important broking entities in a Kafka ecosystem, and it also has the responsibility to maintain the leader-follower relationship across all the partitions. If a node for some reason is shutting down, it’s the controller’s responsibility to tell all the replicas to act as partition leaders in order to fulfil the duties of the partition leaders on the node that is about to fail. So, whenever a node shuts down, a new controller can be elected and it can also be made sure that at any given time, there is only one controller and all the follower nodes have agreed on that. 
+Consumer Offsets and Registry: ZooKeeper keeps all information about how many messages Kafka consumer consumes.
+Consumers in Kafka also have their own registry as in the case of Kafka Brokers. However, the same rules apply to it, ie. as ephemeral zNode, it’s destroyed once the consumer goes down and the registration process is made automatically by the consumer.

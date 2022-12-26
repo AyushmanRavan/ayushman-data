@@ -1,0 +1,20 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  fields_under_root: true
+  scan_frequency: 5s
+  fields:
+    type: "service_logs"
+  paths:
+    - /usr/share/filebeat/log/*.log    # Make sure to provide the absolute path of the file
+  exclude_lines: ['^#','HealthChecker']
+  
+
+output.logstash:
+  hosts: ["logstash:5044"]
+
+
+# output.elasticsearch:
+#   hosts: ["localhost:9200"]
+#   protocol: "http"
+#   index: "myapp-%{[fields.type]:other}-%{+yyyy.MM.dd}"

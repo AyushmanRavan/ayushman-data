@@ -1,0 +1,228 @@
+Design principles used
+==================================================================
+1) Program to an interface, not implementations(Interfaces are just contracts or signatures and they don't know anything about implementations.)
+2) Favour composition over inheritance
+
+What is Decorator Design Pattern?
+1 Inheritance is static. We couldn’t alter the behavior of an existing object at runtime, And we can only replace the object with another one from a different subclass.
+2 Subclasses can have just one parent class. Usually, inheritance doesn’t let a class inherit behaviors of multiple class.
+
+=> One of the ways to overcome these caveats is by using Aggregation or Composition instead of Inheritance.
+
+https://darrenfinch.com/decorator-design-pattern-explained-structural-design-patterns/
+
+Use Cases of Wrapper or Decorator Design Pattern in Java
+=========================================================================================
+
+    BuffereReader br = new BufferedReader(new InputStreamReader(System.in));
+    DataInputStream dis = new DataInputStream(new FileInputStream("file.txt"));
+    Scanner scan = new Scanner(System.in);
+    ObjectInputStream ois = new ObjectInputStream(new FileInputStream("file.txt"));
+
+When Is It Useful?
+=================================================================
+    When you want to change the behavior of an existing class without modifying it.
+    When you aren’t sure of the behavior your class needs at compile-time.
+    When you want your class’s behavior to be modular.
+    When you want to add functionality as needed in layers.
+    When you want to minimize the number of classes needed to implement different behaviors.
+
+Advantages
+=========================
+    It allows you to add behavior to existing classes at runtime.
+    It adheres to the single responsibility principle nicely.
+    It allows you to modify the behavior of existing classes without changing those existing classes.
+    Behaviors become modular and can be added as needed.
+
+Disadvantages
+==========================================================
+    All decorators must implement every method of the original interface.
+    You must be careful to never rely on another decorator from a decorator.
+
+
+
+
+
+    public enum Language
+{
+    English, German, Spanish
+}
+
+public class SpeakerFactory
+{
+    public static ISpeaker CreateSpeaker(Language language)
+    {
+        switch (language)
+        {
+            case Language.English:
+                return new EnglishSpeaker();
+            case Language.German:
+                return new GermanSpeaker();
+            case Language.Spanish:
+                return new SpanishSpeaker();
+            default:
+                throw new ApplicationException("No speaker can speak such language");
+        }
+    }
+}
+
+[STAThread]
+static void Main()
+{
+    //This is your client code.
+    ISpeaker speaker = SpeakerFactory.CreateSpeaker(Language.English);
+    speaker.Speak();
+    Console.ReadLine();
+}
+
+public interface ISpeaker
+{
+    void Speak();
+}
+
+public class EnglishSpeaker : ISpeaker
+{
+    public EnglishSpeaker() { }
+
+    #region ISpeaker Members
+
+    public void Speak()
+    {
+        Console.WriteLine("I speak English.");
+    }
+
+    #endregion
+}
+
+public class GermanSpeaker : ISpeaker
+{
+    public GermanSpeaker() { }
+
+    #region ISpeaker Members
+
+    public void Speak()
+    {
+        Console.WriteLine("I speak German.");
+    }
+
+    #endregion
+}
+
+public class SpanishSpeaker : ISpeaker
+{
+    public SpanishSpeaker() { }
+
+    #region ISpeaker Members
+
+    public void Speak()
+    {
+        Console.WriteLine("I speak Spanish.");
+    }
+
+    #endregion
+}
+
+===============================================================================
+public enum Language
+{
+    English, German, Spanish
+}
+
+public class SpeakerFactory
+{
+    public static ISpeaker CreateSpeaker(Language language)
+    {
+        switch (language)
+        {
+            case Language.English:
+                return new EnglishSpeaker();
+            case Language.German:
+                return new GermanSpeaker();
+            case Language.Spanish:
+                return new SpanishSpeaker();
+            default:
+                throw new ApplicationException("No speaker can speak such language");
+        }
+    }
+}
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        //This is your client code.
+        ISpeaker speaker = SpeakerFactory.CreateSpeaker(Language.English);
+        speaker.Speak();
+        Console.ReadLine();
+    }
+}
+
+public interface ISpeaker
+{
+    void Speak();
+}
+
+public abstract class Speaker : ISpeaker
+{
+
+    #region ISpeaker Members
+
+    public abstract void Speak();
+
+    public virtual void SayHello()
+    {
+        Console.WriteLine("Hello world.");
+    }
+
+    #endregion
+}
+
+public class EnglishSpeaker : Speaker
+{
+    public EnglishSpeaker() { }
+
+    #region ISpeaker Members
+
+    public override void Speak()
+    {
+        this.SayHello();
+        Console.WriteLine("I speak English.");
+    }
+
+    #endregion
+}
+
+public class GermanSpeaker : Speaker
+{
+    public GermanSpeaker() { }
+
+    #region ISpeaker Members
+
+    public override void Speak()
+    {
+        Console.WriteLine("I speak German.");
+        this.SayHello();
+    }
+
+    #endregion
+}
+
+public class SpanishSpeaker : Speaker
+{
+    public SpanishSpeaker() { }
+
+    #region ISpeaker Members
+
+    public override void Speak()
+    {
+        Console.WriteLine("I speak Spanish.");
+    }
+
+    public override void SayHello()
+    {
+        throw new ApplicationException("I cannot say Hello World.");
+    }
+
+    #endregion
+}

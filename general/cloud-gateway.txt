@@ -1,0 +1,490 @@
+The GlobalFilter interface has the same signature as GatewayFilter.
+These are special filters that are conditionally applied to all routes
+
+
+Implementing Spring Cloud API Gateway
+-------------------------------------------------------
+Using Spring Cloud Gateway we can create routes in either of the two ways –
+
+1) Use java based configuration to programmatically create routes
+Ex : 
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class SpringCloudGatewayRouting {
+
+    @Bean
+    public RouteLocator configureRoute(RouteLocatorBuilder builder) {
+       return builder.routes()
+      .route("internet-banking-user-service", r->r.path("/user/**").uri("lb://internet-banking-user-service")) //static routing
+      .route("internet-banking-fund-transfer-service", r->r.path("/fund-transfer/**").uri("lb://internet-banking-fund-transfer-service")) //dynamic routing
+      .build();
+    }
+}
+
+2) Use property based configuration(i.e application.properties or application.yml) to create routes.
+Ex : 
+spring:
+  application:
+    name: internet-banking-api-gateway
+  ##GATEWAY CONFIGURATIONS
+  cloud:
+    gateway:
+      routes:
+        ## USER SERVICE
+        - id: internet-banking-user-service
+          uri: lb://internet-banking-user-service
+          predicates:
+            - Path=/user/**
+          filters:
+            - StripPrefix=1
+        ## FUND TRANSFER SERVICE
+        - id: internet-banking-fund-transfer-service
+          uri: lb://internet-banking-fund-transfer-service
+          predicates:
+            - Path=/fund-transfer/**
+          filters:
+            - StripPrefix=1
+server:
+  port: 8082
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8081/eureka
+
+
+a) Predicates – match requests based on their feature (path, hostname, headers, cookies, query) 
+b) Filters – process and modify requests in a variety of ways. Can be divided depending on their purpose: 
+c) gateway filter – modify the incoming http request or outgoing http response  
+d) global filter – special filters applying to all routes so long as some conditions are fulfilled 
+lb://<service-name> protocol to instruct gateway to lookup service via Eureka server
+
+
+@Configuration
+@EnableHystrix
+public class GatewayConfig {
+
+    @Autowired
+    AuthenticationFilter filter;
+
+    @Bean
+    public RouteLocator routes(RouteLocatorBuilder builder) {
+        return builder.routes()
+                .route("user-service", r -> r.path("/users/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("lb://user-service"))
+
+                .route("auth-service", r -> r.path("/auth/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("lb://auth-service"))
+                .build();
+    }
+
+}
+
+
+favoritemedicice /order set 
+last vivited medicine
+
+
+
+
+ @Bean
+    public RouteLocator customerRouteLocator(RouteLocatorBuilder builder) {
+        // @formatter:off
+        return builder.routes()
+                .route(r -> r.path("/customer/**")
+                        .filters(f -> f.filter(new RequestTimeFilter())
+                                .addResponseHeader("X-Response-Default-Foo", "Default-Bar"))
+                        .uri("http://httpbin.org:80/get")
+                        .order(0)
+                        .id("customer_filter_router")
+                )
+                .build();
+        // @formatter:on
+    }
+
+public class RequestTimeFilter implements GatewayFilter, Ordered {
+
+    private static final Log log = LogFactory.getLog(GatewayFilter.class);
+    private static final String REQUEST_TIME_BEGIN = "requestTimeBegin";
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
+        exchange.getAttributes().put(REQUEST_TIME_BEGIN, System.currentTimeMillis());
+        return chain.filter(exchange).then(
+                Mono.fromRunnable(() -> {
+                    Long startTime = exchange.getAttribute(REQUEST_TIME_BEGIN);
+                    if (startTime != null) {
+                        log.info(exchange.getRequest().getURI().getRawPath() + ": " + (System.currentTimeMillis() - startTime) + "ms");
+                    }
+                })
+        );
+
+    }
+
+    @Override
+    public int getOrder() {
+        return 0;
+    }
+}
+
+
+https://gorillalogic.com/blog/microservices-with-spring-boot-and-spring-cloud-developer-tutorial/
+https://shining-life.tistory.com/53
+https://blog.knoldus.com/spring-cloud-gateway-security-with-json-web-tokensjwt/
+https://blog.knoldus.com/play-with-text-in-linux-grep-cut-awk-sed/
+https://www.woolha.com/tutorials/spring-cloud-gateway-creating-custom-route-filters-abstractgatewayfilterfactory
+
+https://oril.co/blog/spring-cloud-gateway-security-with-jwt/
+
+http://localhost:8080/payment/info
+http://localhost:8080/order/info
+
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+@Configuration
+public class SpringCloudGatewayRouting {
+
+    @Bean
+    public RouteLocator configureRoute(RouteLocatorBuilder builder) {
+       return builder.routes()
+      .route("paymentId", r->r.path("/payment/**").uri("http://localhost:9009")) //static routing
+      .route("orderId", r->r.path("/order/**").uri("lb://ORDER-SERVICE")) //dynamic routing
+      .build();
+    }
+}
+  
+  
+  
+  
+  
+  
+  
+    GatewayFilter: applied to a single route or a grouped route.
+    GlobalFilter: applied to all routes.
+
+
+
+
+    GatewayFilter: It needs to be configured under the specific route through spring.cloud.routes.filters, which only works on the current route or configured globally through spring.cloud.default-filters, which works on all routes
+
+    GlobalFilter: A global filter, which does not need to be configured in the configuration file, acts on all routes, and is finally packaged into a GatewayFilterChain identifiable filter through the GatewayFilterAdapter, which converts the URI of the request business and the route into the request address of the real business service The core filter does not need to be configured, is loaded when the system is initialized, and acts on each route.
+
+public class TokenFilter implements GlobalFilter, Ordered {
+
+    Logger logger=LoggerFactory.getLogger( TokenFilter.class );
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        String token = exchange.getRequest().getQueryParams().getFirst("token");
+        if (token == null || token.isEmpty()) {
+            logger.info( "token is empty..." );
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
+        }
+        return chain.filter(exchange);
+    }
+
+    @Override
+    public int getOrder() {
+        return -100;
+    }
+}
+
+
+Implementing Spring Cloud API Gateway
+---------------------------------------------------
+Using Spring Cloud Gateway we can create routes in either of the two ways –
+
+A) Use java based configuration to programmatically create routes
+    @Bean
+    public RouteLocator myRoutes(RouteLocatorBuilder builder) {
+        return builder.routes()
+            // Add a simple re-route from: /get to: http://httpbin.org:80
+            // Add a simple "Hello:World" HTTP Header
+            .route(p -> p
+            .path("/get") // intercept calls to the /get path
+            .filters(f -> f.addRequestHeader("Hello", "World")) // add header
+            .uri("http://httpbin.org:80")) // forward to httpbin
+            .build();
+    }
+B) Use property based configuration(i.e application.properties or application.yml) to create routes.
+
+
+
+Basically, the spring cloud gateway consists of 3 main blocks:
+------------------------------------------------------------
+Route
+Predicate
+Filter
+
+
+Spring Cloud Gateway Filters can be divided in two categories:
+-------------------------------------------------------------
+Pre Filters
+Post Filters
+
+
+Also,There are two ways to implement Spring Cloud Filters:
+------------------------------------------------------------
+Using Java Based Configuration
+Using Property Based Configuration
+
+
+Creating a Global Pre-Filter Class
+-------------------------------------
+
+@Component
+public class MyPreFilter implements GlobalFilter {
+
+    final Logger logger = LoggerFactory.getLogger(MyPreFilter.class);
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        logger.info("Pre-Filter executed");
+ 
+        String requestPath = exchange.getRequest().getPath().toString();
+        logger.info("Request path = " + requestPath);
+        
+        HttpHeaders headers = exchange.getRequest().getHeaders();
+        Set<String> headerNames = headers.keySet();
+ 
+        headerNames.forEach((header) -> {
+            logger.info(header + " " + headers.get(header));
+        });
+ 
+        return chain.filter(exchange);
+    }
+
+}
+
+Creating a Global Post-Filter Class
+----------------------------------------
+
+@Component
+public class MyPostFilter implements GlobalFilter {
+    
+    final Logger logger = LoggerFactory.getLogger(MyPostFilter.class);
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+         
+        return chain.filter(exchange).then(Mono.fromRunnable(()-> {
+            
+            logger.info("Global Post-filter executed...");
+            
+        }));
+    }
+
+}
+
+
+
+@Configuration
+public class SpringCloudGatewayRouting {
+
+    @Bean
+    public RouteLocator configureRoute(RouteLocatorBuilder builder) {
+       return builder.routes()
+      .route("paymentId", r->r.path("/payment/**").uri("http://localhost:9009")) //static routing
+      .route("orderId", r->r.path("/order/**").uri("lb://ORDER-SERVICE")) //dynamic routing
+      .build();
+    }
+}
+
+
+
+
+
+
+
+package com.springcloudgateway.config;
+
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class SpringCloudConfig {
+
+        @Bean
+	public RouteLocator gatewayRoutes(RouteLocatorBuilder builder) {
+		return builder.routes()
+		      .route(r -> r.path("/student/**")
+		//Pre and Post Filters provided by Spring Cloud Gateway
+.filters(f -> f.addRequestHeader("student-request", "student-request-header")
+								.addResponseHeader("student-response", "student-response-header"))
+						.uri("http://localhost:8081/")
+			.id("studentModule"))
+
+			.route(r -> r.path("/subject/**")
+		//Pre and Post Filters provided by Spring Cloud Gateway
+.filters(f -> f.addRequestHeader("subject-request", "subject-request-header")
+								.addResponseHeader("subject-response", "subject-response-header"))
+						      .uri("http://localhost:8082/")
+			.id("subjectModule"))
+			.build();
+	}
+}
+
+
+https://segmentfault.com/a/1190000041007660/en
+==========================================================
+Modify the routine of the request body
+
+    How to modify the request body with Spring Cloud Gateway? Take a look at the routines:
+
+    Modifying the request body is achieved through a custom filter
+    When configuring routing and its filters, there are two ways to configure routing, yml configuration file and code configuration. The demo given in the official document is configured by code, so today we also refer to the official practice to configure routing and filters through code
+    When configuring routing in the code, call the <font color="blue">filters</font> method. The input parameter of this method is a lambda expression
+    This lambda expression always calls the modifyRequestBody method, we only need to define the three input parameters of the modifyRequestBody method.
+    The first input parameter of the modifyRequestBody method is the input type
+    The second input parameter is the return type
+    The third is the implementation of the RewriteFunction interface. This code needs to be written by yourself. The content is the specific logic of converting input data into return type data. Let's look at the official Demo, which is the above routine:
+
+
+@Bean
+public RouteLocator routes(RouteLocatorBuilder builder) {
+    return builder.routes()
+        .route("rewrite_request_obj", r -> r.host("*.rewriterequestobj.org")
+            .filters(f -> f.prefixPath("/httpbin")
+                .modifyRequestBody(String.class, Hello.class, MediaType.APPLICATION_JSON_VALUE,
+                    (exchange, s) -> return Mono.just(new Hello(s.toUpperCase())))).uri(uri))
+        .build();
+}
+
+
+Modify the response body routine
+
+    Using Spring Cloud Gateway to modify the response body is exactly the same as the previous request body
+
+    Configure routing and filters through code
+    When configuring routing in the code, call the <font color="blue">filters</font> method. The input parameter of this method is a lambda expression
+    This lambda expression always calls the modifyResponseBody method, we only need to define the three input parameters of the modifyResponseBody method
+    The first input parameter of the modifyRequestBody method is the input type
+    The second input parameter is the return type
+    The third is the implementation of the RewriteFunction interface. You need to write this code yourself. The content is the specific logic of converting input data into return type data. Let's look at the official Demo, which is actually the above routine:
+
+
+    @Bean
+public RouteLocator routes(RouteLocatorBuilder builder) {
+    return builder.routes()
+        .route("rewrite_response_upper", r -> r.host("*.rewriteresponseupper.org")
+            .filters(f -> f.prefixPath("/httpbin")
+                .modifyResponseBody(String.class, String.class,
+                    (exchange, s) -> Mono.just(s.toUpperCase()))).uri(uri))
+        .build();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Spring Cloud Gateway - Custom Filter
+----------------https://kingchan223.tistory.com/m/398-------------------------
+
+package com.example.apigatewayservice.filter;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+@Component
+@Slf4j
+public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Config> {
+    public CustomFilter() {super(Config.class);}
+
+    @Override
+    public GatewayFilter apply(Config config) {
+        //Custom Pre Filter
+        return (exchange, chain) ->{
+            ServerHttpRequest request = exchange.getRequest();
+            ServerHttpResponse response = exchange.getResponse();
+
+            log.info("Custom Pre filter: request id -> {}", request.getId());
+
+            //Custom Post Filter
+            return chain.filter(exchange).then(Mono.fromRunnable(()->{
+                log.info("Custom Post filter: response code -> {}", response.getStatusCode());
+            }));
+        };
+    }
+
+    public static class Config{
+        //Put the configuration properties
+    }
+}
+
+
+
+Spring Filter Gateway - Global Filter
+=============================================
+package com.example.apigatewayservice.filter;
+
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+@Component
+@Slf4j
+public class GlobalFilter extends AbstractGatewayFilterFactory<GlobalFilter.Config> {
+    public GlobalFilter() {super(Config.class);}
+
+    @Override
+    public GatewayFilter apply(Config config) {
+        //Custom Pre Filter
+        return (exchange, chain) ->{
+            ServerHttpRequest request = exchange.getRequest();
+            ServerHttpResponse response = exchange.getResponse();
+            log.info("Global Filter baseMessage: -> {}", config.getBaseMessage());
+
+            if(config.isPreLogger()) log.info("Global Filter Start: request id -> {}", request.getId());
+            //Custom Post Filter
+            return chain.filter(exchange).then(Mono.fromRunnable(()->{
+                if(config.isPostLogger()) log.info("Global Filter End: response status code -> {}", response.getStatusCode());
+            }));
+        };
+    }
+
+    @Data
+    public static class Config{
+        private String baseMessage;
+        private boolean preLogger;
+        private boolean postLogger;
+    }
+}
+
+
+
+
+private static final GatewayFilter DROP_FILTER = (exchange, chain) -> {
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_FOUND);
+        return exchange.getResponse().setComplete();
+};

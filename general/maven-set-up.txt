@@ -1,0 +1,177 @@
+Display information about the  java locations on our system:
+update-alternatives --list java
+
+sudo apt update
+sudo apt install openjdk-8-jdk
+sudo update-alternatives --config java
+
+
+$ sudo apt install default-jdk
+or
+$ sudo apt install openjdk-11-jdk
+
+
+Reload the ~/.bashrc file:
+source ~/.bashrc
+
+
+
+How to check the installation method of Java on Linux (Ubuntu):
+$ dpkg -l | grep openjdk
+
+
+
+Press Ctrl + Alt + T to open the terminal
+sudo apt-get update && sudo apt-get upgrade -y
+sudo apt install openjdk-8-jdk           or      sudo apt-get install openjdk-11-jre openjdk-11-jdk
+update-java-alternatives --list            or  readlink -f /usr/bin/java
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export PATH=$PATH:$JAVA_HOME/bin
+
+
+sudo nano /etc/environment
+For changes to take effect on your current shell you can either log out and log in or run the following [source](https://linuxize.com/post/bash-source-command/)
+source /etc/environment
+
+
+Set JAVA_HOME
+=================
+echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/" >> /etc/environment
+source /etc/environment
+
+A)Set Up JAVA_HOME variable Permanently for Single User
+=======================================================
+Back-Up the Bashrc File
+=====================================
+cp ~/.bashrc ~/.bashrc.bak
+echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> ~/.bashrc
+display the last lines of the bashrc file.
+tail -3 ~/.bashrc
+Now you can run the source command or restart the terminal to activate the changes.
+source ~/.bashrc
+
+B)Set Up JAVA_HOME variable Globally
+============================================================
+To set JAVA_HOME in Linux for all users, we can use /etc/profile or /etc/environment (preferred).
+Please note that /etc/environment is not a script, but a list of assignment expressions (that is why export is not used).
+JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+
+
+
+Uninstalling Java
+=================
+sudo apt remove openjdk-11-jdk
+sudo apt remove openjdk-11-jdk
+sudo apt purge openjdk-11-*
+Or
+sudo apt remove --autoremove openjdk-11-*
+
+Extract the jdk-Xuxx-linux-xXX.tar.gz file in that directory using this command.
+==============================================================
+sudo tar -xvzf ~/Downloads/jdk-11.0.13_linux-x64_bin.tar.gz
+
+
+A suitable file for environment variable settings that affect the system as a whole (rather than just a particular user) is /etc/environment.
+An alternative is to create a file for the purpose in the /etc/profile.d directory.
+====================================https://keepgrowing.in/java/how-to-permanently-set-java_home-on-ubuntu/======================================
+Since we want the variable to hold its value despite restarting the system and for all users, we will create he jdk_home.sh script in the /etc/profile.d/ directory:
+1) sudo nano /etc/profile.d/jdk_home.sh
+2) paste the following lines to the jdk_home.sh file
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+export PATH=$PATH:$JAVA_HOME/bin
+3) save the changes and  exit the file.
+
+4) Make the script executable : sudo chmod +x /etc/profile.d/jdk_home.sh
+
+5)To verify that the file was modified correctly you can use the cat command to print its content:
+$ cat /etc/profile.d/jdk_home.sh 
+export JAVA_HOME=/usr/lib/jvm/java-14-openjdk-amd64
+export PATH=$PATH:$JAVA_HOME/bin
+6) Load the environment variables in the current shell session using the source command:  
+ source /etc/profile.d/jdk_home.sh
+While /etc/profile is often suggested for setting environment variables system-wide, it is a configuration file of the base-files package, 
+so it’s not appropriate to edit that file directly. Use a file in /etc/profile.d instead
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ wget https://downloads.gradle-dn.com/distributions/gradle-7.0.2-bin.zip
+ sudo unzip -d /opt/gradle gradle-7.0.2-bin.zip
+ To verify if the file has been extracted, use the command below:   ls -la /opt/gradle/gradle-7.0.2
+ sudo nano /etc/profile.d/gradle.sh
+ 
+  export GRADLE_HOME=/opt/gradle/gradle-7.0.2
+ export PATH=${GRADLE_HOME}/bin:${PATH}
+ 
+ Then save and close the file.
+ 
+ Then give the /etc/profile.d/gradle.sh file execute permission using the command below:  sudo chmod +x /etc/profile.d/gradle.sh
+ 
+  Now load the environment variables as follows:  source /etc/profile.d/gradle.sh
+  
+  
+  
+  
+  
+  
+  1) This command will save the downloaded Apache Maven archive file apache-maven-3.6.3-bin.tar.gz in the /tmp directory.
+  wget https://dlcdn.apache.org/maven/maven-3/3.8.4/binaries/apache-maven-3.8.4-bin.tar.gz -P /tmp
+  
+  2) extract the installation file in the /opt/ directory:
+  If you want to extract files to some location other than your present working directory, use the -C option and specify the path. 
+  sudo tar -xvzf /tmp/apache-maven-*.tar.gz -C /opt/
+	  other wise use bellow: 
+			  sudo tar -xvzf /tmp/apache-maven-*.tar.gz
+	  Next, move the extracted directory to the /opt
+			  mv apache-maven-3.6.3 /opt/
+  
+  3) Create a symbolic link called maven leading to the Maven installation directory:
+  sudo ln -s /opt/apache-maven-3.8.4 /opt/maven      (ln -s [Source_Directory_Path] [Symbolic_Link_Destination_Path])
+  
+  4) Next, create a new maven.sh and setup Maven environment variables.
+      nano /etc/profile.d/maven.sh
+	  
+      Add the following lines: 
+	  export M2_HOME=/opt/maven
+	  export MAVEN_HOME=/opt/maven
+	  export PATH=${M2_HOME}/bin:${PATH}
+	  
+			  or
+	  ==========
+	    A) echo "export M2_HOME=/opt/maven" >> ~/.bashrc
+		B) echo "export MAVEN_HOME=/opt/maven" >> ~/.bashrc
+		C) echo "export PATH=$M2_HOME/bin:$PATH" >> ~/.bashrc
+		Verify that it has been correctly added to the end of the file:
+			tail -3 ~/.bashrc
+
+      
+  5) Save and close the file then give the execution permission and activate the environment variables with the following command:
+	  sudo chmod +x /etc/profile.d/maven.sh
+	  load the environment variables using the source command:
+	  source /etc/profile.d/maven.sh
+	
+  6) Finally, cleanup the disk by removing the downloaded archive file.
+    rm -rf apache-maven-3.6.3-bin.tar.gz
+
+
+
+
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+export PATH=${JAVA_HOME}/bin:${PATH}

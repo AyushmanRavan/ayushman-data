@@ -1,0 +1,247 @@
+lenovo@lenovo-Pc:~/JHipster/Angular$ sudo jhipster entity product
+[sudo] password for lenovo: 
+INFO! Switching to JHipster installed locally in current project's node repository (node_modules)
+(node:11795) [DEP0148] DeprecationWarning: Use of deprecated folder mapping "./lib/util/" in the "exports" field module resolution of the package at /home/lenovo/JHipster/Angular/node_modules/yeoman-environment/package.json.
+Update this package.json to use a subpath pattern like "./lib/util/*".
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+        ██╗ ██╗   ██╗ ████████╗ ███████╗   ██████╗ ████████╗ ████████╗ ███████╗
+        ██║ ██║   ██║ ╚══██╔══╝ ██╔═══██╗ ██╔════╝ ╚══██╔══╝ ██╔═════╝ ██╔═══██╗
+        ██║ ████████║    ██║    ███████╔╝ ╚█████╗     ██║    ██████╗   ███████╔╝
+  ██╗   ██║ ██╔═══██║    ██║    ██╔════╝   ╚═══██╗    ██║    ██╔═══╝   ██╔══██║
+  ╚██████╔╝ ██║   ██║ ████████╗ ██║       ██████╔╝    ██║    ████████╗ ██║  ╚██╗
+   ╚═════╝  ╚═╝   ╚═╝ ╚═══════╝ ╚═╝       ╚═════╝     ╚═╝    ╚═══════╝ ╚═╝   ╚═╝
+                            https://www.jhipster.tech
+Welcome to JHipster v7.9.3
+
+
+The entity Product is being created.
+
+
+Generating field #1
+
+? Do you want to add a field to your entity? Yes
+? What is the name of your field? name
+? What is the type of your field? String
+? Do you want to add validation rules to your field? Yes
+? Which validation rules do you want to add? Required, Unique
+
+================= Product =================
+Fields
+name (String) required unique
+
+
+Generating field #2
+
+? Do you want to add a field to your entity? Yes
+? What is the name of your field? description
+? What is the type of your field? String
+? Do you want to add validation rules to your field? Yes
+? Which validation rules do you want to add? Required, Minimum length, Maximum length
+? What is the minimum length of your field? 10
+? What is the maximum length of your field? 15
+
+================= Product =================
+Fields
+name (String) required unique
+description (String) required minlength='10' maxlength='15'
+
+
+Generating field #3
+
+? Do you want to add a field to your entity? Yes
+? What is the name of your field? price
+? What is the type of your field? BigDecimal
+? Do you want to add validation rules to your field? Yes
+? Which validation rules do you want to add? Required, Minimum, Maximum
+? What is the minimum of your field? 5
+? What is the maximum of your field? 10
+
+================= Product =================
+Fields
+name (String) required unique
+description (String) required minlength='10' maxlength='15'
+price (BigDecimal) required min='5' max='10'
+
+
+Generating field #4
+
+? Do you want to add a field to your entity? No
+
+================= Product =================
+Fields
+name (String) required unique
+description (String) required minlength='10' maxlength='15'
+price (BigDecimal) required min='5' max='10'
+
+
+Generating relationships to other entities
+
+? Do you want to add a relationship to another entity? No
+
+================= Product =================
+Fields
+name (String) required unique
+description (String) required minlength='10' maxlength='15'
+price (BigDecimal) required min='5' max='10'
+
+
+
+? Do you want to use separate service class for your business logic? Yes, generate a separate service interface and implementation
+? Do you want to use a Data Transfer Object (DTO)? Yes, generate a DTO with MapStruct
+? Is this entity read-only? No
+? Do you want pagination and sorting on your entity? Yes, with infinite scroll and sorting headers
+
+Everything is configured, generating the entity...
+
+    force .yo-rc-global.json
+    force .jhipster/Product.json
+    force .yo-rc.json
+   create src/test/java/com/mgmt/chatbot/domain/ProductTest.java
+   create src/test/java/com/mgmt/chatbot/service/dto/ProductDTOTest.java
+   create src/test/java/com/mgmt/chatbot/web/rest/ProductResourceIT.java
+   create src/test/java/com/mgmt/chatbot/service/mapper/ProductMapperTest.java
+   create src/main/java/com/mgmt/chatbot/repository/ProductRepository.java
+   create src/main/webapp/app/entities/product/product.model.ts
+   create src/main/java/com/mgmt/chatbot/service/ProductService.java
+   create src/main/java/com/mgmt/chatbot/service/impl/ProductServiceImpl.java
+   create src/main/webapp/app/entities/product/update/product-update.component.html
+   create src/main/webapp/app/entities/product/delete/product-delete-dialog.component.spec.ts
+   create src/main/webapp/app/entities/product/product.test-samples.ts
+   create src/main/java/com/mgmt/chatbot/web/rest/ProductResource.java
+   create src/main/java/com/mgmt/chatbot/service/dto/ProductDTO.java
+   create src/main/webapp/app/entities/product/product.module.ts
+   create src/main/webapp/app/entities/product/delete/product-delete-dialog.component.html
+   create src/main/webapp/app/entities/product/list/product.component.ts
+   create src/main/webapp/app/entities/product/update/product-update.component.ts
+ conflict src/main/webapp/app/entities/entity-routing.module.ts
+? Overwrite src/main/webapp/app/entities/entity-routing.module.ts? overwrite this and all others
+    force src/main/webapp/app/entities/entity-routing.module.ts
+   create src/main/java/com/mgmt/chatbot/service/mapper/EntityMapper.java
+   create src/main/webapp/app/entities/product/delete/product-delete-dialog.component.ts
+   create src/main/webapp/app/entities/product/detail/product-detail.component.ts
+   create src/main/java/com/mgmt/chatbot/service/mapper/ProductMapper.java
+   create src/main/webapp/app/entities/product/detail/product-detail.component.spec.ts
+   create src/main/java/com/mgmt/chatbot/domain/Product.java
+   create src/main/webapp/app/entities/product/list/product.component.spec.ts
+   create src/main/webapp/app/entities/product/service/product.service.ts
+   create src/main/webapp/app/entities/product/list/product.component.html
+   create src/main/webapp/app/entities/product/route/product-routing.module.ts
+   create src/main/webapp/app/entities/product/route/product-routing-resolve.service.spec.ts
+   create src/main/webapp/app/entities/product/update/product-form.service.ts
+   create src/main/webapp/app/entities/product/service/product.service.spec.ts
+   create src/main/webapp/app/entities/product/detail/product-detail.component.html
+   create src/main/webapp/app/entities/product/route/product-routing-resolve.service.ts
+   create src/main/webapp/app/entities/product/update/product-form.service.spec.ts
+   create src/main/webapp/app/entities/product/update/product-update.component.spec.ts
+    force src/main/webapp/app/layouts/navbar/navbar.component.html
+    force .yo-rc.json
+    force .jhipster/Product.json
+
+No change to package.json was detected. No package manager install will be executed.
+Entity Product generated successfully.
+
+Running `webapp:build` to update client app
+
+
+> chatbot@0.0.1-SNAPSHOT webapp:build
+> npm run clean-www && npm run webapp:build:dev
+
+
+> chatbot@0.0.1-SNAPSHOT clean-www
+> rimraf target/classes/static/app/{src,target/}
+
+
+> chatbot@0.0.1-SNAPSHOT webapp:build:dev
+> ng build --configuration development
+
+? Would you like to share pseudonymous usage data about this project with the Angular Team
+at Google under Google's Privacy Policy at https://policies.google.com/privacy. For more
+details and how to change this setting, see https://angular.io/analytics. No
+Global setting: not set
+Local setting: disabled
+Effective status: disabled
+⠙ Generating browser application bundles (phase: setup)...DeprecationWarning: 'getMutableClone' has been deprecated since v4.0.0. Use an appropriate `factory.update...` method instead, use `setCommentRange` or `setSourceMapRange`, and avoid setting `parent`.
+✔ Browser application bundle generation complete.
+✔ Copying assets complete.
+✔ Index html generation complete.
+
+Initial Chunk Files                                                    | Names                                  |  Raw Size
+polyfills.js                                                           | polyfills                              | 962.45 kB | 
+styles.css                                                             | styles                                 | 235.77 kB | 
+runtime.js                                                             | runtime                                |  12.46 kB | 
+main.js                                                                | main                                   | 778 bytes | 
+
+                                                                       | Initial Total                          |   1.18 MB
+
+Lazy Chunk Files                                                       | Names                                  |  Raw Size
+src_main_webapp_bootstrap_ts.js                                        | bootstrap                              |   4.69 MB | 
+src_main_webapp_app_admin_metrics_metrics_module_ts.js                 | metrics-metrics-module                 | 167.06 kB | 
+src_main_webapp_app_account_account_module_ts.js                       | account-account-module                 | 157.01 kB | 
+src_main_webapp_app_admin_user-management_user-management_module_ts.js | user-management-user-management-module | 101.64 kB | 
+src_main_webapp_app_entities_product_product_module_ts.js              | product-product-module                 |  94.28 kB | 
+src_main_webapp_app_admin_health_health_module_ts.js                   | health-health-module                   |  28.91 kB | 
+src_main_webapp_app_admin_configuration_configuration_module_ts.js     | configuration-configuration-module     |  25.41 kB | 
+src_main_webapp_app_admin_logs_logs_module_ts.js                       | logs-logs-module                       |  23.98 kB | 
+src_main_webapp_app_login_login_module_ts.js                           | login-login-module                     |  16.24 kB | 
+src_main_webapp_app_admin_docs_docs_module_ts.js                       | docs-docs-module                       |   4.69 kB | 
+src_main_webapp_app_admin_admin-routing_module_ts.js                   | admin-admin-routing-module             |   3.95 kB | 
+common.js                                                              | common                                 |   3.85 kB | 
+src_main_webapp_app_entities_entity-routing_module_ts.js               | entities-entity-routing-module         |   2.18 kB | 
+
+Build at: 2022-11-23T06:01:04.148Z - Hash: 769cc4064d16a570 - Time: 9561ms
+Congratulations, JHipster execution is complete!
+Sponsored with ❤️  by @oktadev.
+lenovo@lenovo-Pc:~/JHipster/Angular$ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+entity Board {
+    boardName String
+}
+
+entity Task {
+    taskName String,
+    taskDescription String,
+    taskType TaskType
+}
+
+enum TaskType {
+    TAKE_YOUR_TIME, ASAP
+}
+
+// defining multiple OneToMany relationships with comments
+relationship OneToMany {
+    Board to Task{board},
+}
+
+// Set pagination options
+paginate Task with infinite-scroll
+
+// Use Data Transfer Objects (DTO)
+dto * with mapstruct
+
+// Set service options to all
+service all with serviceImpl

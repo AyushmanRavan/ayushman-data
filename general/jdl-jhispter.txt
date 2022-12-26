@@ -1,0 +1,126 @@
+lenovo@lenovo-Pc:~/JHipster/React$ sudo jhipster import-jdl ~/Downloads/job.jdl
+[sudo] password for lenovo: 
+INFO! Switching to JHipster installed locally in current project's node repository (node_modules)
+(node:18181) [DEP0148] DeprecationWarning: Use of deprecated folder mapping "./lib/util/" in the "exports" field module resolution of the package at /home/lenovo/JHipster/React/node_modules/yeoman-environment/package.json.
+Update this package.json to use a subpath pattern like "./lib/util/*".
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+        ██╗ ██╗   ██╗ ████████╗ ███████╗   ██████╗ ████████╗ ████████╗ ███████╗
+        ██║ ██║   ██║ ╚══██╔══╝ ██╔═══██╗ ██╔════╝ ╚══██╔══╝ ██╔═════╝ ██╔═══██╗
+        ██║ ████████║    ██║    ███████╔╝ ╚█████╗     ██║    ██████╗   ███████╔╝
+  ██╗   ██║ ██╔═══██║    ██║    ██╔════╝   ╚═══██╗    ██║    ██╔═══╝   ██╔══██║
+  ╚██████╔╝ ██║   ██║ ████████╗ ██║       ██████╔╝    ██║    ████████╗ ██║  ╚██╗
+   ╚═════╝  ╚═╝   ╚═╝ ╚═══════╝ ╚═╝       ╚═════╝     ╚═╝    ╚═══════╝ ╚═╝   ╚═╝
+                            https://www.jhipster.tech
+Welcome to JHipster v7.9.3
+
+INFO! Executing import-jdl /home/lenovo/Downloads/job.jdl
+INFO! The JDL is being parsed.
+info: The dto option is set for Job, the 'serviceClass' value for the 'service' is gonna be set for this entity if no other value has been set.
+INFO! Found entities: Job.
+INFO! The JDL has been successfully parsed
+INFO! Generating 0 applications.
+INFO! Generating 1 entity.
+INFO! Generating entities for application undefined in a new parallel process
+
+Found the .jhipster/Product.json configuration file, entity can be automatically generated!
+
+
+Found the .jhipster/Job.json configuration file, entity can be automatically generated!
+
+    force .jhipster/Job.json
+    force .yo-rc.json
+    force .jhipster/Product.json
+identical src/test/java/com/chatbot/mgmt/domain/ProductTest.java
+identical src/test/java/com/chatbot/mgmt/web/rest/ProductResourceIT.java
+identical src/test/java/com/chatbot/mgmt/service/dto/ProductDTOTest.java
+identical src/test/java/com/chatbot/mgmt/service/mapper/ProductMapperTest.java
+   create src/test/java/com/chatbot/mgmt/domain/JobTest.java
+   create src/test/java/com/chatbot/mgmt/web/rest/JobResourceIT.java
+identical src/main/java/com/chatbot/mgmt/repository/ProductRepository.java
+identical src/main/java/com/chatbot/mgmt/service/ProductService.java
+identical src/main/webapp/app/entities/product/product-detail.tsx
+identical src/main/webapp/app/entities/product/product.tsx
+identical src/main/java/com/chatbot/mgmt/web/rest/ProductResource.java
+   create src/test/java/com/chatbot/mgmt/service/dto/JobDTOTest.java
+identical src/main/webapp/app/entities/product/product-update.tsx
+identical src/main/java/com/chatbot/mgmt/service/dto/ProductDTO.java
+   create src/test/java/com/chatbot/mgmt/service/mapper/JobMapperTest.java
+identical src/main/java/com/chatbot/mgmt/service/mapper/EntityMapper.java
+identical src/main/webapp/app/entities/product/index.tsx
+identical src/main/java/com/chatbot/mgmt/service/mapper/ProductMapper.java
+   create src/main/java/com/chatbot/mgmt/web/rest/JobResource.java
+identical src/main/java/com/chatbot/mgmt/service/impl/ProductServiceImpl.java
+   create src/main/java/com/chatbot/mgmt/repository/JobRepository.java
+identical src/main/webapp/app/entities/product/product-reducer.spec.ts
+   create src/main/java/com/chatbot/mgmt/service/JobService.java
+identical src/main/webapp/app/shared/model/product.model.ts
+identical src/main/webapp/app/entities/product/product.reducer.ts
+   create src/main/java/com/chatbot/mgmt/service/impl/JobServiceImpl.java
+   create src/main/webapp/app/shared/model/job.model.ts
+   create src/main/java/com/chatbot/mgmt/service/dto/JobDTO.java
+identical src/main/webapp/app/entities/product/product-delete-dialog.tsx
+   create src/main/java/com/chatbot/mgmt/service/mapper/JobMapper.java
+ conflict src/main/webapp/app/entities/routes.tsx
+? Overwrite src/main/webapp/app/entities/routes.tsx? overwrite this and all others
+    force src/main/webapp/app/entities/routes.tsx
+   create src/main/webapp/app/entities/job/job-detail.tsx
+   create src/main/webapp/app/entities/job/job.tsx
+   create src/main/webapp/app/entities/job/job.reducer.ts
+   create src/main/webapp/app/entities/job/index.tsx
+   create src/main/webapp/app/entities/job/job-delete-dialog.tsx
+   create src/main/webapp/app/entities/job/job-update.tsx
+   create src/main/webapp/app/entities/job/job-reducer.spec.ts
+   create src/main/webapp/app/shared/model/enumerations/language.model.ts
+   create src/main/java/com/chatbot/mgmt/domain/enumeration/Language.java
+identical src/main/java/com/chatbot/mgmt/domain/Product.java
+   create src/main/java/com/chatbot/mgmt/domain/Job.java
+    force src/main/webapp/app/entities/reducers.ts
+    force src/main/webapp/app/entities/menu.tsx
+    force .yo-rc.json
+    force .jhipster/Job.json
+    force .jhipster/Product.json
+
+No change to package.json was detected. No package manager install will be executed.
+Entity Product generated successfully.
+Entity Job generated successfully.
+
+Running `webapp:build` to update client app
+
+
+> chatbot@0.0.1-SNAPSHOT webapp:build
+> npm run clean-www && npm run webapp:build:dev --
+
+
+> chatbot@0.0.1-SNAPSHOT clean-www
+> rimraf target/classes/static/app/{src,target/}
+
+
+> chatbot@0.0.1-SNAPSHOT webapp:build:dev
+> webpack --config webpack/webpack.dev.js --env stats=minimal
+
+Webpack: Starting ...
+
+  ✔ Compile modules
+  ✔ Build modules
+  ✔ Optimize modules
+  ✔ Emit files
+
+Finished after 4.561 seconds.
+
+Webpack: Starting ...
+
+  ✔ Compile modules
+  ✔ Build modules
+  ✔ Optimize modules
+  ✔ Emit files
+
+Finished after 0.391 seconds.
+
+46 assets
+598 modules
+webpack 5.74.0 compiled successfully in 4543 ms
+INFO! Generator entities succeed
+Congratulations, JHipster execution is complete!
+Sponsored with ❤️  by @oktadev.
+lenovo@lenovo-Pc:~/JHipster/React$ 

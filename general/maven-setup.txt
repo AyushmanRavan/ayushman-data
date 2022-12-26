@@ -1,0 +1,64 @@
+cd /tmp
+VERSION=3.6.0
+1. Download the Maven install file in the /tmp directory:
+wget https://dlcdn.apache.org/maven/maven-3/${VERSION}/binaries/apache-maven-${VERSION}-bin.tar.gz -P /tmp
+
+2. Once the download is complete, extract the installation file in the /opt directory:
+sudo tar -zxvf /tmp/apache-maven-${VERSION}-bin.tar.gz -C /opt
+
+or
+(Once the download is completed, extract the downloaded file with the following command:
+tar -xvzf apache-maven-${VERSION}-bin.tar.gz
+
+Next, copy the extracted directory to the /opt/ directory with the following command:
+cp -r apache-maven-${VERSION} /opt/maven)
+
+3. Create a symbolic link called maven leading to the Maven installation directory:
+sudo ln -s /opt/apache-maven-${VERSION} /opt/maven
+
+Step 3: Set Up Environment Variables
+1. Use the Nano text editor to create and open the maven.sh script file in the /etc/profile.d/ directory:
+sudo nano /etc/profile.d/maven.sh
+
+2. Add the following lines to the maven.sh file:
+export JAVA_HOME=/usr/lib/jvm/default-java
+export M2_HOME=/opt/maven
+export MAVEN_HOME=/opt/maven
+export PATH=${M2_HOME}/bin:${PATH}
+
+Create the maven.sh script file
+3. Press Ctrl + X, then type Y and press Enter to save changes to maven.sh.
+
+4. Make the maven.sh file executable using the chmod command:
+sudo chmod +x /etc/profile.d/maven.sh
+
+5. Execute the maven.sh script file with the source command to set up the new environment variables:
+source /etc/profile.d/maven.sh
+
+
+Finally, cleanup the disk by removing the downloaded archive file.
+rm -rf /tmp/apache-maven-${VERSION}-bin.tar.gz
+
+
+
+
+
+
+
+
+
+Setting PATH
+========================================
+Back up your bashrc file (in case you mess it, you can get it back):
+cp ~/.bashrc ~/.bashrc.bak
+
+Next, use the echo command to append the export command
+echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> ~/.bashrc
+
+or export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")    export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:jre/bin/java::")
+
+Verify that it has been correctly added to the end of the file:
+tail -3 ~/.bashrc
+
+Now you can run the source command or restart the terminal to activate the changes.
+source ~/.bashrc

@@ -1,0 +1,6 @@
+For let us first understand a few key terms in OAuth2.0: https://nicklee1006.github.io/Spring-Cloud-13-Security/
+
+    Resource Owner: The resource owner, in other words: User;
+    User Agent: User agent can be directly understood as a browser for Web applications;
+    Authorization server: Authentication server, that is, a server that provides user authentication and authorization. It can be a stand-alone server;
+    Resource server: the microservices that need to be protected.

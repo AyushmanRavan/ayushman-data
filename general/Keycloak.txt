@@ -1,0 +1,622 @@
+Setting Application Property values
+================================================
+This contains two parts. Setting the provider properties and registering the client information properties.
+
+A) Provider’s properties — The provider of the OAuth2 mechanism i.e the realm.
+B) Client properties — These are the properties of the Keycloak client to communicate with the realm.
+Setting Provider Properties
+=====================================
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          my-keycloak-provider:
+            issuer-uri: http://localhost:8080/auth/realms/My-Realm
+Note: The provider name can be a custom value, but you need to use this exact name while using it in the client registration properties.
+Setting Client Registration Properties
+==============================================
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          my-keycloak-provider:
+            issuer-uri: http://localhost:8080/auth/realms/My-Realm
+        registration:
+          keycloak-spring-gateway-client:
+            provider: my-keycloak-provider
+            client-id: spring-gateway-client
+            client-secret: fc36fd82-7042-4287-aef0-e9f8603abd02
+            authorization-grant-type: authorization_code
+            redirect-uri: '{baseUrl}/login/oauth2/code/keycloak'
+Note: The client registration name can be any custom name. It is used to just identify the client in your application.
+Starting the application
+
+Since we set server.port=9090, the application starts at 9090. When we open http://localhost:9090 on the web browser, 
+It immediately redirects to the login page from Keycloak as we are querying the root resource /.
+
+
+
+import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
+import org.keycloak.adapters.springsecurity.client.KeycloakClientRequestFactory;
+import org.keycloak.adapters.springsecurity.client.KeycloakRestTemplate;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+@Configuration
+public class KeycloakConfig {
+    @Bean
+    KeycloakSpringBootConfigResolver configResolver() {
+        return new KeycloakSpringBootConfigResolver();
+    }
+
+    @Bean
+    KeycloakRestTemplate keycloakRestTemplate(KeycloakClientRequestFactory keycloakClientRequestFactory) {
+        return new KeycloakRestTemplate(keycloakClientRequestFactory);
+
+    }
+}
+
+
+
+
+
+
+Service URL: http://127.0.0.1:9080/
+
+Keycloak​
+Service URL: http://127.0.0.1:8080/
+Realm: myrealm
+Client ID: myclient
+Client Secret: e91CKZQwhxyDqpkP0YFUJBxiXJ0ikJhq
+Redirect URI: http://127.0.0.1:9080/anything/callback
+Discovery: http://127.0.0.1:8080/realms/myrealm/.well-known/openid-configuration
+Logout URL: /anything/logout
+Bearer Only: false
+Username: myuser
+Password: mypassword
+
+Clients come in two forms:
+==============================
+1) the first type of client is an application that wants to participate in single-sign-on. These clients just want Keycloak to provide security for them.
+2) the other type of client is one that is requesting an access token so that it can invoke other services on behalf of the authenticated user. 
+
+
+The first was the Access Type with three possible values:
+                  ===========
+Bearer-only – this is typically used for securing the back-end and for services that make use of the bearer token included in the request and never initiate login on their own.
+Confidential – clients of this type need to provide a secret in order to initiate the login process.
+Public – this is for JavaScript based browser applications that don not have a real way of hiding the secret
+
+The last of the important options was Web Origins, which governs CORS requests.
+
+1) added lab name for production api.
+2) Investigations e-prescription api. for staging and uat
+3) symptom mapping for prod/uat/staging.
+4) search api dummy data for uat and production.
+
+http://127.0.0.1:9080/anything/callback
+
+realm id : vbot-realm
+client id : vbot-client 
+client secret : ObTILMYZtCKaITkR7p5ZLGeMN123F3rE
+
+Valid Redirect URIs: [http://localhost:4200/\*](http://localhost:4200/*)  
+BaseU URL: [http://localhost:4200](http://localhost:4200)  
+Web Origins: \*
+http://localhost:9080/realms/vbot-realm/protocol/openid-connect/auth?response_type=code&client_id=vbot-client
+
+
+
+
+http://localhost:8080/auth/realms/XXX/protocol/openid-connect/auth?client_id=photo-app-code-flow-client&response_type=code&state=fj8o3n7bdy1op5
+When you visit above url after successful API creation, 
+APISIX will redirect your browser to Keycloak's login page because you need to log in.
+http://localhost:8080/auth/realms/XXX/protocol/openid-connect/auth?client_id=photo-app-code-flow-client&response_type=code&state=fj8o3n7bdy1op5
+Enter username (myuser) and password (mypassword) to log in, and your browser will redirect to callback uri in browser.
+
+
+Response (302)
+===============================
+http://localhost:8081/callback
+?state=fj8o3n7bdy1op5
+&session_state=f109bb89-cd34-4374-b084-c3c1cf2c8a0b
+&code=0aaca7b5-a314-4c07-8212-818cb4b7e8d0.f109bb89-cd34-4374-b084-c3c1cf2c8a0b.1dc15d06-d8b9-4f0f-a042-727eaa6b98f7
+
+
+REST endpoint should in the following format.
+========================================================
+http://localhost:8080/auth/realms/<realm-name>/protocol/openid-connect/token
+
+
+Request
+=================================
+curl --location --request POST 'http://localhost:8080/auth/realms/appsdeveloperblog/protocol/openid-connect/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'grant_type=authorization_code' \
+--data-urlencode 'client_id=photo-app-code-flow-client' \
+--data-urlencode 'client_secret=3424193f-4728-4d19-8517-d450d7c6f2f5' \
+--data-urlencode 'code=c081f6ca-ae87-40b6-8138-5afd4162d181.f109bb89-cd34-4374-b084-c3c1cf2c8a0b.1dc15d06-d8b9-4f0f-a042-727eaa6b98f7' \
+--data-urlencode 'redirect_uri=http://localhost:8081/callback'
+
+
+Response
+====================================
+{
+    "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICItNUlsX2I0cUktdWFvaEI3d244UHY3WEM2UEktU3BNbmZCRnlJZUx6QTJNIn0.eyJleHAiOjE1OTIzNDM5NDEsImlhdCI6MTU5MjM0MzY0MSwiYXV0aF90aW1lIjoxNTkyMzQwODA1LCJqdGkiOiJlYjlhNTc2NS1jYmVhLTQ2ZWMtYTk4NS0wOWFkYTM5NTk5YjIiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvYXV0aC9yZWFsbXMvYXBwc2RldmVsb3BlcmJsb2ciLCJzdWIiOiIxZGRlM2ZjMy1jNmRiLTQ5ZmItOWIzZC03OTY0YzVjMDY4N2EiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJwaG90by1hcHAtY29kZS1mbG93LWNsaWVudCIsInNlc3Npb25fc3RhdGUiOiJmMTA5YmI4OS1jZDM0LTQzNzQtYjA4NC1jM2MxY2YyYzhhMGIiLCJhY3IiOiIwIiwic2NvcGUiOiJwcm9maWxlIiwibmFtZSI6IkthcmdvcG9sb3YiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJnZXkiLCJmYW1pbHlfbmFtZSI6IkthcmdvcG9sb3YifQ.KHCNF0Rn-I7iFosB3oEaWetRw9lhSkkP0-Ef6iW2GAZuuI-GQtZUBDAD_aEDtLTdUpvGL8MKx8Os0qbUZKJJhBhTAJyz2DycgY--ROc_vLbPtJSll-F68tHT6KgC2etbTjpz4Ira6PaLigkT80zGb6tpnQmm1o7a4IGQ40-faKC4fivdfblypGqgRnniOGXMLGpzO2Ln92w1azjFAyOCIBhe3Nlcofjupi26qNGrJKuwBudzZgZCla9RDWm2MUTqMW65AOUpOmiJCd5E4JxbwOuG6H2tbYI2Z-ajQXzzcodmCAWfWu2oRkMaAuNImph8W9tRrqCQ0wlb55tXnUvEuw",
+    "expires_in": 300,
+    "refresh_expires_in": 1800,
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJlYWQyMDZmOS05MzczLTQ1OTAtOGQ4OC03YWNkYmZjYTU5MmMifQ.eyJleHAiOjE1OTIzNDU0NDEsImlhdCI6MTU5MjM0MzY0MSwianRpIjoiOGE2NTdhMDktYTQ3My00OTAyLTk1MjItYWYxMGFkMzUwYzUyIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL2FwcHNkZXZlbG9wZXJibG9nIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL2FwcHNkZXZlbG9wZXJibG9nIiwic3ViIjoiMWRkZTNmYzMtYzZkYi00OWZiLTliM2QtNzk2NGM1YzA2ODdhIiwidHlwIjoiUmVmcmVzaCIsImF6cCI6InBob3RvLWFwcC1jb2RlLWZsb3ctY2xpZW50Iiwic2Vzc2lvbl9zdGF0ZSI6ImYxMDliYjg5LWNkMzQtNDM3NC1iMDg0LWMzYzFjZjJjOGEwYiIsInNjb3BlIjoicHJvZmlsZSJ9.WevUHYd7DV3Ft7mFJnM2iLlArotBvLlMfQxlcy0nig8",
+    "token_type": "bearer",
+    "not-before-policy": 0,
+    "session_state": "f109bb89-cd34-4374-b084-c3c1cf2c8a0b",
+    "scope": "profile"
+}
+
+
+What is OAuth Scope?
+A scope is used by OAuth 2 to restrict access to a resource.
+
+
+
+resource owner. 
+scope.
+data context.
+
+
+
+Configure the JWT  Issuer URI
+application.properties
+=======================
+spring.security.oauth2.resourceserver.jwt.issuer-uri = http://localhost:8080/auth/realms/XXXX-Realm
+Another way to configure our Resource Server to validate the JWT token with the Authorization Server is to use the following property.
+===================================================================
+spring.security.oauth2.resourceserver.jwt.jwk-set-uri = http://localhost:8080/auth/realms/XXXX-Realm/protocol/openid-connect/certs
+
+even both of them at the same time. If both properties are used and the value of one is incorrect, the validation of JWT will fail.
+
+
+
+
+Custom implementation
+=====================================
+You can also write custom parses, at which point the json form is irrelevant and you can store the contents of the json file anywhere you like.
+@Bean
+public KeycloakConfigResolver fileKeycloakConfigResolver() {
+    return  new KeycloakConfigResolver() {
+        @SneakyThrows
+        @Override
+        public KeycloakDeployment resolve(HttpFacade.Request request) {
+            // json 文件放到resources 文件夹下
+            ClassPathResource classPathResource = new ClassPathResource("./keycloak.json");
+            AdapterConfig adapterConfig = new ObjectMapper().readValue(classPathResource.getFile(), AdapterConfig.class);
+
+            return KeycloakDeploymentBuilder.build(adapterConfig);
+        }
+    };
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Extending the configuration
+application.yml
+======================
+keycloak:
+  use-resource-role-mappings: false
+It means that authorization will be based on Keycloak realm level roles, and not client roles specific to the Spring Boot application.
+We do that because the default Keycloak admin role we are using is defined as a realm-level role.
+
+@Configuration
+public class KeycloakConfig {
+    ////use below code for application.properties instead of WEB-INF/keycloack.json
+    @Bean
+    public KeycloakSpringBootConfigResolver keycloakConfigResolver() {
+        return new KeycloakSpringBootConfigResolver();
+    }
+}
+
+private KeycloakSecurityContext getKeycloakSecurityContext() {
+  return (KeycloakSecurityContext) request.getAttribute(KeycloakSecurityContext.class.getName());
+}
+
+getKeycloakSecurityContext().getIdToken().getGivenName();
+
+Note: The content-type of both requests is application/x-www-form-urlencoded.
+===================================================================================
+POST /auth/realms/felord.cn/protocol/openid-connect/token HTTP/1.1
+Host: localhost:8011
+Content-Type: application/x-www-form-urlencoded
+client_id=springboot-client&grant_type=refresh_token&refresh_token=eyJhbGci
+
+keycloak:
+  realm: felord.cn
+  auth-server-url: http://localhost:8011/auth
+  resource: springboot-client
+  public-client: true
+  security-constraints:
+    - auth-roles:
+        - base_user
+      security-collections:
+        - patterns:
+            - '/foo/bar'
+
+Keycloak provides a KeycloakWebSecurityConfigurerAdapter as a convenient base class for creating WebSecurityConfigurer instances
+
+When Access Type is set to public, this means that keycloak will protect this client by the default login page shipped with keycloak.
+
+
+
+@Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+@ComponentScan(basePackageClasses = KeycloakSecurityComponents.class)
+
+
+
+
+@Configuration
+@ComponentScan(
+        basePackageClasses = {KeycloakSecurityComponents.class}
+)
+@EnableWebSecurity(debug = true)
+
+public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
+//ignore
+}
+To see more logs, adjust the logs for Spring Boot’s org related packages to debug as well.
+logging:  
+   level:    
+     org : debug
+
+
+A)  Configure Spring Security With Keycloak
+//@Configuration +  @EnableWebSecurity = @KeycloakConfiguration
+//@ComponentScan(basePackageClasses = KeycloakSecurityComponents.class)
+@KeycloakConfiguration    ///This annotation provides a Keycloak-based Spring Security configuration. 
+public class WebSecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter {
+
+    // B) Register Keycloak as the Authentication Provider
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        KeycloakAuthenticationProvider keycloakAuthenticationProvider =
+                keycloakAuthenticationProvider();
+        keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(new SimpleAuthorityMapper());
+        auth.authenticationProvider(keycloakAuthenticationProvider);
+    }
+    //Member and Librarian
+    //ROLE_Member and ROLE_Librarian
+    //OR 
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) {
+      SimpleAuthorityMapper grantedAuthorityMapper = new SimpleAuthorityMapper();
+      grantedAuthorityMapper.setPrefix("ROLE_");
+
+      //We could even make the full role name uppercase by calling the method grantedAuthorityMapper.setConvertToUpperCase(true);
+
+      KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
+      keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(grantedAuthorityMapper);
+      auth.authenticationProvider(keycloakAuthenticationProvider);
+    }
+
+// RegisterSessionAuthenticationStrategy for public or confidential applications 
+// and NullAuthenticatedSessionStrategy for bearer-only applications.
+
+    // C) Define a Session Authentication Strategy
+    @Bean
+    @Override
+    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+        return new NullAuthenticatedSessionStrategy(); //When securing a service-to-service application, instead, we would use a NullAuthenticatedSessionStrategy
+    }
+
+    //OR 
+    @Bean
+    @Override
+    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+        return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl()); //the recommended session authentication strategy is RegisterSessionAuthenticationStrategy, which registers a user session after successful authentication.
+    }
+    
+
+    // D) Define Role-Based Access Security Policies
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        super.configure(http);
+        http.csrf()
+                .disable()
+                .authorizeRequests()
+                .antMatchers(HttpMethod.DELETE,"/plant/**")
+                .hasRole("admin")
+                .anyRequest()
+                .authenticated()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    }
+
+    //OR
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        super.configure(http);
+        http
+            .authorizeRequests()
+            .antMatchers("/books").hasAnyRole("Member", "Librarian")
+            .antMatchers("/manager").hasRole("Librarian")
+            .anyRequest().permitAll();
+    }
+    
+    //OR
+      @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        super.configure(http);
+        http.authorizeRequests()
+                .antMatchers("/hello").permitAll()
+                .antMatchers("/departments").hasRole("ADMIN")
+                .antMatchers("/employees").hasRole("USER")
+                .anyRequest().authenticated()
+                .and().exceptionHandling().accessDeniedPage("/access-denied-response");
+    }
+
+    // E) Handle Bean Definition Overriding Issues
+    @Bean
+    @Override
+    @ConditionalOnMissingBean(HttpSessionManager.class)//I prefer adjusting the bean definition to be loaded conditionally only if no other bean of that type has been defined.
+    protected HttpSessionManager httpSessionManager() {
+        return new HttpSessionManager();
+    }
+
+    ////use below code for application.properties instead of WEB-INF/keycloack.json
+    @Bean
+    public KeycloakSpringBootConfigResolver keycloakConfigResolver() {
+        return new KeycloakSpringBootConfigResolver();
+    }
+}
+
+
+
+
+package com.javainfinite.keycloack.controller;
+import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
+import org.keycloak.representations.AccessToken;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.security.Principal;
+
+@RestController
+public class KeycloakController {
+
+    @GetMapping("/login")
+    public String login() {
+        return "Welcome to login screen";
+    }
+
+    @GetMapping("/homepage")
+    public String homepage(Principal principal) {
+        KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) principal;
+        AccessToken accessToken = token.getAccount().getKeycloakSecurityContext().getToken();
+        return "Welcome to homepage, " +accessToken.getPreferredUsername()+" successfully logged in";
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Roles and scopes can be used to provide fine-grained access control to resources.
+Basic Keycloak Configuration
+===============================
+The default configuration file for Keycloak is keycloak.json, but thanks to the Keycloak Spring Boot Adapter we can use the native application.properties 
+file (or application.yml).
+keycloak.realm=public-library  //required
+keycloak.resource=spring-boot-app   //required
+keycloak.auth-server-url=http://localhost:8180/auth //the base URL of the Keycloak server, required
+keycloak.ssl-required=external
+keycloak.public-client=true
+keycloak.principal-attribute=preferred_username   //the attribute with which to populate the UserPrincipal name. Optional.
+
+
+@Override
+    public void configure(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+                .authorizeRequests()
+                .anyRequest().authenticated()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .cors()
+                .and()
+                .csrf()
+                .disable()
+                .oauth2ResourceServer()
+                .jwt();
+    }
+}
+
+
+
+
+
+
+
+
+angular with spring boot and keycloak
+=======================================
+https://hamdi-bouallague.medium.com/secure-your-angular-spring-boot-application-using-keycloak-891efab50db8
+
+
+We will be creating two clients in the KeyCloak, one to authenticate the user and another to authorize the user.
+Authentication means confirming your own identity, 
+while Authorization means granting access to the system.
+
+Here we have two applications. Front-end and back-end. We have to create two clients to manage those application.
+
+Realm (vbot-realm)
+vbot-front-end-client
+vbot-back-end-client 
+
+
+angular/react(angular/react-web-app)
+==============
+Create new client == For the front-end client (react-web-app) we set Access Type to public and Redirect URL to application url.
+When Access Type is set to public, this means that keycloak will protect this client by the default login page shipped with keycloak.
+we’ll register the KeyCloak as an Authentication server to our angular application.
+1) The user is redirected to the KeyCloak login page on the click of Login
+2) After successful login, KeyCloak issues an authorization token
+3) This token will be attached to each REST call
+4) Spring boot backend will verify the authorization token with the KeyCloak server
+5) If the user has appropriate permissions, access will be granted
+Enabled: ON
+Client Protocol: openid-connect
+Access Type: public
+Standard Flow Enabled: ON
+Implicit Flow Enabled: ON
+Valid Redirect URI: Add URL to redirect after login, in our case it is http://localhost:4200/*
+Web Origin: * because we don’t want to restrict the users who can make requests to the KeyCloak.
+
+
+1) Bearer-only – this is for services that rely solely on the bearer token included in the request and never initiate login on their own. It’s typically used for securing the back-end.
+2) Confidential – clients of this type need to provide a secret in order to initiate the login process.
+3) Public – since we have no real way of hiding the secret in a JS-based browser app, this is what we need to stick with.
+
+Create Roles
+*********************
+A) Create client roles admin and user for react-web-app client
+B) Create realm roles app-admin and app-user for react-web-app client
+C) After saving the realm roles enable Composite Roles and search for client react-web-app in Client Roles field. Select admin role and click Add selected. This configuration will assign react-web-app, admin client role to the app-admin realm role. 
+   If you have multiple clients with multiple roles, pick and choose the required roles from each client to create realm roles based on the need.
+D) Similarly add user client role to app-user realm role.
+
+Create Users
+******************
+User1 with app-user
+User2 with app-admin
+User3 with app-user, app-admin
+
+
+
+
+Spring boot(spring-boot-app)
+=================
+create new client == For the back-end client (spring-boot-app) we set Access Type to bearer-only.
+change Temporary to OFF, if it is ON keycloak will force you to change the password after your first login.
+Change the Access Type to the bearer only because the backend needs only the bearer token sent by keycloak after signing from the front end (angular app).
+Set Enabled to ON, and Access Type to bearer-only because our backend API REST Service will only verify bearer token, it will never initiate the login.
+user1 with app-userrealm role
+user2 with app-adminrealm role
+user3 with app-user& app-adminrealm roles
+spring boot REST APIs by setting up KeyCloak as an Authorization server.
+
+Create Roles
+*********************
+A) Create client roles admin and user for react-web-app client
+B) Create realm roles app-admin and app-user for react-web-app client
+C) After saving the realm roles enable Composite Roles and search for client react-web-app in Client Roles field. Select admin role and click Add selected. This configuration will assign react-web-app, admin client role to the app-admin realm role. 
+   If you have multiple clients with multiple roles, pick and choose the required roles from each client to create realm roles based on the need.
+D) Similarly add user client role to app-user realm role.
+
+
+
+
+
+Note: Applications often assign access and permissions to specific roles rather than individual users
+Realm Roles: Realm-level roles are a global namespace to define your roles.
+Client Roles: Client roles are basically a namespace dedicated to a client. Each client gets its own namespace. Client roles are managed under the Roles tab under each individual client.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+admin, user, manager, and employee 
+Keycloak has roles for the whole realm or a specific client.
+
+
+Realm roles : 
+The roles defined within a realm will be effective across all its clients. As a result, we can use them to provide more coarse-grained access control.
+
+Client roles : 
+==============
+However, it is possible to have client roles with broad scope and share them between different clients.
+Roles defined in one client are invisible to other clients
+Keep in mind that this role is only effective for that particular client. It won’t be added to the realm namespace by default, nor will it be visible for other clients.
+we can also preview what client roles will be included in the access token for a given user.
+Go to Clients → Client Scopes → Evaluate, select a user, click the Evaluate button and go to the Generated Access Token tab
+
+
+
+
+We enter the name of the application as Client ID = productlist-frontend.
+We enter the URL of our Angular application as the root URL, i.e. http://localhost:4200 by default.
+Valid Redirect URI : http://localhost:4200/*
+
+
+
+
+
+create a new client come back to the keycloak Administration console
+Root URL: the root URL of your backend.
+Change the Access Type to the bearer only because the backend needs only the bearer token sent by keycloak after signing from the front end (angular app).
+
+
+
+meet : https://meet.google.com/pbu-pdxf-thq
+
+
+
+{
+  "realm" : "spring-security-example",
+  "bearer-only" : true,
+  "auth-server-url" : "http://localhost:8080/auth",
+  "ssl-required" : "external",
+  "resource" : "spring-security-demo-app",
+  "use-resource-role-mappings" : true
+}
+
+
+https://medium.com/@bcarunmail/accessing-secure-rest-api-using-spring-oauth2resttemplate-ef18377e2e05
+https://blog.ineat-group.com/2017/12/securisez-vos-apis-spring-avec-keycloak-3-utilisation-des-connecteurs-spring-de-keycloak/
+https://www.linkedin.com/pulse/securing-rest-api-using-keycloak-spring-oauth2-abid-anjum?trk=pulse-article
+https://blog.codecentric.de/keycloak-und-spring-security-teil-2-integration-von-keycloak-in-spring-security
+https://www.laitimes.com/zh/article/21jxu_2afmm.html
+https://www.jianshu.com/p/45040e2fe291
+https://www.appsdeveloperblog.com/guide-to-use-keycloak-with-spring-boot/

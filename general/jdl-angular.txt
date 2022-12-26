@@ -1,0 +1,162 @@
+lenovo@lenovo-Pc:~/JHipster/Angular$ sudo jhipster import-jdl ~/Downloads/job.jdl
+[sudo] password for lenovo: 
+INFO! Switching to JHipster installed locally in current project's node repository (node_modules)
+(node:12560) [DEP0148] DeprecationWarning: Use of deprecated folder mapping "./lib/util/" in the "exports" field module resolution of the package at /home/lenovo/JHipster/Angular/node_modules/yeoman-environment/package.json.
+Update this package.json to use a subpath pattern like "./lib/util/*".
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+        ██╗ ██╗   ██╗ ████████╗ ███████╗   ██████╗ ████████╗ ████████╗ ███████╗
+        ██║ ██║   ██║ ╚══██╔══╝ ██╔═══██╗ ██╔════╝ ╚══██╔══╝ ██╔═════╝ ██╔═══██╗
+        ██║ ████████║    ██║    ███████╔╝ ╚█████╗     ██║    ██████╗   ███████╔╝
+  ██╗   ██║ ██╔═══██║    ██║    ██╔════╝   ╚═══██╗    ██║    ██╔═══╝   ██╔══██║
+  ╚██████╔╝ ██║   ██║ ████████╗ ██║       ██████╔╝    ██║    ████████╗ ██║  ╚██╗
+   ╚═════╝  ╚═╝   ╚═╝ ╚═══════╝ ╚═╝       ╚═════╝     ╚═╝    ╚═══════╝ ╚═╝   ╚═╝
+                            https://www.jhipster.tech
+Welcome to JHipster v7.9.3
+
+INFO! Executing import-jdl /home/lenovo/Downloads/job.jdl
+INFO! The JDL is being parsed.
+info: The dto option is set for Job, the 'serviceClass' value for the 'service' is gonna be set for this entity if no other value has been set.
+INFO! Found entities: Job.
+INFO! The JDL has been successfully parsed
+INFO! Generating 0 applications.
+INFO! Generating 1 entity.
+INFO! Generating entities for application undefined in a new parallel process
+
+Found the .jhipster/Product.json configuration file, entity can be automatically generated!
+
+
+Found the .jhipster/Job.json configuration file, entity can be automatically generated!
+
+    force .yo-rc.json
+    force .jhipster/Product.json
+    force .jhipster/Job.json
+identical src/test/java/com/mgmt/chatbot/domain/ProductTest.java
+identical src/test/java/com/mgmt/chatbot/web/rest/ProductResourceIT.java
+identical src/test/java/com/mgmt/chatbot/service/dto/ProductDTOTest.java
+identical src/test/java/com/mgmt/chatbot/service/mapper/ProductMapperTest.java
+identical src/main/java/com/mgmt/chatbot/web/rest/ProductResource.java
+identical src/main/java/com/mgmt/chatbot/repository/ProductRepository.java
+identical src/main/java/com/mgmt/chatbot/service/dto/ProductDTO.java
+identical src/main/java/com/mgmt/chatbot/service/mapper/EntityMapper.java
+identical src/main/java/com/mgmt/chatbot/service/ProductService.java
+identical src/main/java/com/mgmt/chatbot/service/mapper/ProductMapper.java
+identical src/main/webapp/app/entities/product/product.test-samples.ts
+identical src/main/webapp/app/entities/product/product.module.ts
+identical src/main/webapp/app/entities/product/update/product-update.component.html
+identical src/main/webapp/app/entities/product/service/product.service.ts
+identical src/main/webapp/app/entities/product/route/product-routing.module.ts
+identical src/main/webapp/app/entities/product/delete/product-delete-dialog.component.html
+identical src/main/webapp/app/entities/product/product.model.ts
+identical src/main/java/com/mgmt/chatbot/service/impl/ProductServiceImpl.java
+identical src/main/webapp/app/entities/product/route/product-routing-resolve.service.ts
+identical src/main/webapp/app/entities/product/update/product-form.service.ts
+identical src/main/webapp/app/entities/product/list/product.component.html
+identical src/main/webapp/app/entities/product/update/product-update.component.ts
+identical src/main/webapp/app/entities/product/route/product-routing-resolve.service.spec.ts
+identical src/main/webapp/app/entities/product/list/product.component.ts
+identical src/main/webapp/app/entities/product/service/product.service.spec.ts
+identical src/main/webapp/app/entities/product/update/product-form.service.spec.ts
+identical src/main/webapp/app/entities/product/detail/product-detail.component.ts
+identical src/main/webapp/app/entities/product/detail/product-detail.component.html
+identical src/main/webapp/app/entities/product/delete/product-delete-dialog.component.ts
+identical src/main/webapp/app/entities/product/update/product-update.component.spec.ts
+identical src/main/webapp/app/entities/product/delete/product-delete-dialog.component.spec.ts
+identical src/main/webapp/app/entities/product/detail/product-detail.component.spec.ts
+   create src/test/java/com/mgmt/chatbot/domain/JobTest.java
+identical src/main/webapp/app/entities/product/list/product.component.spec.ts
+   create src/main/java/com/mgmt/chatbot/web/rest/JobResource.java
+   create src/test/java/com/mgmt/chatbot/web/rest/JobResourceIT.java
+   create src/main/java/com/mgmt/chatbot/repository/JobRepository.java
+   create src/main/java/com/mgmt/chatbot/service/JobService.java
+   create src/main/java/com/mgmt/chatbot/service/impl/JobServiceImpl.java
+   create src/main/java/com/mgmt/chatbot/service/dto/JobDTO.java
+   create src/main/java/com/mgmt/chatbot/service/mapper/JobMapper.java
+   create src/test/java/com/mgmt/chatbot/service/dto/JobDTOTest.java
+   create src/test/java/com/mgmt/chatbot/service/mapper/JobMapperTest.java
+   create src/main/webapp/app/entities/job/job.model.ts
+   create src/main/webapp/app/entities/job/job.test-samples.ts
+   create src/main/webapp/app/entities/job/list/job.component.html
+   create src/main/webapp/app/entities/job/detail/job-detail.component.html
+   create src/main/java/com/mgmt/chatbot/domain/enumeration/Language.java
+   create src/main/webapp/app/entities/job/job.module.ts
+   create src/main/webapp/app/entities/job/route/job-routing.module.ts
+   create src/main/webapp/app/entities/job/route/job-routing-resolve.service.ts
+   create src/main/webapp/app/entities/job/list/job.component.ts
+   create src/main/webapp/app/entities/job/detail/job-detail.component.spec.ts
+   create src/main/webapp/app/entities/job/detail/job-detail.component.ts
+   create src/main/webapp/app/entities/job/list/job.component.spec.ts
+   create src/main/webapp/app/entities/job/route/job-routing-resolve.service.spec.ts
+   create src/main/webapp/app/entities/job/service/job.service.ts
+   create src/main/webapp/app/entities/job/service/job.service.spec.ts
+   create src/main/webapp/app/entities/job/update/job-form.service.ts
+   create src/main/webapp/app/entities/job/update/job-update.component.spec.ts
+   create src/main/webapp/app/entities/job/update/job-form.service.spec.ts
+   create src/main/webapp/app/entities/job/update/job-update.component.html
+   create src/main/webapp/app/entities/job/delete/job-delete-dialog.component.html
+ conflict src/main/webapp/app/entities/entity-routing.module.ts
+? Overwrite src/main/webapp/app/entities/entity-routing.module.ts? overwrite this and all others
+    force src/main/webapp/app/entities/entity-routing.module.ts
+   create src/main/webapp/app/entities/job/update/job-update.component.ts
+   create src/main/webapp/app/entities/job/delete/job-delete-dialog.component.ts
+identical src/main/java/com/mgmt/chatbot/domain/Product.java
+   create src/main/java/com/mgmt/chatbot/domain/Job.java
+   create src/main/webapp/app/entities/job/delete/job-delete-dialog.component.spec.ts
+   create src/main/webapp/app/entities/enumerations/language.model.ts
+    force src/main/webapp/app/layouts/navbar/navbar.component.html
+    force .yo-rc.json
+    force .jhipster/Job.json
+    force .jhipster/Product.json
+
+No change to package.json was detected. No package manager install will be executed.
+Entity Product generated successfully.
+Entity Job generated successfully.
+
+Running `webapp:build` to update client app
+
+
+> chatbot@0.0.1-SNAPSHOT webapp:build
+> npm run clean-www && npm run webapp:build:dev
+
+
+> chatbot@0.0.1-SNAPSHOT clean-www
+> rimraf target/classes/static/app/{src,target/}
+
+
+> chatbot@0.0.1-SNAPSHOT webapp:build:dev
+> ng build --configuration development
+
+⠙ Generating browser application bundles (phase: setup)...DeprecationWarning: 'getMutableClone' has been deprecated since v4.0.0. Use an appropriate `factory.update...` method instead, use `setCommentRange` or `setSourceMapRange`, and avoid setting `parent`.
+✔ Browser application bundle generation complete.
+✔ Copying assets complete.
+✔ Index html generation complete.
+
+Initial Chunk Files                                                    | Names                                  |  Raw Size
+polyfills.js                                                           | polyfills                              | 962.45 kB | 
+styles.css                                                             | styles                                 | 235.77 kB | 
+runtime.js                                                             | runtime                                |  12.46 kB | 
+main.js                                                                | main                                   | 778 bytes | 
+
+                                                                       | Initial Total                          |   1.18 MB
+
+Lazy Chunk Files                                                       | Names                                  |  Raw Size
+src_main_webapp_bootstrap_ts.js                                        | bootstrap                              |   4.69 MB | 
+src_main_webapp_app_admin_metrics_metrics_module_ts.js                 | metrics-metrics-module                 | 167.06 kB | 
+src_main_webapp_app_account_account_module_ts.js                       | account-account-module                 | 157.01 kB | 
+src_main_webapp_app_admin_user-management_user-management_module_ts.js | user-management-user-management-module | 101.64 kB | 
+src_main_webapp_app_entities_product_product_module_ts.js              | product-product-module                 |  94.28 kB | 
+src_main_webapp_app_entities_job_job_module_ts.js                      | job-job-module                         |  89.18 kB | 
+src_main_webapp_app_admin_health_health_module_ts.js                   | health-health-module                   |  28.91 kB | 
+src_main_webapp_app_admin_configuration_configuration_module_ts.js     | configuration-configuration-module     |  25.41 kB | 
+src_main_webapp_app_admin_logs_logs_module_ts.js                       | logs-logs-module                       |  23.98 kB | 
+src_main_webapp_app_login_login_module_ts.js                           | login-login-module                     |  16.24 kB | 
+src_main_webapp_app_admin_docs_docs_module_ts.js                       | docs-docs-module                       |   4.69 kB | 
+src_main_webapp_app_admin_admin-routing_module_ts.js                   | admin-admin-routing-module             |   3.95 kB | 
+common.js                                                              | common                                 |   3.85 kB | 
+src_main_webapp_app_entities_entity-routing_module_ts.js               | entities-entity-routing-module         |   2.55 kB | 
+
+Build at: 2022-11-23T06:06:22.164Z - Hash: f45cb99cb804577d - Time: 10013ms
+INFO! Generator entities succeed
+Congratulations, JHipster execution is complete!
+Sponsored with ❤️  by @oktadev.
+lenovo@lenovo-Pc:~/JHipster/Angular$ 

@@ -1,0 +1,70 @@
+Saga Pattern:
+
+    Choreography approach
+    Orchestration approach
+
+
+
+Event Sourcing:
+This approach has many advantages.
+
+    There is no service dependency. payment-service & inventory-services do not have to be up and running always.
+    Loose coupling
+    Horizontal scaling
+    Fault tolerant
+
+
+
+
+Choreography: Where each service listens to an event from other services, to determine if it should proceed or rollback.
+     committing/rolling back a transaction which spans multiple microservices is very challenging. 
+     Each service should have the event-handlers, for committing / rolling back the transaction to maintain the data consistency, for every event it is listening to!
+
+Orchestration: Where a central coordinator is responsible for instructing individual services to continue or rollback.
+    Each microservice which will be coordinated by orchestrator is expected to have at least 2 endpoints for each entity! One is deducting and other one is for resetting the transaction. 
+    For example. if we deduct inventory first and then later when we come to know that insufficient balance from payment system, we need to add the inventory back.
+
+
+Receive process initiation request and call the first service.
+Listen to success or failure feedback from the currently running service.
+For successful feedback, ask the next service to proceed.
+For failure feedback, relay a message to all participation services to rollback their transactions.
+
+
+    Start: When the orchestrator asks the service to execute an operation. (Create order, make the payment, prepare food, make delivery)
+    Rollback: When the orchestrator asks the service to rollback the transaction.
+
+Each micro-service replies back to orchestrator on the Reply channel. The service replies to the operation with 2 statuses
+-----------------------------------------------------------------------------------------------------------------------------------
+    Done: When the intended operation was successful. The orchestrator executes the next service in the pipeline.
+    Error: When either of the service errors out. The orchestrator asks all the services to rollback the transaction.
+
+
+
+Orchestration-based sagas have a variety of benefits:   
+
+    Avoid cyclic dependencies between services, as the saga orchestrator invokes the saga participants but the participants do not invoke the orchestrator
+    Centralize the orchestration of the distributed transaction
+    Reduce participants complexity as they only need to execute/reply commands.
+    Easier to be implemented and tested
+    The transaction complexity remains linear when new steps are added
+    Rollbacks are easier to manage
+    If you have a second transaction willing to change the same target object, you can easily put it on hold on the orchestrator until the first transaction ends.
+
+Guidelines and recommendations:   https://levelup.gitconnected.com/modelling-saga-as-a-state-machine-cec381acc3ef
+-----------------------------------------
+If we are designing and building orchestrator driven saga for supporting distributed and long running transactions, the below guidelines are recommended:
+
+    Orchestrator should only be responsible for managing transactions and states, and there should not be any business logic added here. Business logic should be defined in individual service participants.
+    All events and commands to and from the orchestrator should be carrying only transaction data, not reference data.
+    Use asynchronous style messaging to communicate between services.
+    Implement idempotency and state checks for resiliency, if using message brokers like Kafka.
+    Suitable for designing command side (write model) in CQRS and Event Sourcing architecture.
+
+Related patterns
+=======================================================
+    The Database per Service pattern creates the need for this pattern
+    The following patterns are ways to atomically update state and publish messages/events:
+    Event sourcing
+    Transactional Outbox
+    A choreography-based saga can publish events using Aggregates and Domain Events.

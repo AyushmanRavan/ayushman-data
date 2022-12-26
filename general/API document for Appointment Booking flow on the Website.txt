@@ -1,0 +1,254 @@
+1) Global Serach Doctor/Speciality/Lab test API.
+---------------------------------------------- 
+Request URL: https://emr.staging.meddo.in/api/v1/emr/v2/es/global-search?keyword=dr%20ast&latitude=28.4554726&longitude=77.0219019&pinCode=122001&size=5&searchFor=all
+CURL 
+curl 'https://emr.staging.meddo.in/api/v1/emr/v2/es/global-search?keyword=dr%20asth&latitude=28.4554726&longitude=77.0219019&pinCode=122001&size=5&searchFor=all' \
+  -H 'authority: emr.staging.meddo.in' \
+  -H 'accept: application/json' \
+  -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
+  -H 'appplatform: Web' \
+  -H 'cache-control: no-cache, no-store, must-revalidate' \
+  -H 'cookie: _fbp=fb.1.1630666529787.433453938; _ga=GA1.1.312079963.1630666530; _ga_467R439C6W=GS1.1.1639139015.86.0.1639139015.0; _hjSessionUser_2784591=eyJpZCI6IjJiYjllNTg5LWZkMDQtNTM3ZS1hYmU4LTAwMGI3NGRhZGNjNiIsImNyZWF0ZWQiOjE2NDYwMjAzOTE0NDAsImV4aXN0aW5nIjp0cnVlfQ==; _gcl_au=1.1.560551702.1655110751; _hjSessionUser_3018265=eyJpZCI6Ijg2YzViMmFmLTIzMDYtNTVhYi05NmZjLTQ1YmVlOWU1ZmJmZiIsImNyZWF0ZWQiOjE2NTUyOTU0MDM0MDgsImV4aXN0aW5nIjp0cnVlfQ==; _ga_8J4CQWY1GY=GS1.1.1655358176.3.1.1655358304.0; _ga_KH7ESDLYP9=GS1.1.1655880063.66.1.1655880904.0; amp_59db7e=dZArpg7wWneG1voKxpq-gL...1g67g6uvj.1g67hj3d7.0.0.0; _ga_4ENEEWV7M7=GS1.1.1655961779.259.1.1655963227.0; _ga_12LTVHV9SS=GS1.1.1655961785.234.1.1655963234.0' \
+  -H 'meddoapp: WEBSITE' \
+  -H 'origin: https://staging.meddo.in' \
+  -H 'pragma: no-cache' \
+  -H 'referer: https://staging.meddo.in/' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Linux"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-site' \
+  -H 'source: web' \
+  -H 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36' \
+  --compressed
+
+2) Show Doctor Details API(fetch-by-slug).
+------------------------------------------------
+Request URL: https://order.staging.meddo.in/api/v1/order/recent-care-provider/fetch
+CURL 
+curl 'https://emr.staging.meddo.space/api/v1/emr/doctor/fetch-by-slug?slug=dr-astha-dayal-gynaecologist-obstetrician' \
+  -H 'authority: emr.staging.meddo.space' \
+  -H 'accept: application/json' \
+  -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
+  -H 'appplatform: Web' \
+  -H 'cache-control: no-cache, no-store, must-revalidate' \
+  -H 'meddoapp: WEBSITE' \
+  -H 'origin: http://localhost:3000' \
+  -H 'pragma: no-cache' \
+  -H 'referer: http://localhost:3000/' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="102", "Google Chrome";v="102"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: cross-site' \
+  -H 'source: web' \
+  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.61 Safari/537.36' \
+  --compressed
+
+3) Show Doctor Appointment Timeslot API.
+Request URL: https://emr.staging.meddo.in/api/v1/emr/doctors/appointmentForDesktop?doctorinclinic=587&startDate=2022-06-23&endDate=2022-06-24&type=E_CONSULTATION
+CURL
+curl 'https://emr.staging.meddo.in/api/v1/emr/doctors/appointmentForDesktop?doctorinclinic=7&startDate=2022-06-23&endDate=2022-06-24&type=E_CONSULTATION' \
+  -H 'authority: emr.staging.meddo.in' \
+  -H 'accept: application/json' \
+  -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
+  -H 'appplatform: Web' \
+  -H 'cache-control: no-cache, no-store, must-revalidate' \
+  -H 'cookie: _fbp=fb.1.1630666529787.433453938; _ga=GA1.1.312079963.1630666530; _ga_467R439C6W=GS1.1.1639139015.86.0.1639139015.0; _hjSessionUser_2784591=eyJpZCI6IjJiYjllNTg5LWZkMDQtNTM3ZS1hYmU4LTAwMGI3NGRhZGNjNiIsImNyZWF0ZWQiOjE2NDYwMjAzOTE0NDAsImV4aXN0aW5nIjp0cnVlfQ==; _gcl_au=1.1.560551702.1655110751; _hjSessionUser_3018265=eyJpZCI6Ijg2YzViMmFmLTIzMDYtNTVhYi05NmZjLTQ1YmVlOWU1ZmJmZiIsImNyZWF0ZWQiOjE2NTUyOTU0MDM0MDgsImV4aXN0aW5nIjp0cnVlfQ==; _ga_8J4CQWY1GY=GS1.1.1655358176.3.1.1655358304.0; _ga_KH7ESDLYP9=GS1.1.1655880063.66.1.1655880904.0; _ga_12LTVHV9SS=GS1.1.1655961785.234.1.1655963291.0; _ga_4ENEEWV7M7=GS1.1.1655961779.259.1.1655963293.0; amp_59db7e=dZArpg7wWneG1voKxpq-gL...1g67g6uvj.1g67hl5dl.0.0.0' \
+  -H 'meddoapp: WEBSITE' \
+  -H 'origin: https://staging.meddo.in' \
+  -H 'pragma: no-cache' \
+  -H 'referer: https://staging.meddo.in/' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Linux"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-site' \
+  -H 'source: web' \
+  -H 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36' \
+  --compressed
+
+4) After seeing doctor details Patient/User can select timeslot.
+5) After that login patient to system based on mobile number then verify OTP.
+-----------------------------------------------------------------------------
+Request URL: https://patient.staging.meddo.in/api/v1/auth/meddo/sendOTP?mobileNo=8585858521
+CURL
+curl 'https://patient.staging.meddo.in/api/v1/auth/meddo/sendOTP?mobileNo=9874525896' \
+  -H 'authority: patient.staging.meddo.in' \
+  -H 'accept: application/json' \
+  -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
+  -H 'appplatform: Web' \
+  -H 'cache-control: no-cache, no-store, must-revalidate' \
+  -H 'cookie: _fbp=fb.1.1630666529787.433453938; _ga=GA1.1.312079963.1630666530; _ga_467R439C6W=GS1.1.1639139015.86.0.1639139015.0; _hjSessionUser_2784591=eyJpZCI6IjJiYjllNTg5LWZkMDQtNTM3ZS1hYmU4LTAwMGI3NGRhZGNjNiIsImNyZWF0ZWQiOjE2NDYwMjAzOTE0NDAsImV4aXN0aW5nIjp0cnVlfQ==; _gcl_au=1.1.560551702.1655110751; _hjSessionUser_3018265=eyJpZCI6Ijg2YzViMmFmLTIzMDYtNTVhYi05NmZjLTQ1YmVlOWU1ZmJmZiIsImNyZWF0ZWQiOjE2NTUyOTU0MDM0MDgsImV4aXN0aW5nIjp0cnVlfQ==; _ga_8J4CQWY1GY=GS1.1.1655358176.3.1.1655358304.0; _ga_KH7ESDLYP9=GS1.1.1655880063.66.1.1655880904.0; amp_59db7e=dZArpg7wWneG1voKxpq-gL...1g67g6uvj.1g67hl5dl.0.0.0; _ga_4ENEEWV7M7=GS1.1.1655961779.259.1.1655963333.0; _ga_12LTVHV9SS=GS1.1.1655961785.234.1.1655963349.0' \
+  -H 'meddoapp: WEBSITE' \
+  -H 'origin: https://staging.meddo.in' \
+  -H 'otp: true' \
+  -H 'pragma: no-cache' \
+  -H 'referer: https://staging.meddo.in/' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Linux"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-site' \
+  -H 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36' \
+  --compressed
+Request URL: https://patient.staging.meddo.in/api/v1/auth/meddo/verifyOTP?mobileNo=8585858521&otp=538322
+CURL
+curl 'https://patient.staging.meddo.in/api/v1/auth/meddo/verifyOTP?mobileNo=9874525896&otp=933154' \
+  -H 'authority: patient.staging.meddo.in' \
+  -H 'accept: application/json' \
+  -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
+  -H 'appplatform: Web' \
+  -H 'cache-control: no-cache, no-store, must-revalidate' \
+  -H 'cookie: _fbp=fb.1.1630666529787.433453938; _ga=GA1.1.312079963.1630666530; _ga_467R439C6W=GS1.1.1639139015.86.0.1639139015.0; _hjSessionUser_2784591=eyJpZCI6IjJiYjllNTg5LWZkMDQtNTM3ZS1hYmU4LTAwMGI3NGRhZGNjNiIsImNyZWF0ZWQiOjE2NDYwMjAzOTE0NDAsImV4aXN0aW5nIjp0cnVlfQ==; _gcl_au=1.1.560551702.1655110751; _hjSessionUser_3018265=eyJpZCI6Ijg2YzViMmFmLTIzMDYtNTVhYi05NmZjLTQ1YmVlOWU1ZmJmZiIsImNyZWF0ZWQiOjE2NTUyOTU0MDM0MDgsImV4aXN0aW5nIjp0cnVlfQ==; _ga_8J4CQWY1GY=GS1.1.1655358176.3.1.1655358304.0; _ga_KH7ESDLYP9=GS1.1.1655880063.66.1.1655880904.0; amp_59db7e=dZArpg7wWneG1voKxpq-gL...1g67g6uvj.1g67hl5dl.0.0.0; _ga_4ENEEWV7M7=GS1.1.1655961779.259.1.1655963333.0; _ga_12LTVHV9SS=GS1.1.1655961785.234.1.1655963393.0' \
+  -H 'meddoapp: WEBSITE' \
+  -H 'origin: https://staging.meddo.in' \
+  -H 'otp: true' \
+  -H 'pragma: no-cache' \
+  -H 'referer: https://staging.meddo.in/' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Linux"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-site' \
+  -H 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36' \
+  --compressed
+
+6) Collect user data to enter in to System.
+-----------------------------------------------
+Request URL: https://patient.staging.meddo.in/api/v1/user/create/new/emr
+CURL
+curl 'https://patient.staging.meddo.in/api/v1/user/create/new/emr' \
+  -H 'authority: patient.staging.meddo.in' \
+  -H 'accept: application/json' \
+  -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
+  -H 'appplatform: Web' \
+  -H 'cache-control: no-cache, no-store, must-revalidate' \
+  -H 'content-type: application/json;charset=UTF-8' \
+  -H 'cookie: _fbp=fb.1.1630666529787.433453938; _ga=GA1.1.312079963.1630666530; _ga_467R439C6W=GS1.1.1639139015.86.0.1639139015.0; _hjSessionUser_2784591=eyJpZCI6IjJiYjllNTg5LWZkMDQtNTM3ZS1hYmU4LTAwMGI3NGRhZGNjNiIsImNyZWF0ZWQiOjE2NDYwMjAzOTE0NDAsImV4aXN0aW5nIjp0cnVlfQ==; _gcl_au=1.1.560551702.1655110751; _hjSessionUser_3018265=eyJpZCI6Ijg2YzViMmFmLTIzMDYtNTVhYi05NmZjLTQ1YmVlOWU1ZmJmZiIsImNyZWF0ZWQiOjE2NTUyOTU0MDM0MDgsImV4aXN0aW5nIjp0cnVlfQ==; _ga_8J4CQWY1GY=GS1.1.1655358176.3.1.1655358304.0; _ga_KH7ESDLYP9=GS1.1.1655880063.66.1.1655880904.0; amp_59db7e=dZArpg7wWneG1voKxpq-gL...1g67g6uvj.1g67hl5dl.0.0.0; _ga_4ENEEWV7M7=GS1.1.1655961779.259.1.1655963333.0; _ga_12LTVHV9SS=GS1.1.1655961785.234.1.1655963393.0' \
+  -H 'meddoapp: WEBSITE' \
+  -H 'origin: https://staging.meddo.in' \
+  -H 'otp: true' \
+  -H 'pragma: no-cache' \
+  -H 'referer: https://staging.meddo.in/' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Linux"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-site' \
+  -H 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36' \
+  --data-raw '{"name":"Male Patient","gender":"male","dateofbirth":"1992-10-10","phone":"9874525896"}' \
+  --compressed
+
+6) select patient for Appointment.
+    6.1) or he/she can add family member for Appointment
+    ----------------------------------------------------
+    Request URL: https://emr.staging.meddo.in/api/v1/emr/patient/add-family-member
+    CURL
+    curl 'https://emr.staging.meddo.in/api/v1/emr/patient/add-family-member' \
+    -H 'authority: emr.staging.meddo.in' \
+    -H 'accept: application/json' \
+    -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
+    -H 'appplatform: Web' \
+    -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcmltYXJ5UGF0aWVudElkIjoyNDgyOTgsImdlbmRlciI6Im1hbGUiLCJ1c2VyX25hbWUiOiJNYWxlIFBhdGllbnQiLCJwcm9maWxlUGljIjpudWxsLCJkYXRlT2ZCaXJ0aCI6IjE5OTItMTAtMTAiLCJ1c2VySUQiOjE0OTY0LCJhdXRob3JpdGllcyI6WyJQQVRJRU5UIl0sImNsaWVudF9pZCI6IkxSTDZaQ0V0NUFnN3doYWEiLCJmYW1pbHlJZCI6MjM0NDg1LCJhdWQiOlsidGVzdGp3dHJlc291cmNlaWQiXSwicGhvbmUiOiI5ODc0NTI1ODk2IiwiaGFzRmFtaWx5IjpmYWxzZSwic2NvcGUiOlsicmVhZHdyaXRlIl0sIm5hbWUiOiJNYWxlIFBhdGllbnQiLCJpc1BhdGllbnRTdWJzY3JpYmVkIjpmYWxzZSwiZXhwIjoxNjYzNzM5Mzk4LCJqdGkiOiI3NzAyOWU4NC00MmNlLTQxZTctOTlmNS1lZTZlYjY4MmY1NDkiLCJlbWFpbCI6ImR1bW15Xzk4NzQ1MjU4OTZAbWVkZG8uaW4ifQ.GTwViPr8HADWBJsshZu7sAG4_TXMdhzRl2PulMc6d7o' \
+    -H 'cache-control: no-cache, no-store, must-revalidate' \
+    -H 'content-type: application/json;charset=UTF-8' \
+    -H 'cookie: _fbp=fb.1.1630666529787.433453938; _ga=GA1.1.312079963.1630666530; _ga_467R439C6W=GS1.1.1639139015.86.0.1639139015.0; _hjSessionUser_2784591=eyJpZCI6IjJiYjllNTg5LWZkMDQtNTM3ZS1hYmU4LTAwMGI3NGRhZGNjNiIsImNyZWF0ZWQiOjE2NDYwMjAzOTE0NDAsImV4aXN0aW5nIjp0cnVlfQ==; _gcl_au=1.1.560551702.1655110751; _hjSessionUser_3018265=eyJpZCI6Ijg2YzViMmFmLTIzMDYtNTVhYi05NmZjLTQ1YmVlOWU1ZmJmZiIsImNyZWF0ZWQiOjE2NTUyOTU0MDM0MDgsImV4aXN0aW5nIjp0cnVlfQ==; _ga_8J4CQWY1GY=GS1.1.1655358176.3.1.1655358304.0; _ga_KH7ESDLYP9=GS1.1.1655880063.66.1.1655880904.0; amp_59db7e=dZArpg7wWneG1voKxpq-gL...1g67g6uvj.1g67hl5dl.0.0.0; _ga_4ENEEWV7M7=GS1.1.1655961779.259.1.1655963333.0; _ga_12LTVHV9SS=GS1.1.1655961785.234.1.1655963428.0' \
+    -H 'meddoapp: WEBSITE' \
+    -H 'origin: https://staging.meddo.in' \
+    -H 'pragma: no-cache' \
+    -H 'referer: https://staging.meddo.in/' \
+    -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"' \
+    -H 'sec-ch-ua-mobile: ?0' \
+    -H 'sec-ch-ua-platform: "Linux"' \
+    -H 'sec-fetch-dest: empty' \
+    -H 'sec-fetch-mode: cors' \
+    -H 'sec-fetch-site: same-site' \
+    -H 'source: web' \
+    -H 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36' \
+    --data-raw '{"bloodGroup":"","gender":"male","height":"","name":"CHANGE capture","weight":"","relation":"Brother","dateofbirth":"1982-12-12","phone":"9874525896","familyId":234485,"email":"dcdsf@hdfbd.vcf"}' \
+    --compressed
+    6.2) Upload User Image 
+    CURL 
+    curl 'https://web.staging.meddo.in/upload-scribble' \
+    -H 'authority: web.staging.meddo.in' \
+    -H 'accept: */*' \
+    -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
+    -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundaryMkQyAfsIImQGSwRV' \
+    -H 'origin: https://staging.meddo.in' \
+    -H 'referer: https://staging.meddo.in/' \
+    -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"' \
+    -H 'sec-ch-ua-mobile: ?0' \
+    -H 'sec-ch-ua-platform: "Linux"' \
+    -H 'sec-fetch-dest: empty' \
+    -H 'sec-fetch-mode: cors' \
+    -H 'sec-fetch-site: same-site' \
+    -H 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36' \
+    --data-raw $'------WebKitFormBoundaryMkQyAfsIImQGSwRV\r\nContent-Disposition: form-data; name="awsurl"\r\n\r\nhttps://meddospace.blob.core.windows.net/ap-south-1-emr-scribbles/1655963499609_1ToSHebEePKt1oET.png?sv=2018-03-28&spr=https&se=2022-09-21T05%3A49%3A58Z&sr=b&sp=raw&sig=P7nY0rNt%2B%2Fvq7vU6M%2FUcHIsQ%2B094iI0fYPJwFIyIjgY%3D&rsct=image%2Fpng\r\n------WebKitFormBoundaryMkQyAfsIImQGSwRV\r\nContent-Disposition: form-data; name="image"; filename="0_-ZrIUnYEXFTVp4Oe.png"\r\nContent-Type: image/png\r\n\r\n\r\n------WebKitFormBoundaryMkQyAfsIImQGSwRV--\r\n' \
+    --compressed
+
+7) Select Payment mode and Pay fees.
+-----------------------------------------
+Request URL: https://order.staging.meddo.in/api/v1/order/payment-gateway/fetch-payment-offer/by-name?name=JUSPAY&cartType=CONSULTATION
+
+8) Now System can create consultation order using following API
+----------------------------------------------------------------------
+Request URL: https://order.staging.meddo.in/api/v1/order/create-consultation-order/v1
+CURL 
+curl 'https://order.staging.meddo.in/api/v1/order/create-consultation-order/v1' \
+  -H 'authority: order.staging.meddo.in' \
+  -H 'accept: application/json' \
+  -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
+  -H 'appplatform: Web' \
+  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcmltYXJ5UGF0aWVudElkIjoyNDgyOTgsImdlbmRlciI6Im1hbGUiLCJ1c2VyX25hbWUiOiJNYWxlIFBhdGllbnQiLCJwcm9maWxlUGljIjpudWxsLCJkYXRlT2ZCaXJ0aCI6IjE5OTItMTAtMTAiLCJ1c2VySUQiOjE0OTY0LCJhdXRob3JpdGllcyI6WyJQQVRJRU5UIl0sImNsaWVudF9pZCI6IkxSTDZaQ0V0NUFnN3doYWEiLCJmYW1pbHlJZCI6MjM0NDg1LCJhdWQiOlsidGVzdGp3dHJlc291cmNlaWQiXSwicGhvbmUiOiI5ODc0NTI1ODk2IiwiaGFzRmFtaWx5IjpmYWxzZSwic2NvcGUiOlsicmVhZHdyaXRlIl0sIm5hbWUiOiJNYWxlIFBhdGllbnQiLCJpc1BhdGllbnRTdWJzY3JpYmVkIjpmYWxzZSwiZXhwIjoxNjYzNzM5Mzk4LCJqdGkiOiI3NzAyOWU4NC00MmNlLTQxZTctOTlmNS1lZTZlYjY4MmY1NDkiLCJlbWFpbCI6ImR1bW15Xzk4NzQ1MjU4OTZAbWVkZG8uaW4ifQ.GTwViPr8HADWBJsshZu7sAG4_TXMdhzRl2PulMc6d7o' \
+  -H 'cache-control: no-cache, no-store, must-revalidate' \
+  -H 'content-type: application/json;charset=UTF-8' \
+  -H 'cookie: _fbp=fb.1.1630666529787.433453938; _ga=GA1.1.312079963.1630666530; _ga_467R439C6W=GS1.1.1639139015.86.0.1639139015.0; _hjSessionUser_2784591=eyJpZCI6IjJiYjllNTg5LWZkMDQtNTM3ZS1hYmU4LTAwMGI3NGRhZGNjNiIsImNyZWF0ZWQiOjE2NDYwMjAzOTE0NDAsImV4aXN0aW5nIjp0cnVlfQ==; _gcl_au=1.1.560551702.1655110751; _hjSessionUser_3018265=eyJpZCI6Ijg2YzViMmFmLTIzMDYtNTVhYi05NmZjLTQ1YmVlOWU1ZmJmZiIsImNyZWF0ZWQiOjE2NTUyOTU0MDM0MDgsImV4aXN0aW5nIjp0cnVlfQ==; _ga_8J4CQWY1GY=GS1.1.1655358176.3.1.1655358304.0; _ga_KH7ESDLYP9=GS1.1.1655880063.66.1.1655880904.0; amp_59db7e=dZArpg7wWneG1voKxpq-gL...1g67g6uvj.1g67hl5dl.0.0.0; _ga_4ENEEWV7M7=GS1.1.1655961779.259.1.1655963604.0; _ga_12LTVHV9SS=GS1.1.1655961785.234.1.1655963610.0' \
+  -H 'meddoapp: WEBSITE' \
+  -H 'origin: https://staging.meddo.in' \
+  -H 'pragma: no-cache' \
+  -H 'referer: https://staging.meddo.in/' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Linux"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-site' \
+  -H 'source: web' \
+  -H 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36' \
+  --data-raw '{"cart":{"orderId":null,"discount":0,"voucherCategory":"APPOINTMENT","shippingPrice":0,"isReferral":false,"consultationDto":{"price":1000,"appointmentTime":"2022-06-23T13:40:00.000Z","isFollowUp":false,"doctorInClinicId":7,"displayPrice":1000,"productTypeId":7,"name":"Consultation Fee","percentageOff":0,"priceOff":0,"finalPrice":1000,"subscriptionDiscount":null,"isSubscriptionApplied":false,"isUsedFreeFollowUp":false,"isOnline":true,"voucherDiscount":null},"subscriptionCartItem":{"subscriptionId":null,"primaryPatientId":248298,"patientIds":[248298],"amount":null,"displayName":null},"subscriptionDiscount":null},"source":"WEBSITE","orderState":"PENDING","timeSlot":692,"patientId":248298,"phone":"9874525896","jusPayCallBackUrl":"https://staging.meddo.in/booking/processing","subscriptionDiscount":null,"code":"","offerId":""}' \
+  --compressed
+
+9) After that PAY API get called. and show Appoint booked message.
+----------------------------------------------------------------------
+Request URL: https://order.staging.meddo.in/api/v1/order/pay
+CURL 
+curl 'https://order.staging.meddo.in/api/v1/order/pay' \
+  -H 'authority: order.staging.meddo.in' \
+  -H 'accept: application/json' \
+  -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
+  -H 'appplatform: Web' \
+  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcmltYXJ5UGF0aWVudElkIjoyNDgyOTgsImdlbmRlciI6Im1hbGUiLCJ1c2VyX25hbWUiOiJNYWxlIFBhdGllbnQiLCJwcm9maWxlUGljIjpudWxsLCJkYXRlT2ZCaXJ0aCI6IjE5OTItMTAtMTAiLCJ1c2VySUQiOjE0OTY0LCJhdXRob3JpdGllcyI6WyJQQVRJRU5UIl0sImNsaWVudF9pZCI6IkxSTDZaQ0V0NUFnN3doYWEiLCJmYW1pbHlJZCI6MjM0NDg1LCJhdWQiOlsidGVzdGp3dHJlc291cmNlaWQiXSwicGhvbmUiOiI5ODc0NTI1ODk2IiwiaGFzRmFtaWx5IjpmYWxzZSwic2NvcGUiOlsicmVhZHdyaXRlIl0sIm5hbWUiOiJNYWxlIFBhdGllbnQiLCJpc1BhdGllbnRTdWJzY3JpYmVkIjpmYWxzZSwiZXhwIjoxNjYzNzM5Mzk4LCJqdGkiOiI3NzAyOWU4NC00MmNlLTQxZTctOTlmNS1lZTZlYjY4MmY1NDkiLCJlbWFpbCI6ImR1bW15Xzk4NzQ1MjU4OTZAbWVkZG8uaW4ifQ.GTwViPr8HADWBJsshZu7sAG4_TXMdhzRl2PulMc6d7o' \
+  -H 'cache-control: no-cache, no-store, must-revalidate' \
+  -H 'content-type: application/json;charset=UTF-8' \
+  -H 'cookie: _fbp=fb.1.1630666529787.433453938; _ga=GA1.1.312079963.1630666530; _ga_467R439C6W=GS1.1.1639139015.86.0.1639139015.0; _hjSessionUser_2784591=eyJpZCI6IjJiYjllNTg5LWZkMDQtNTM3ZS1hYmU4LTAwMGI3NGRhZGNjNiIsImNyZWF0ZWQiOjE2NDYwMjAzOTE0NDAsImV4aXN0aW5nIjp0cnVlfQ==; _gcl_au=1.1.560551702.1655110751; _hjSessionUser_3018265=eyJpZCI6Ijg2YzViMmFmLTIzMDYtNTVhYi05NmZjLTQ1YmVlOWU1ZmJmZiIsImNyZWF0ZWQiOjE2NTUyOTU0MDM0MDgsImV4aXN0aW5nIjp0cnVlfQ==; _ga_8J4CQWY1GY=GS1.1.1655358176.3.1.1655358304.0; _ga_KH7ESDLYP9=GS1.1.1655880063.66.1.1655880904.0; _ga_12LTVHV9SS=GS1.1.1655961785.234.1.1655963613.0; amp_59db7e=dZArpg7wWneG1voKxpq-gL...1g67g6uvj.1g67hv83m.0.0.0; _ga_4ENEEWV7M7=GS1.1.1655961779.259.1.1655963623.0' \
+  -H 'meddoapp: WEBSITE' \
+  -H 'origin: https://staging.meddo.in' \
+  -H 'pragma: no-cache' \
+  -H 'referer: https://staging.meddo.in/' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Linux"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-site' \
+  -H 'source: web' \
+  -H 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36' \
+  --data-raw '{"orderId":341982,"paymentAmount":1000,"paymentModeId":3,"currency":"INR","transactionId":" ","patientName":"Male Patient","paymentGateway":"JUSPAY","consultationOrderDto":{"appointmentTime":"2022-06-23T13:40:00.000Z","dicId":7,"isVisited":false,"patientId":248298,"payLaterForDeliveryMedicines":false,"payLaterForHomeCollectionOnTests":false,"status":"CHECKED_IN","timeSlotId":692,"visitTypeId":1,"settleConsultationAmount":false,"isOnline":true,"isSubscriptionApplied":false,"isUsedFreeFollowUp":false,"communicationMode":"AUDIO","acceptPathology":true,"acceptMedicine":true,"symptoms":"","existingCondition":"","ongoingTreatment":"","sugarLevel":"","temperature":""},"subscriptionCartItem":{"subscriptionId":null,"primaryPatientId":248298,"patientIds":[248298],"amount":null,"displayName":null,"patientId":248298},"patientIdForWallet":248298,"isWalletSelected":false,"paymentAmountThroughWallet":null,"cashbackAmount":1000,"patientSubscriptionId":"","paymentGatewayAndPaymentModeId":5,"paymentGatewayModeOfferId":5}' \
+  --compressed

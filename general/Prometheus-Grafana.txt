@@ -1,0 +1,452 @@
+https://www.junosnotes.com/guide/how-to-install-grafana-on-ubuntu-20-04/
+https://www.centlinux.com/2021/09/install-prometheus-systems-monitoring-tool-centos-rhel-8.html
+https://www.cyberithub.com/how-to-install-grafana-monitoring-tool-on-ubuntu-20-04-lts/
+https://antonputra.com/monitoring/Install-prometheus-and-grafana-on-ubuntu/#install-grafana-on-ubuntu-2004
+https://linuxopsys.com/topics/install-prometheus-on-ubuntu
+https://itslinuxfoss.com/how-to-install-prometheus-on-ubuntu-22-04-lts/
+
+10 Oct
+22 Oct
+
+anjali and manoj
+@Manoj Desai @Anjali Borge 
+Natural Language Understanding (NLU) and Dual Intent and Entity Transformer (DIET) 
+
+
+
+https://blogs.perficient.com/2022/08/22/elasticsearch-java-api-client-springboot/
+https://www.pixeltrice.com/spring-boot-elasticsearch-crud-example/
+https://codecurated.com/blog/how-to-connect-java-with-elasticsearch/
+RestClient restClient = RestClient.builder(new HttpHost("localhost", 9200)).build();
+    ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+    elasticsearchClient = new ElasticsearchClient(transport);
+https://codecurated.com/blog/how-to-connect-java-with-elasticsearch/
+Low level client
+<dependency>
+    <groupId>org.elasticsearch.client</groupId>
+    <artifactId>elasticsearch-rest-client</artifactId>
+    <version>8.0.0</version>
+</dependency>
+
+
+High level client
+<dependency>
+    <groupId>org.elasticsearch.client</groupId>
+    <artifactId>elasticsearch-rest-high-level-client</artifactId>
+    <version>8.0.0</version>
+</dependency>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+https://keyholesoftware.com/2016/09/26/jhipster-part-1/
+MongoDB support if you’d rather use a document-oriented NoSQL database instead of JPA
+Cassandra support if you’d rather use a column-oriented NoSQL database instead of JPA
+Caching with ehcache (local cache) or hazelcast (distributed cache)
+
+Production Utilities and the Like
+========================================================
+Monitoring with Metrics
+Caching with ehcache (local cache) or hazelcast (distributed cache)
+Optional HTTP session clustering with hazelcast
+Optimized static resources (gzip filter, HTTP cache headers)
+Log management with Logback, configurable at runtime
+Connection pooling with HikariCP for optimum performance
+Builds a standard WAR file or an executable JAR file
+
+
+
+; https://www.scaleway.com/en/docs/tutorials/setup-mongodb-on-ubuntu/
+; Step 1: Import MongoDB public key
+; wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+
+; Step 2: Add MongoDB repository to the source list
+; echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+; sudo apt update -y
+
+; Step 3: Install MongoDB on Ubuntu 20.04
+; sudo apt install -y mongodb-org
+
+; you can verify the version of MongoDB installed as shown:
+; mongod --version
+
+; Step 4: Run MongoDB
+; sudo systemctl start mongod
+; sudo systemctl status mongod
+
+; Now to start the mongo shell from the same system running the mongod process, the command is as follows:
+; > mongosh
+
+; Next, connect or switch to the admin database.
+; > use admin
+
+Next, create the database user by pasting these lines and hitting ENTER on the keyboard.
+All-Database Roles
+These roles lie on the admin database and provide privileges which apply to all databases.
+==================================================================================
+readAnyDatabase – The same as ‘read’ role but applies to all databases
+readWriteAnyDatabase – The same as ‘readWrite’ role but applies to all databases
+userAdminAnyDatabase – The same as ‘userAdmin’ role but applies to all databases
+dbAdminAnyDatabase – The same as ‘dbAdmin’ role but applies to all databases
+Database Administration Roles
+The database administration roles we can use are the following:
+===========================================================
+dbAdmin – Grant privileges to perform administrative tasks
+userAdmin – Allows you to create and modify users and roles on the current database
+dbOwner – This role combines the following:
+            readWrite
+            dbAdmin
+            userAdmin
+Superuser Roles
+The following roles are not superuser roles directly but are able to assign any user any privilege on any database, also themselves.
+=====================================================================================
+userAdmin
+dbOwner
+userAdminAnyDatabase
+ Syntax : > db.createUser({
+    user : '<userName>',
+    pwd : '<password>',
+    roles : [ { role : '<roleName>', db : '<dbName>' } | '<roleName>', …] 
+})
+ Ex : db.createUser(
+   {
+     user: "app_user",
+     pwd: "app_pass",
+     roles: [ { role: "dbOwner", db: "vbot" }, "readWriteAnyDatabase" ]
+  }
+ )
+ Ex : 
+ db.createUser(
+   {
+     user: "AdminAyush",
+     pwd: "AdminAyush",
+     roles: [ { role: "userAdminAnyDatabase", db: "vbot" }, "readWriteAnyDatabase" ]
+  }
+ )
+
+ db.createUser(
+   {
+     user: "AdminAyush",
+     pwd: "AdminAyush",
+     roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
+  }
+ )
+Enter password :
+; To exit from the Mongo Shell, run the exit command or press CTRL + C.
+
+; Enable Authorization in MongoDB
+; Next we need to enable security in MongoDB configuration file. Edit the mongo configuration file by using:
+; Scroll down and locate the security section. Uncomment it and add the authorization directive and set it to enabled.
+; sudo vim /etc/mongod.conf 
+; security:
+;   authorization: enabled
+
+; sudo systemctl daemon-reload
+; sudo systemctl start mongod
+
+; Now to start the mongo shell from the same system running the mongod process, the command is as follows:
+; > mongosh
+
+; By default, there are three databases that are created upon installation. These are admin, config, and local.
+; > show dbs
+; MongoServerError: command listDatabases requires authentication
+
+; > exit
+; > mongosh -u AdminAyush -p --authenticationDatabase vbot
+
+; To create a database invoke the use command followed by the database name.
+; > show dbs
+; > use <database_name>
+
+; To confirm the database you can currently in, run the db command
+; > db
+; > show collections
+
+  Show contents/documents of a collection:
+  db.your_collection_name.find()
+
+  Save a data to a collection:
+  db.your_collection_name.save({"name":"Sony AK"})
+
+  Show database version:
+  db.version()
+
+; You can list the users created using the db.getUsers() method as shown.
+; db.getUsers();
+; Alternatively, you can run the command:
+; > show users
+
+; To delete the user, use the db.dropUser method as shown.
+; db.dropUser("cherry", {w: "majority", wtimeout: 4000})
+
+
+
+# Now it’s time to configure the MongoDB properties inside the application.properties file
+# You can define the MongoDB properties by either using the MongoURI or by defining the host, username, password and database details.
+
+# Approach 1:
+# ####### Mongo Properties ###########
+# spring.data.mongodb.uri=mongodb://localhost:27017/expense-tracker
+
+# Approach 2:
+# ####### Mongo Properties ###########
+# spring.data.mongodb.host=localhost
+# spring.data.mongodb.port=27017
+# spring.data.mongodb.username=<your-username>    // AdminAyush
+# spring.data.mongodb.password=<your-password>    // AdminAyush
+# spring.data.mongodb.database=expense-tracker    // chatbot
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+docker -v 
+docker-compose -v 
+java -version 
+node -v 
+
+To install JHipster we need:
+1. JAVA     
+2. Node.js
+
+Then execute the following command with npm:
+$ npm install -g generator-jhipster
+$ npm install -g generator-jhipster@6.0.1   specific version.
+$ jhipster --version
+$ mkdir -p jhipster-workspace/vbot
+
+In a terminal, navigate to the vbot directory and run jhipster.
+$ cd jhipster-workspace/vbot
+$ jhipster
+
+
+Start Containers for Mongo and Kafka
+docker-compose -f src/main/docker/mongodb.yml up -d
+docker-compose -f src/main/docker/kafka.yml up -d
+
+Start the backend
+./mvnw
+
+Start frontend live-reload
+npm start
+
+The storage location of Docker images and containers
+Ubuntu: /var/lib/docker/
+Fedora: /var/lib/docker/
+Debian: /var/lib/docker/
+Windows: C:\ProgramData\DockerDesktop
+MacOS: ~/Library/Containers/com.docker.docker/Data/vms/0/
+
+
+docker  container ls
+docker  image ls
+docker  volume ls
+docker  network ls
+docker  info
+ docker rmi $(docker images -a -q)
+$ docker stop $(docker ps -a -q)
+$ docker rm $(docker ps -a -q)
+
+
+Clean up space used by Docker
+It is recommended to use the Docker command to clean up unused containers. Container, networks, images, and the build cache can be cleaned up by executing:
+$ docker system prune -a
+
+Additionally, you can also remove unused volumes by executing:
+$ docker volumes prune
+
+
+$ docker image rm nginx -f
+$ docker image prune -a
+$ docker rmi $(docker images -q)
+
+
+JDL-Studio
+JDL-Studio is a database diagramming tool.
+Run the following command (in the jhipster-workspace/vbot directory) to import this file.
+$ jhipster import-jdl ~/Downloads/jhipster-jdl.jh
+You’ll be prompted to overwrite src/main/resources/config/liquibase/master.xml. Type a to overwrite this file, as well as others.
+Start the application with /.mvnw and run yarn start (in another window) to view the UI for the generated entities.
+
+OR 
+
+Generate Product Entity
+Create a product entity by running the following command in the store directory. jhipster entity --help
+jhipster entity <entityName> — [options]
+$ jhipster entity product
+    Do you want to add a field to your entity? Yes
+    What is the name of your field? name
+    What is the type of your field? String
+    Do you want to add validation rules to your field? Yes
+    Which validation rules do you want to add? Required
+    Do you want to add a field to your entity? Yes
+    What is the name of your field? price
+    What is the type of your field? BigDecimal
+    Do you want to add validation rules to your field? Yes
+    Which validation rules do you want to add? Required
+    Do you want to add a field to your entity? No
+    Do you want to use a Data Transfer Object (DTO)? No
+    Do you want to use separate service class for your business logic? No
+    Do you want pagination on your entity? Yes, with pagination links
+
+
+However if you have different options per entity then you need to have a line per option eg.
+==================================================================================================
+paginate ParkingSpace, AvailabilitySlot with pagination
+paginate  BookingSlot with infinite-scroll
+
+> jhipster spring-controller sample_controller
+> jhipster spring-service sample_service
+
+    mongodb:
+      host: localhost
+      port: 27017
+#      uri: mongodb://localhost:27017 mongodb://AdminAyush:AdminAyush@localhost:27017/chatbot?authSource=admin
+#      uri: mongodb://localhost:27017/chatbot?authSource=admin?authSource=admin
+      database: chatbot
+      password: AdminAyush
+      username: AdminAyush
+
+
+
+
+
+
+
+<!-- $ docker-compose build -->
+<!-- $ docker-compose up -d # start all containers daemonized -->
+
+<!-- export FILEBEAT_CONTAINER_ID=$(docker ps | grep filebeat | awk '{print $1}') -->
+<!-- docker logs -f $FILEBEAT_CONTAINER_ID -->
+
+
+
+
+
+
+
+git 
+docker    details check.  => by kamal sir
+models
+JDL Studio
+
+https://sleeplessbeastie.eu/2020/11/23/how-to-create-mongodb-container-with-designated-user/
+https://javatodev.com/docker-compose-for-spring-boot-with-mongodb/
+Open .env and put these:
+# host ports
+SERVER_HOST_PORT=25000
+MONGO_HOST_PORT=26000
+# host paths to mount
+MONGO_DATA_HOST_PATH="A:\love\mongodb\data"
+MONGO_LOG_HOST_PATH="A:\love\mongodb\log"
+MONGO_INITDB_SCRIPTS_HOST_PATH="A:\love\mongodb\initdb.d"
+# application
+APP_NAME=love
+NETWORK_NAME=love-network
+# mongodb
+MONGO_AUTO_INDEX_CREATION=true
+MONGO_ROOT_USERNAME=root
+MONGO_ROOT_PASSWORD=root
+MONGO_DB=love
+MONGO_DB_USERNAME=user1
+MONGO_DB_PASSWORD=user1
+
+
+
+
+
+
+
+
+
+
+
+version: '3.6'
+# Deploys MongoDB with customization scripts and container with Mongo client
+# https://fabianlee.org/2018/05/20/docker-using-docker-compose-to-link-a-mongodb-server-and-client/
+#
+# usage:
+# sudo docker-compose build
+# sudo docker-compose up
+
+
+services:
+  my-mongodb:
+    image: mongo:4.2.3-bionic
+    container_name: my-mongodb
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_DATABASE=test
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    volumes:
+      # seeding scripts
+      - ./mongo-entrypoint:/docker-entrypoint-initdb.d
+      # named volumes
+      - mongodb:/data/db
+      - mongoconfig:/data/configdb
+    networks:
+      - mongo_net
+
+  my-mongoclient:
+    # build will get tagged with 'image'
+    build: ./my-mongoclient
+    image: fabianlee/my-mongoclient:3.9
+    container_name: my-mongoclient
+    environment:
+      - MONGO_SERVER=my-mongodb
+      - MONGO_INITDB_DATABASE=test
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    networks:
+      - mongo_net
+    depends_on:
+      - my-mongodb
+    
+volumes:
+  # default dir on Ubuntu: /var/lib/docker/volumes
+  mongodb:
+  mongoconfig:
+
+networks:
+  mongo_net:
+    driver: bridge
+
+
+
+106.79.209.84/32
+root
+root
+mongosh "mongodb+srv://cluster0.5gqoyzq.mongodb.net/myFirstDatabase" --apiVersion 1 --username root
+
+spring.data.mongodb.host=localhost
+spring.data.mongodb.port=27017
+spring.data.mongodb.authentication-database=admin
+spring.data.mongodb.username=root
+spring.data.mongodb.password=root
+spring.data.mongodb.database=bzklog

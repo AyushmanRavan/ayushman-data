@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <title>Href Attribute Example</title>
+    <script>
+      let data={name:'vvvv',
+      grade: 'A',}
+      const Result = [
+    {
+      name:'John',
+      grade: 'AAA',
+    },
+    {
+      name:'Ben',
+      grade: 'C',
+    },
+    {
+      name:'Anthony',
+      grade: 'B',
+    },
+    {
+      name:'Tim',
+      grade: 'B-',
+    },
+  ]
+  
+  const index = Result.findIndex( (element) => element.name === data.name);
+  if(index == -1){
+    Result.push(data);
+  }else{
+    Result[index].grade = Result[index].grade + data.grade;
+  }
+  console.log(index,Result)
+   </script>
+  </head>
+  <body>
+    <h1>Href Attribute Example</h1>
+    <p>
+      <a href="https://www.freecodecamp.org/contribute/">The freeCodeCamp Contribution Page</a> shows you how and where you can contribute to freeCodeCamp's community and growth.
+    </p>
+    <iframe src="https://research.google.com/pubs/archive/44678.pdf" width="800" height="600">
+  </body>
+ 
+</html>
+
+
+

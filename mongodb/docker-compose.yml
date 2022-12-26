@@ -1,0 +1,247 @@
+version: '3.8'
+services:
+  mongodb-database:
+    image: mongo:${MONGO_VERSION}
+    container_name: ${CONTAINER_NAME}
+    restart: unless-stopped
+    env_file: ./var.env
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+    volumes:
+          # seeding scripts
+      - ./volumes-data/vbot-init.js:/docker-entrypoint-initdb.d/vbot-init.js:ro
+           # named volumes
+      #  - ./volumes-data/:/data/db/
+      #  - ./volumes-data/:/var/log/mongodb/
+    # networks:
+    #   - mongo_net
+
+
+
+
+
+# see the content of /etc/hosts ( cat /etc/hosts ) after running the above docker-compose.
+
+
+
+
+
+            # MONGO_INITDB_ROOT_USERNAME: <admin-user>
+            # MONGO_INITDB_ROOT_PASSWORD: <admin-password>
+            # MONGO_INITDB_DATABASE: <database to create>
+
+# Viewing Logs
+# Syntax : docker logs <container ID>
+# ex : docker logs  <container_id> -f
+# docker logs <container_id> --tail N
+# docker logs <container_id> -t
+# docker logs <container_id> --details
+# docker logs <container_id> | grep pattern
+# docker logs --since 2019-03-02 <container_id>
+# docker logs --follow --until=30m <container_id>
+
+
+
+
+
+
+
+# https://sleeplessbeastie.eu/2020/11/23/how-to-create-mongodb-container-with-designated-user/
+# docker run --rm -p <CONTAINER_PORT>:<HOST_PORT> --name <CONTAINER_NAME> <APPLICATION_IMAGE_NAME>:<IMAGE_VERSION>
+# sudo docker run -it fba0df960494 mongo -u application_user -p application_pass -h localhost -P 27017 --authenticationDatabase  application_database --eval "db.adminCommand({ listDatabases: 1 })"
+# docker-compose -f src/main/docker/mongodb.yml down
+# docker run -it mongo:latest mongosh --username app_user --password app_pass  --authenticationDatabase app_database --eval "db.adminCommand({ listDatabases: 1 })"
+# # See logs for all services
+# docker-compose logs -f
+
+# # See logs for only the application service
+# docker-compose logs -f web
+
+# # See logs for only the MongoDB service
+# docker-compose logs -f database
+
+# volumes:
+#   # default dir on Ubuntu: /var/lib/docker/volumes
+#   mongodb:
+#   mongoconfig:
+
+# networks:
+#   mongo_net:
+#     driver: bridge
+
+
+
+# depends_on:
+#   - my-mongodb
+
+
+
+# volumes:
+#   mongodb_data_container:
+# ------------
+# volumes:
+#   - mongodb_data_container:/data/db
+
+
+# Interacting with the MongoDB container
+# sudo docker exec -it mongodb bash
+
+# If you want to stop the container:
+# docker-compose down -v
+
+
+
+# 1) Pull MongoDB image
+# $ docker pull mongo:latest
+
+# 2) Show pulled images
+# $ docker images
+
+# 3) Create a file for initiate authenticated database and user
+# init-mongo.js
+# db.createUser(
+#    {
+#      user: "AdminAyush",
+#      pwd: passwordPrompt(),
+#      roles: [ { role: "userAdminAnyDatabase", db: "chatbot" }, "readWriteAnyDatabase" ]
+#   }
+#  )
+# 4) Execution
+# $ docker-compose up or$ docker-compose up -d
+
+# 5) login to the container.
+# Type $ docker container ls to see our running container
+# 5.1) Enter the following to gain the bash prompt within the container:
+# $ docker exec -it <container-name> /bin/bash
+# 5.2) Once at the container’s command prompt, enter the mongosh shell:
+# $ mongosh
+
+# 6) Login to MongoDB with created User & Database by using
+# $ mongosh -u <your username> -p <your password> --authenticationDatabase <your database name>
+### OR ### 
+# $ mongosh -u <your username> --authenticationDatabase <your database name>
+
+# mongodb://YourUsername:YourPasswordHere@127.0.0.1:27017/your-database-name
+
+
+
+# Explanation
+# ===========================================================================
+# version: is a version of docker-compose file format, you can change to the latest version
+# database: on line 3 is just a service name, you can change the name whatever you want
+# image: must be mongo, because you want to create a container from mongo image
+# container_name: is a name for your container, it’s optional
+# environment: is a variables that will be used on the mongo container
+# MONGO_INITDB_DATABASE: you fill with a database name that you want to create, make it same like init-mongo.js
+# MONGO_INITDB_ROOT_USERNAME: you fill with username of root that you want
+# MONGO_INITDB_ROOT_PASSWORD: you fill with password of root that you want
+# volumes: to define a file/folder that you want to use for the container
+# ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo-js:ro means you want to copy init-mongo.js to /docker-entrypoint-initdb.d/ as a read only file. /docker-entrypoint-initdb.d is a folder that already created inside the mongo container used for initiating database, so we copy our script to that folder
+# ./mongo-volume:/data/db means you want to set data on container persist on your local folder named mongo-volume . /data/db/ is a folder that already created inside the mongo container.
+# ports: is to define which ports you want to expose and define, in this case I use default mongoDB port 27017 until 27019
+
+
+
+
+# A) Downloading the Latest MongoDB Docker Image
+# docker pull mongo:4.0.4
+
+# B) Deploying an Instance of MongoDB as a Container
+# docker run -d -p 27017-27019:27017-27019 --name mongodb mongo:4.0.4
+
+# C) Interacting with the MongoDB Docker Container with Basic Shell Operations
+# $ docker exec -it <container-name> bash
+# $ mongosh
+# Or go to mongo shell directly:
+# $ docker exec -it <container-name> mongosh
+
+
+
+    # networks: # Networks to join (Services on the same network can communicate with each other using their name)
+    #   - database
+    #   - reactjs
+
+
+
+# -p <host-port>:<container-port>
+# So the outsiders can access the XXXXX container with host machine ip-address:2012 port.
+
+
+
+# Build Docker Image
+# Now that we have an executable jar file and a Dockerfile, it’s time to build a Docker Image.
+# $ docker build -t bootdocker:1.0 .
+# docker build -f Dockerfile -t spring-jpa-app:1.0 .
+
+# Make sure to include . at the end (. referse to = from the directory where our Dockerfile is located in this case current working directory.)
+# Here, -t simply means tag followed by "name:tag" format.
+# After running the command, you can see that a Docker image is built.
+# You can $ docker images | grep bootdocker to check if the Docker image was built successfully.
+
+# Run Docker container using the image built
+# $ docker run -d --name bootdocker -p 8080:8080 bootdocker:1
+
+# Side Notes
+# If you want to see if the jar file is correctly copied to the container’s given directory, you can use docker exec -it -w /usr/app bootdocker /bin/bash.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# mvn cobertura:cobertura
+# Accessing the report
+# The generated code coverage analysis report can be accessed through  ${project}/target/site/cobertura/index.html 
+
+
+
+
+# docker pull sonarqube
+# docker run -d --name sonarqube -p 9000:9000 -p 9092:9092 sonarqube  
+# Now you can navigate to http://localhost:9000 and you will see your local SonarQube dashboard.
+# JaCoCo Test Coverage Analysis with SonarQube
+# First you need to run the test cases with maven before sending the report for the Sonar server.
+# mvn test           ////Running test cases  with maven
+# make sure that you have run the mvn test command successfully before executing the below command
+# mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=admin                  //////Sending the coverage report to sonar 
+# Then it will send the inspection report to the SonarQube and you can access the detailed report through http://localhost:9000
+
+# Both of above commands can be composed into one single command as follows.
+# mvn test sonar:sonar -Dsonar.login=admin -Dsonar.password=admin
+
+# Exclude Classes from Code Coverage Analysis
+# E.g:- configuration related classes (SpringBootApplication configuration class, SpringSecurityApplication configuration class etc..) should be avoided
+# pom.xml
+# ====================================================================
+# <properties>
+#     <sonar.exclusions>
+#       **/SpringBootDockerExampleApplication.java,
+#       **/config/*.java
+#     </sonar.exclusions>
+#  </properties>
+

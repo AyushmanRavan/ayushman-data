@@ -1,0 +1,234 @@
+Spring Cloud Config has features such as centralization, version control, support for dynamic updates, and language independence. Its characteristics includes:
+
+    Provide server and client support (Spring Cloud Config Server and Spring Cloud Config Client);
+    Centralized management of application configuration in a distributed environment;
+    Based on the Spring environment, it achieves seamless integration with Spring applications;
+    Programs that can be used in any language development;
+    The default implementation is based on Git repositories (also supports SVN), so that version management can be performed;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1) Config files
+		application.properties
+2) Config server
+		spring.config.import=configserver:http://localhost:8888
+3) Environment variables
+		DEMO_VALUE=abc => demo.value=abc
+4) System properties
+		java -Ddemo.value=abc -jar demo.jar
+5) Command line arguments
+		java -jar demo.jar --demo.value=abc
+
+Relaxed binding : 
+		demo-value=abc
+		DEMO_VALUE=abc
+		demoValue=abc
+can be equally mapped to:
+
+		@Value("${demo-value}")
+		String demoValue;
+
+		@ConfigurationProperties
+		public class Demo {
+		   String demoValue;
+		   // getters and setters
+		}
+
+One more thing to mention is that if you are consuming values with @Value annotation, then corresponding classes need to be marked with @RefreshScope. 
+Otherwise the annotated fields won’t be updated. There are no additional actions needed for either Environment or @ConfigurationProropeties with Spring Boot, 
+though. This is another reason why you might prefer @ConfigurationProropeties to @Value.
+
+“-Dspring.profiles.active=dev”
+Refresh Repository:
+==============================================
+We can control how often the config server will pull updated configuration data from your Git backend by using spring.cloud.config.server.git.refreshRate.
+The value of this property specified in seconds.
+By default the value is 0, meaning the config server will fetch updated configuration from the Git repo every time it is requested.
+
+Serving Configuration from A Branch or Label:
+========================================================
+By default, spring config server will load properties from a master, but we can configure this using spring.cloud.config.server.git.default-label property.
+
+spring.cloud.config.server.git.cloneOnStart=true
+
+
+ If you use a subfolder for each application, remember to set the spring.cloud.config.server.git.search-paths property in the Config Server configuration,
+ otherwise it will only consider the files in the root folder.
+
+ Serving application and profile specific properties:
+ ==========================================================
+/{application}/application-{profile}.yml
+/{application}/application.yml
+application-{profile}.yml
+application.yml
+
+/{application}/{profile}[/{label}]
+/{application}-{profile}.yml
+/{label}/{application}-{profile}.yml
+/{application}-{profile}.properties
+/{label}/{application}-{profile}.properties
+
+
+spring.cloud.config.server.git.search-paths 
+===================================================================
+– Here I’m setting whatever the folder structure that we are keeping where I’ve stored all the configuration in github repository. (Optional)
+
+<spring.application.name> -<profile>.yml/.properties
+http://<server>:<port>/<spring.application.name>/<profile>
+
+
+    {application} is spring.application.name on the client side.
+
+    {profile} is spring.profiles.active on the client.
+
+    {label} is the commit id, branch name, or tag.
+Note: Active profiles take precedence over defaults. When multiple profiles are selected, the last one will be chosen.
+
+
+#By default without any profile, it'll consider default i.e. local
+# i.e without any profile environment name (default) -> techgeeknext-client-config.properties
+#For Active Profile - development -> techgeeknext-client-config-development.properties
+#For Active Profile - production -> techgeeknext-client-config-production.properties
+# uncomment below property to see if you change the value like development/production etc.
+##spring.profiles.active=production
+
+
+
+
+
+
+book-management-dev.properties
+book-management-local.properties
+===========================Config Client(bootstrap.properties/yml)========================================
+bootstrap.properties/yml
+---------------------------------------------
+spring.application.name=book-management
+#Config Server location
+spring.config.import=optional:configserver:http://localhost:8888
+#spring.config.import=optional:configserver:http://root:s3cr3t@localhost:8888
+management.security.enabled=false
+
+application.properties/yml
+-----------------------------------------
+server.port=8999
+spring.profiles.active=dev
+#Activate Spring Boot Actuator
+#management.endpoints.web.exposure.include=refresh
+management.endpoints.web.exposure.include=*
+
+
+
+
+Change@1997
+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
+
+
+
+===========================Config Server(application.properties/yml)========================================
+server.port=8888
+spring.profiles.active=git
+spring.application.name=config-server
+
+# Repository Location in Github
+spring.cloud.config.server.git.uri=https://github.com/username/config-server.git
+spring.cloud.config.name=*Your cloud config server name*
+spring.cloud.config.server.git.username=yourUserName
+spring.cloud.config.server.git.password=yourPassword
+# Github default branch(By default, spring config server will load properties from a master.)
+spring.cloud.config.server.git.default-label=main
+#if need to load configuration properties from git repository subfolder then use
+spring.cloud.config.server.git.search-paths=configuration
+#Disable security of the Management endpoint
+management.security.enabled=false
+
+
+
+
+spring.cloud.config.server.git.uri=ssh://localhost/config-repo
+spring.cloud.config.server.git.clone-on-start=true
+spring.security.user.name=root
+spring.security.user.password=s3cr3t
+
+
+
+
+7776031672
+one-broad-band 
+
+
+
+
+
+[application-name]-[profile].properties / [application-name]-[profile].yml
+[application-name].properties / [application-name].yml
+application.properties / application.yml
+
+http://localhost:8888/{client.application.name}/{profile}
+---------------------------------------------
+    bank-account-service.properties – this file contains the default properties and is used as the property source when the default profile is specified on the request.
+    bank-account-service-dev.properties – this file has a ‘-dev’ post fix and contains the properties returned when the dev profile is specified on the request.
+    bank-account-service-uat.properties – this file has a ‘-uat’ post fix and contains the properties returned when the uat profile is specified on the request.
+
+
+Let’s look over each part of this url:
+
+    application
+        Client application sets the spring.application.name property in the bootstrap.properties file and this is used as the first parameter in the config server url.
+        Config server url tells the config server that the config data is to be fetched first from a file whose name begins with the application name parameter in the url.
+    profile
+        Client application sets the spring.profiles.active property in the bootstrap.properties file and this is used as the second parameter in the config server url.
+        Config server url tells the config server that the config data is to be fetched preferably from files whose name contains the profile in the url.
+        This parameter is optional and the default value is default.
+        An active profile set in the properties file overrides the default profile.
+        In case of db backend, default profile must also be implicitly set.
+        In case of multiple active profiles in client applications, last-wins strategy is applied and profiles override each other’s properties.
+        For example;
+        spring.profiles.active = test, cluster2
+        1
+        	
+        spring.profiles.active = test, cluster2
+
+        This definition means that; if a property is defined both in application-test.properties and application-cluster2.profiles, then the latter one overrides the former one.
+    label
+        label is the third parameter in the config server url and it is also optional with the default value as master which references the master branch of the repository in case of git.
+        label corresponds to branch when using git or any other version control system as backend.
+        Client application can also set the spring.cloud.config.label property in the bootstrap.properties file and this is used as the third parameter in the config server url, telling the config server from which branch the config data must be fetched.
+        label can be used for grouping the properties by environments like develop, test and master.
+
+
+###############LOCAL REPOSITORY########################
+#spring.cloud.config.server.git.uri = file:///home/erol/dev/app_data/config-repo
+
+###############GITHUB REPOSITORY#######################
+spring.cloud.config.server.git.uri = https://github.com/erolhira/config-repo-sample.git
+#spring.cloud.config.server.git.username = my-user-name
+#spring.cloud.config.server.git.password = my-password
+
+The default precedence over the property sources is as follows:
+=====================================================================
+Bootstrap Context > Application Context
+Config Server > bootstrap.properties > application.properties
+
+
+spring.application.name=config-server
+server.port=8888
+# URI of GIT repo containing properties
+spring.cloud.config.server.git.uri=https://github.com/briansjavablog/micro-services-spring-cloud-config
+# path to properties from root of repo 
+spring.cloud.config.server.git.searchPaths: configuration
+spring.cloud.config.server.git.clone-on-start=true
+logging.level.org.springframework.web=INFO

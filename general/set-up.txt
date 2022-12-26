@@ -1,0 +1,60 @@
+Setting an environment variable this way isn't permanent. 
+If you want to permanently set an environment variable, you need to set it in either the system-wide startup file, /etc/profile, 
+or one of the user-specific startup files, i.e., ~/.bash_profile, ~/.bash_login, and ~/.profile.
+
+
+
+
+
+Note : the file ~/.bashrc is similar, with the exception that ~/.bash_profile runs only for Bash login shells and .bashrc runs for every new Bash shell. 
+
+1) Install JAVA ==    https://www.explorelinux.com/set-java-home-variable-for-all-users-in-linux/
+
+For setting environment variable for JAVA globally follow bellow step:
+A) echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> ~/.bashrc
+B) echo "export PATH=$JAVA_HOME/bin:$PATH" >> ~/.bashrc
+Verify that it has been correctly added to the end of the file:
+tail -3 ~/.bashrc
+=============================================================================================================================
+
+2) Install Gradle   ==  https://vitux.com/how-to-install-gradle-on-ubuntu/
+
+For setting environment variable for GRADLE globally follow bellow step:
+A) echo "export GRADLE_HOME=/opt/gradle/gradle-6.4.1" >> ~/.bashrc
+B) echo "export PATH=$GRADLE_HOME/bin:$PATH" >> ~/.bashrc
+Verify that it has been correctly added to the end of the file:
+tail -3 ~/.bashrc
+=============================================================================================================================
+
+3) Install Docker    ==  https://vitux.com/ubuntu-docker/
+
+To run Docker as a non-root user, you have to add your user to the docker group.
+- Create a docker group if there isn't one: $ sudo groupadd docker.
+- Add your user to the docker group: $ sudo usermod -aG docker $USER
+- Log out and log back in so that your group membership is re-evaluated.
+=============================================================================================================================
+
+4) Install Docker Compose   ==       https://www.cyberithub.com/how-to-install-docker-compose-on-ubuntu-20-04-lts-step-by-step/
+=============================================================================================================================
+
+5) Install IntelliJ IDEA community version   ==  https://linuxhint.com/install-intellij-idea-on-ubuntu-20-04/
+=============================================================================================================================
+
+6) Install git   ===   https://www.cyberithub.com/how-to-install-and-use-git-on-ubuntu-20-04-lts/
+=============================================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

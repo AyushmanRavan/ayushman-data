@@ -1,0 +1,35 @@
+let userEmailList = [ 'a@example.com', 'b@example.com', ..., 'z@example.com' ];
+let limit = 5;
+let taskList = userEmailList.map(function (email) {
+    return function (callback) {
+        sendEmail(email, function (error, result) {
+            return callback(error, result); // The first parameter is the exception error, and the second parameter is the return value
+        });
+    }
+});
+console.log('attempting to start scrapers');
+console.log('total scrapers: ' + taskList.length);
+// Parallel limit: each method is executed in parallel, but there is an upper limit on the number of parallel tasks at the same time
+async.parallel(taskList, limit, function (error, result) {
+    // results is an array of return values
+    console.log('event ' + results[0] + results[1] + ' occurs')
+    console.log(error, result);
+    if(err) {
+		console.log('error', err);
+	}
+	console.log('done!');
+});
+
+
+or
+--------------------------------------------------
+
+  // run 'my_task' 100 times, with parallel limit of 10
+
+  var my_task = function(callback) { ... };
+  var when_done = function(err, results) { ... };
+
+  // create an array of tasks
+  var async_queue = Array(100).fill(my_task);
+
+  async.parallelLimit(async_queue, 10, when_done);

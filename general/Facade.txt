@@ -1,0 +1,7 @@
+https://javadevcentral.com/facade-design-pattern
+https://kkjavatutorials.com/facade-design-pattern-in-java/
+
+
+
+a) Aggregation — loose coupling, weak
+b) Composition — tight coupling, strong

@@ -1,0 +1,85 @@
+Note: Auth in OAuth stands for AUTHORIZATION but NOT AUTHENTICATION.
+according to one of the two main supported SSO (Single Sign-On) protocols: OpenID Connect and SAML.
+SAML for SOAP services
+while OIDC makes use of JWT (JSON Web Token) in the form of identity tokens and access tokens.
+
+client represents :  a web application or web service that wants to use Keycloak to authenticate and authorize users.
+Client ID: spring-boot-app
+Client Protocol: openid-connect
+Root URL: http://localhost:8080
+
+https://www.appsdeveloperblog.com/guide-to-use-keycloak-with-spring-boot/
+https://www.thomasvitale.com/keycloak-authentication-flow-sso-client/
+https://www.keycloak.org/2017/05/easily-secure-your-spring-boot.html
+https://www.analyticsvidhya.com/blog/2022/06/spring-security-oauth2-with-keycloak/
+https://chathurangat.wordpress.com/2020/05/04/setting-up-keycloak-server/
+
+OIDC is more about “proving who you are” where OAuth2 is more about “authorization” (granting access to functionality, data, …)
+
+
+Where do we Implement OAuth 2?
+1. At Spring MVC (Model View Controller) application.
+2. At Single page applications like Angular, react with spring-boot backend.
+3. At M2M (Machine to Machine) Authorization between micro-services as identity server or authorization server.
+
+
+Keycloak provides the application with two tokens as defined by the OIDC protocol:
+1. An Identity Token, which contains information about the logged user such as email, first name & last name.
+   Used to verify the user information and identity of the user.
+2. An Access Token, digitally signed by the realm, which contains access data such as the roles assigned to the logged user.
+   Used to verify a user is authorized to access the resource.
+
+Tokens in OAuth2:
+There are 2 types of tokens issued by Authorization Server
+1) Access Token - Third party apps use this token to access information from the resource server. It has a limited lifetime and must be sent with each request.
+2) Refresh Token - This is similar to REMEMBER ME option. This token has a longer lifetime and is used to re-generate the access token.
+
+
+Note: The client has two types
+1. Public Client — Web, Mobile, Desktop, and Smart TV apps which can access by the public.
+2. Confidential Client — Remote shell scripts, CRON jobs, Microservices.
+
+
+Authorization Server — Server that generates and validates Access Tokens for Clients.
+Options in Market
+1. AWS Cognito
+2. Microsoft Azure AD
+3. Google Identity Platform
+4. OKTA
+5. Key Cloak
+6. Spring Authorization Server
+
+
+
+A). Get authorization grant code
+http://localhost:8080/oauth/authorize?client_id=javafullstack&response_type=code&scope=user_info<code>
+
+
+This redirect URL will also contains a code as part of the query string (http://localhost:8081/login?code=13428u).
+This code is the authorization code for the third party application.
+
+B). Get Access Token
+To get the access token, we need to pass the code received in the previous step.
+curl -X POST \
+  http://localhost:8080/oauth/token \
+  -H 'authorization: Basic amF2YWRldmpvdXJuYWw6MTIzNCQjQCE=' \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: application/x-www-form-urlencoded' \
+  -H 'postman-token: f24e14c3-a90a-4866-59ae-3691dfb3ea0a' \
+  -d 'code=ntCgjD&grant_type=authorization_code&redirect_uri=http%3A%2F%2Flocalhost%3A8081%2Flogin&scope=user_info'
+
+On a successful request, the auth server will return the access token back in the response
+{
+    "access_token": "791dccdf-c41f-42c1-9b88-93853ed5c87b",
+    "token_type": "bearer",
+    "refresh_token": "ec2ef96e-1792-4188-b397-87b1a2afdeb4",
+    "expires_in": 122,
+    "scope": "user_info"
+}
+
+
+
+
+
+https://github.com/keycloak/keycloak/releases/download/20.0.1/keycloak-20.0.1.tar.gz
+https://github.com/keycloak/keycloak/releases/download/15.0.2/keycloak-15.0.2.tar.gz

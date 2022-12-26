@@ -1,0 +1,64 @@
+package com.ayush.threads.lock;
+
+public class Resource {
+
+	public void doSomething(){
+		//do some operation, DB read, write etc
+	}
+	
+	public void doLogging(){
+		//logging, no need for thread safety
+	}
+}
+
+
+
+package com.ayush.threads.lock;
+
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class ConcurrencyLockExample implements Runnable{
+
+	private Resource resource;
+	private Lock lock;
+	
+	public ConcurrencyLockExample(Resource r){
+		this.resource = r;
+		this.lock = new ReentrantLock();
+	}
+	
+	@Override
+	public void run() {
+		try {
+			if(lock.tryLock(10, TimeUnit.SECONDS)){
+			resource.doSomething();
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}finally{
+			//release lock
+			lock.unlock();
+		}
+		resource.doLogging();
+	}
+
+}
+
+IMP : ----Note
+As you can see that, I am using tryLock() method to make sure my thread waits only for definite time and if it’s not getting the lock on object, 
+it’s just logging and exiting. 
+Another important point to note is the use of try-finally block to make sure lock is released even if doSomething() method call throws any exception.
+
+
+
+1) If there’s a single thread that writes to the volatile variable and other threads only read the volatile variable then just using volatile is enough,
+2)  if there’s a possibility of multiple threads writing to the volatile variable then “synchronized” would be required to ensure atomic writes to the variable.
+3)  When a thread exits a synchronized block, it performs a write barrier -- it must flush out any variables modified in that block to main memory 
+    before releasing the lock. 
+4) With the reentrant lock, you are free to lock and unlock it in different methods but not with different threads. 
+   If you attempt to unlock a reentrant lock object by a thread which didn't lock it initially, you'll get an IllegalMonitorStateException.
+5) We can achieve fairness within the Lock APIs by specifying the fairness property.
+6) The Lock API provides tryLock() method. The thread acquires lock only if it’s available and not held by any other thread. 
+6) The Lock API provides a method lockInterruptibly() which can be used to interrupt the thread when/which it’s waiting for the lock

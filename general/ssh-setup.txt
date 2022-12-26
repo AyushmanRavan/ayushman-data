@@ -1,0 +1,51 @@
+https://www.cyberciti.biz/faq/how-to-set-up-ssh-keys-on-linux-unix/
+
+
+
+
+Connecting to your SSH server
+SSH Client Config Files
+Below are the locations of the ssh client configuration files  ::  https://www.tecmint.com/configure-custom-ssh-connection-in-linux/
+=====================================================================
+AA) /etc/ssh/ssh_config – this is the default, system-wide configuration file. It contains settings that apply to all users of ssh client machine.
+BB) ~/.ssh/config or $HOME/.ssh/config – is the user-specific/custom configuration file. It has configurations that apply to a specific user. 
+It therefore overrides default settings in the system-wide config file. This is the file we will create and use.
+
+
+
+ssh-keygen -t rsa -b 4096 -C "your_email@domain.com"
+
+$HOME/.ssh/id_rsa: The private key. DO NOT SHARE THIS FILE!
+$HOME/.ssh/id_rsa.pub: The associated public key. This can be shared.
+
+
+
+
+On your workstation, change the key’s permissions to make it readable for your user only
+--------------------------------------------------------------------------------------------
+chmod 600 ~/Temp/elk-test-eu-west-2.pem
+
+In order to connect to your SSH server, you are going to use the ssh command with the following syntax
+---------------------------------------------------------------------------------------------------------
+$ ssh -p <port> <username>@<ip_address>
+ex : ssh -p 22 tecmint@192.168.56.10
+
+When SSH Public key is not in the default ~/.ssh/id_rsa, use -i to pass manual path for the identity:
+=====================================================================================================
+$ ssh -i /path/to/privkey ubuntu@192.168.200.46
+ex : ssh -i ~/Temp/elk-test-eu-west-2.pem ubuntu@18.135.74.203
+
+Exiting your SSH server:
+============================
+In order to exit from your SSH server on Ubuntu 20.04, you can hit Ctrl + D or type ‘logout’ and your connection will be terminated.
+
+ssh_config : 
+===================
+is used in order to configure SSH clients. It means that it defines rules that are applied everytime you use SSH to connect to a remote host or to transfer files between hosts;
+sshd_config : 
+==================
+is used in order to configure your SSH server. It is used for example to define the reachable SSH port or to deny specific users from communicating with your server.
+
+To check whether you have sudo privileges or not, you can launch the following command.
+=========================================================================================
+sudo -l

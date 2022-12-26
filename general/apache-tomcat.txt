@@ -1,0 +1,157 @@
+cd /opt/tomcat/bin/ && ./startup.sh
+
+
+
+
+https://www.linuxshelltips.com/install-apache-tomcat-ubuntu/
+Step 1: Create Tomcat User
+---------------------------
+Create a new user and group that will run the Tomcat service. First, create a new group “tomcat”.
+$ sudo groupadd tomcat
+
+Next, create a new tomcat user and add the user to the group “tomcat”.
+$ sudo useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
+
+Step 2: Install Tomcat
+-----------------------------
+Now, change the directory to /tmp
+$ cd /tmp
+
+Now using CURL, download the Tomcat from the official website as mentioned above.
+$ curl -O https://downloads.apache.org/tomcat/tomcat-8/v8.5.66/bin/apache-tomcat-8.5.66.tar.gz
+
+or 
+
+VERSION=9.0.35
+wget https://www-eu.apache.org/dist/tomcat/tomcat-9/v${VERSION}/bin/apache-t
+
+
+Let’s install Tomcat under /opt/tomcat directory. Create a directory, then extract the archive to it.
+$ sudo mkdir /opt/tomcat
+$ sudo tar -xzvf apache-tomcat-8*tar.gz -C /opt/tomcat --strip-components=1
+
+or
+
+sudo tar -xzvf /tmp/apache-tomcat-${VERSION}.tar.gz -C /opt/tomcat/
+
+Tomcat is usually updated regularly with safety as well as new features. To have more control, 
+create a symbolic link called the latest. It will point to the Tomcat installation directory.
+sudo ln -s /opt/tomcat/apache-tomcat-${VERSION} /opt/tomcat/latest
+
+
+
+
+Now, setup the proper user permissions for installation.
+
+Step 3: Update Permissions
+----------------------------
+Set permission for newly created Tomcat user. Change the directory where we already unpacked the Tomcat installation.
+$ cd /opt/tomcat
+
+Now, set group ownership to the entire directory.
+$ sudo chgrp -R tomcat /opt/tomcat     |      ///// chown -R tomcat:tomcat /opt/tomcat/ 
+$ sudo chmod -R g+r conf               |     chmod -R u+x /opt/tomcat/bin 
+$ sudo chmod g+x conf                  |
+
+Make the tomcat user the owner of the webapps, work, temp and log directories.
+$ sudo chown -R tomcat webapps/ work/ temp/ logs/
+
+
+or 
+
+
+After that, shell scripts inside the Tomcat’s bin directory needs to be executable.
+Make the shell scripts inside the bin directory executable:
+sudo sh -c 'chmod +x /opt/tomcat/latest/bin/*.sh'
+
+
+
+
+Step 4: Create a systemd Unit File for Install Apache Tomcat 9
+-----------------------------------------------------------------
+To run Tomcat as a service you need to create a new unit file.
+
+Now, create systemd service file. Open a file called tomcat.service from the directory /etc/systemd/system.
+
+Use VI editor to edit the file and modify the JAVA Home by your JAVA Home location.
+
+[Unit]
+Description=Apache Tomcat Web Application Container
+After=network.target
+
+[Service]
+Type=forking
+
+Environment=JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd6
+Environment=CATALINA_PID=/opt/tomcat/temp/tomcat.pid
+Environment=CATALINA_HOME=/opt/tomcat
+Environment=CATALINA_BASE=/opt/tomcat
+Environment='CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC'
+Environment='JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom'
+
+ExecStart=/opt/tomcat/bin/startup.sh
+ExecStop=/opt/tomcat/bin/shutdown.sh
+
+User=tomcat
+Group=tomcat
+UMask=0007
+RestartSec=10
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+
+Then, reload the system daemon for the changes to take effect
+$ sudo systemctl daemon-reload 
+
+Now, we can start the Tomcat application as shown:
+$ sudo systemctl start tomcat.service 
+
+Next, enable tomcat to start automatically upon system boots.
+$ sudo systemctl enable tomcat.service 
+
+The tomcat service is now running on your system. Verify the status with the command:
+$ sudo systemctl status tomcat.service
+
+
+Step 5: Firewall Configuration and Test the Tomcat Server
+---------------------------------------------------------------
+Now allow port 8080 to serve the browser request.
+$ sudo ufw allow 8080
+
+
+
+
+
+
+
+
+
+
+Step 5: Configure Environment variables
+Next configure environment variables using below command
+
+$ echo "export CATALINA_HOME="/opt/tomcat"" >> ~/.bashrc
+
+$ source ~/.bashrc
+
+
+
+
+
+
+
+
+
+
+Change the ownership of the directory to allow tomcat user to write files.
+-------------------------------------------------------------------
+sudo chown -R tomcat:tomcat /opt/tomcat/
+chmod +x /opt/tomcat/bin/*
+
+Next configure environment variables using below command.
+-------------------------------------------------------------------
+echo "export CATALINA_HOME="/opt/tomcat"" >> ~/.bashrc
+source ~/.bashrc
+echo $CATALINA_HOME

@@ -1,0 +1,92 @@
+https://programming.vip/docs/combination-query-aggregation-query.html
+https://github.com/eugenp/tutorials/blob/master/persistence-modules/spring-data-elasticsearch/src/test/java/com/baeldung/spring/data/es/ElasticSearchQueryManualTest.java
+https://www.pixeltrice.com/spring-boot-elasticsearch-crud-example/
+https://www.hireitpeople.com/resume-database/64-java-developers-architects-resumes/200539-elastic-search-engineer-resume
+https://programs.wiki/wiki/61e137d24cb92.html
+
+
+
+
+  * must(QueryBuilders)   :AND
+  * mustNot(QueryBuilders):NOT
+  * should:               :OR
+  //Under builder, must, should and mustNot are equivalent to and, or and not in sql
+
+ 
+    /*
+     * termQuery
+     * wildcardQuery
+     * fuzzyquery
+     * booleanQuery
+     * numericRangeQuery
+     */
+
+
+@Document(indexName = "msg", createIndex = false)
+public class Message {
+    @Id private String id;
+    @Field(type = FieldType.Text)
+    private String message;
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second)
+    private LocalDateTime timestamp = LocalDateTime.now();
+    // getter/setter omitted here for brevity
+}
+
+
+
+
+
+
+
+
+
+public List<EsBlog> elasticSerchTest() {
+    //1. Create Query Builder (that is, set query conditions). Here we create a combination query (also known as multi-condition query). More query methods will be introduced later.
+    /*Combination Query Builder
+        * must(QueryBuilders)   :AND
+        * mustNot(QueryBuilders):NOT
+        * should:               :OR
+    */
+    BoolQueryBuilder builder = QueryBuilders.boolQuery();
+    //Under builder, must, should and mustNot are equivalent to and, or and not in sql
+    
+    //Setting up a vague search, there are two words in the brief comment of the blog: learning
+    builder.must(QueryBuilders.fuzzyQuery("sumary", "Study"));
+    
+    //Set the title of the blog to be queried to contain keywords
+    builder.must(new QueryStringQueryBuilder("man").field("springdemo"));
+ 
+    //The ranking of blog comments is decreasing in turn
+    FieldSortBuilder sort = SortBuilders.fieldSort("commentSize").order(SortOrder.DESC);
+ 
+    //Set Paging (10 items are displayed on the first page)
+    //Note that the start is from 0, a bit like the query for method limit in sql
+    PageRequest page = new PageRequest(0, 10);
+ 
+    //2. Building queries
+    NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
+    //Set search criteria to build
+    nativeSearchQueryBuilder.withQuery(builder);
+    //Setting paging to build
+    nativeSearchQueryBuilder.withPageable(page);
+    //Set the sort to build
+    nativeSearchQueryBuilder.withSort(sort);
+    //Production of Native SearchQuery
+    NativeSearchQuery query = nativeSearchQueryBuilder.build();
+ 
+    //3. Execution Method 1
+    Page<EsBlog> page = esBlogRepository.search(query);
+    //Execution Method 2: Note that there is another way to execute it here: using elastic search Template
+    //Annotations need to be added when executing Method 2
+    //@Autowired
+    //private ElasticsearchTemplate elasticsearchTemplate;
+    List<EsBlog> blogList = elasticsearchTemplate.queryForList(query, EsBlog.class);
+    
+    //4. Get the total number of entries (for front-end paging)
+    int total = (int) page.getTotalElements();
+ 
+    //5. Get the queried data content (returned to the front end)
+    List<EsBlog> content = page.getContent();
+ 
+    return content;
+}

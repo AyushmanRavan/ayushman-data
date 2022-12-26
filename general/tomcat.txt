@@ -1,0 +1,48 @@
+Install Apache Tomcat 10 on Ubuntu
+-------------------------------------------
+
+
+1) We recommended running a Tomcat server with a dedicated user account. Create a new user, which is recommended for security purposes mainly for production deployments.
+   sudo useradd -m -d /opt/tomcat -U -s /bin/false tomcat 
+
+or
+    sudo groupadd tomcat
+    sudo useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
+
+   The above command will create a user and group with the name “tomcat” in your system.
+2) 
+    sudo apt install wget       ---------------------
+    /////               cd /tmp
+    VERSION=10.0.22
+    wget https://archive.apache.org/dist/tomcat/tomcat-10/v${VER}/bin/apache-tomcat-${VER}.tar.gz -P /tmp
+
+3) Once the download is completed, extracted the downloaded archive and copy all content to the tomcat home directory.
+    sudo mkdir /opt/tomcat
+    sudo tar -xzvf apache-tomcat-10*tar.gz -C /opt/tomcat --strip-components=1 
+
+    Next, set the proper file permissions.
+    -------------------------------------------
+    sudo chown -R tomcat:tomcat /opt/tomcat/ 
+    sudo chmod -R u+x /opt/tomcat/bin/*       or     sudo sh -c 'chmod +x /opt/tomcat/bin/*.sh' 
+
+4)
+Edit the '~/.bashrc' configuration using vim editor.
+
+vim ~/.bashrc
+Paste the following configuration into it.
+
+export CATALINA_HOME=/opt/tomcat
+Save and close.
+
+Now reload the '~/.bashrc' config file and check the 'CATALINA_HOME' environment variable.
+
+source ~/.bashrc
+echo $CATALINA_HOME
+You will get the '/opt/tomcat' as a value of the environment variable 'CATALINA_HOME'.
+
+Now you can start the Apache Tomcat manually using the following command.
+
+$CATALINA_HOME/bin/startup.sh
+You will get the Apache Tomcat is started.
+
+$CATALINA_HOME/bin/shutdown.sh

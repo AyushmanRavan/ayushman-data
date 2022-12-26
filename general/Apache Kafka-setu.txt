@@ -1,0 +1,214 @@
+
+
+
+lab test + wallet amount add  =  authorized. 
+
+
+
+https://cloudinfrastructureservices.co.uk/install-apache-kafka-on-ubuntu-20-04-cluster/
+https://www.howtoforge.com/tutorial/ubuntu-apache-kafka-installation/
+https://codingskills.dev/linux/how-to-install-apache-kafka-on-ubuntu-2004/
+
+
+sudo apt update -y && sudo apt upgrade -y
+sudo apt install openjdk-11-jdk/sudo apt install default-jdk
+
+
+Step 1:Download Apache Kafka:
+---------------------------------
+We will install and configure apache Kafka and run it as a non-root user.
+1.1)	Add a new user named 'kafka'.
+    ----------------------------------
+	useradd -d /opt/kafka -s /bin/bash kafka
+	passwd kafka
+1.2)	Now go to the '/opt' directory and download the Apache Kafka binary files using wget.
+	--------------------------------------------------------------------------------------------
+	cd /opt
+	wget http://www-eu.apache.org/dist/kafka/2.0.0/kafka_2.11-2.0.0.tgz
+1.3)	Now create a new kafka directory.
+	------------------------------------------
+	mkdir -p /opt/kafka
+1.4)	Extract the kafka_*.tar.gz file to the 'kafka' directory and change the owner of directory to the 'kafka' user and group.
+	----------------------------------------------------------------------------------------------------------------------------------
+	tar -xvzf kafka_2.11-2.0.0.tgz -C /opt/kafka --strip-components=1
+	sudo chown -R kafka:kafka /opt/kafka
+1.5) Now login to the 'kafka' user and edit the server.properties configuration.
+	-----------------------------------------------------------------------------------
+	su - kafka
+	vim config/server.properties
+	.......................................
+			delete.topic.enable = true
+	Save and exit.
+
+	Configure zookeeper properties:
+	------------------------------------
+	Open the zookeeper.properties file, located under config folder, and update the value of dataDir, 
+	change from "/tmp/zookeeper"  to "/opt/kafka/data/zookeeper"
+
+	Configure kafka-server:
+	----------------------------------
+	Open the server.properties file, located under config folder, and update the value of log.dirs, 
+	change from  "/tmp/kafka-logs"  to "/opt/kafka/data/kafka"
+
+The Apache Kafka configuration has been completed.
+     Now loginout to the 'kafka' user
+	 exit 
+
+
+Step 2:Setting the Path:
+===================================
+We are going to set the path locally so as we can access Kafka from any location (by default we access it from the installation folder we unzipped)
+nano .bashrc
+
+at the end, set the path where we installed kafka, for our example we installed at "/opt/kaka/bin"
+export PATH=/opt/kafka/bin:$PATH
+
+Save the file  ( Ctrl + O )and exit  ( Ctrl + X )
+
+Reload the configuration
+source ~/.bashrc
+
+
+Step 3 - Automatically Start Kafka on Server boot
+=====================================================
+3.1) vim /etc/systemd/system/zookeeper.service
+		And add the following content:
+		==================================================================
+		[Unit]
+		Description=Apache Zookeeper server
+		Documentation=http://zookeeper.apache.org
+		Requires=network.target remote-fs.target
+		After=network.target remote-fs.target
+
+		[Service]
+		Type=simple
+		ExecStart=/usr/local/kafka/bin/zookeeper-server-start.sh /usr/local/kafka/config/zookeeper.properties
+		ExecStop=/usr/local/kafka/bin/zookeeper-server-stop.sh
+		Restart=on-abnormal
+
+		[Install]
+		WantedBy=multi-user.target
+
+
+3.2) vim /etc/systemd/system/kafka.service
+		Add the below content. Make sure to set the correct JAVA_HOME path as per the Java installed on your system.
+		===============================================================================================================
+		[Unit]
+		Description=Apache Kafka Server
+		Documentation=http://kafka.apache.org/documentation.html
+		Requires=zookeeper.service
+
+		[Service]
+		Type=simple
+		Environment="JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64"
+		ExecStart=/usr/local/kafka/bin/kafka-server-start.sh /usr/local/kafka/config/server.properties
+		ExecStop=/usr/local/kafka/bin/kafka-server-stop.sh
+
+		[Install]
+		WantedBy=multi-user.target
+
+
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now zookeeper
+sudo systemctl enable --now kafka
+sudo systemctl status kafka zookeeper
+or -----------------------------------------
+sudo systemctl daemon-reload
+sudo systemctl enable zookeeper.service
+sudo systemctl start zookeeper.service
+sudo systemctl status zookeeper.service
+
+
+Step 4 - Test Kafka works
+====================================
+	create topic
+	..............................
+	kafka-topics.sh --create --topic test-topic --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1
+	kafka-topics.sh --describe --bootstrap-server localhost:9092 --topic test-topic
+
+	put messages to topic
+	............................
+	kafka-console-producer.sh --broker-list localhost:9092 --topic test-topic
+	> test message1
+	> test messate2
+
+ 
+
+	read messages from topic
+	............................
+	kafka-console-consumer.sh --bootstrap-server localhost:9092 --from-beginning --topic test-topic
+	> test message1
+	> test messate2
+
+
+Step 5 - To Connect Kafka from remote machines.
+--------------------------------------------------------
+--------------------------------------------------------
+To connect, create Topic, and send messages from a remote server. Please follow the below steps:
+
+	cd /opt/kafka/config
+	Now look for server.properties and make some configuration changes:
+
+	sudo nano server.properties
+	listeners=PLAINTEXT://:9092
+	advertised.listeners=PLAINTEXT://<HOST IP>:9092
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+cd ~
+wget https://downloads.apache.org/kafka/2.6.0/kafka_2.13-2.6.0.tgz
+sudo mkdir /usr/local/kafka-server && cd /usr/local/kafka-server
+sudo tar -xvzf ~/kafka_2.13-2.6.0.tgz --strip 1 -C /opt/kafka/
+
+tar -xvzf ~/Downloads/kafka.tgz --strip 1 -C /opt/kafka/
+We specify the --strip 1 flag to ensure that the archive’s 
+contents are extracted in ~/kafka/ itself and not in another directory (such as ~/kafka/kafka_2.13-3.1.0/) inside of it.
+
+

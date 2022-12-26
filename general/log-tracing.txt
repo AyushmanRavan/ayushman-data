@@ -1,0 +1,597 @@
+https://nicklee1006.github.io/Spring-Cloud-9-Distributed-Tracing-Solution-Sleuth/
+
+Modify pom.xml
+
+Add dependency:
+-------------------------------
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-zipkin</artifactId>
+</dependency>
+
+And remove:
+---------------------------
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-sleuth</artifactId>
+</dependency>
+
+This is because spring-cloud-starter-sleuth dependency is already included in spring-cloud-starter-zipkin.
+
+	
+Modify bootstrap.properties
+--------------------------------
+server.port=9090
+
+spring.application.name=PRODUCT-SERVICE-CONSUMER
+
+Modify application.properties
+-----------------------------------------------------------
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+feign.hystrix.enabled=true
+management.endpoints.web.exposure.include=hystrix.stream
+logging.level.org.springframework=INFO
+logging.level.org.springframework.web.servlet.DispatcherServlet=DEBUG
+spring.zipkin.base-url=http://localhost:9411
+spring.sleuth.sampler.percentage=1.0
+
+
+
+Modify Logback configuration file   https://nicklee1006.github.io/Spring-Cloud-9-Distributed-Tracing-Solution-Sleuth/
+
+Add a file named logback-spring.xml to the resources directory with the following content:
+----------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    ​
+    <springProperty scope="context" name="springAppName" source="spring.application.name"/>
+ 
+    <!-- Example for logging into the build folder of your project -->
+    <property name="LOG_FILE" value="${BUILD_FOLDER:-build}/${springAppName}"/>​
+
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p})
+            %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss SSS} [%thread] %-5level %logger{36} - %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+
+    <!-- Appender to log to console -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <!-- Minimum logging level to be presented in the console logs-->
+            <level>DEBUG</level>
+        </filter>
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <!-- Appender to log to file -->​
+    <appender name="flatfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.gz</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+    ​    ​
+    <root level="INFO">
+        <appender-ref ref="console"/>
+        <!-- uncomment this to have also JSON logs -->
+        <!--<appender-ref ref="logstash"/>-->
+        <!--<appender-ref ref="flatfile"/>-->
+    </root>
+</configuration>
+
+
+As mentioned in the SpringCloud reference manual: SLF4J MDC is always set automatically, and if logback is used, 
+the trace/span id is immediately displayed in the log. Other log systems need to be configured to achieve this effect. 
+The default logging.pattern.level is set to%clr(% 5p)%clr([${spring.application.name:},%X{X-B3-TraceId:-},%X{X-B3-SpanId: -},% X {X-Span-Export:-}]) {yellow} 
+(This is also a feature of Spring Boot when integrating logback). This means that if you do not need to manually configure the format when using SLF4J, 
+other log systems must be manually configured, otherwise they will not be output.
+
+
+
+How to use Zipkin?
+============================== spring.zipkin.enabled=true
+Install Zipkin on Ubuntu / Debian / CentOS(https://computingforgeeks.com/install-zipkin-distributed-tracing-system-on-ubuntu-debian-centos/)
+--------------
+curl -sSL https://zipkin.io/quickstart.sh | bash -s
+java -jar zipkin.jar
+
+
+
+1) Log Aggregation.
+ - Log Aggregation is used to continuously log the service activities and store the logs into a single repository
+ - supported by a search capability. 
+ - log-aggregation tool like Splunk or the ELK-stack
+2) Log Correlation(Distributed Tracing).
+ - helps to assign the initial service request, which is called by the external client.
+
+Installing and running Zipkin Server
+
+In order to install the zipkin server, there are two ways:
+
+If you have Java 8 or higher installed, the quickest way to get started is to fetch the Latest release as a self-contained executable jar:
+-------------------------------------------------------------------------------------------------------------------------------------------
+curl -sSL https://zipkin.io/quickstart.sh | bash -s
+java -jar zipkin.jar
+
+If you have docker installed, you can use the following to run the latest image directly:
+--------------------------------------------------------------------------------------------
+docker run -d -p 9411:9411 openzipkin/zipkin
+
+
+
+
+Zipkin contains two components
+-------------------------------------------
+    Zipkin Client
+    Zipkin Server
+
+Zipkin client contains Sampler which collects data from ms apps with the help of sleuth and provides it the zipkin server. 
+//Collects data from Sleuth and provides it to Zipkin Client
+       @Bean
+       public Sampler samplerOb() {
+             //return Sampler.NEVER_SAMPLE;
+            return Sampler.ALWAYS_SAMPLE;
+       }
+ If you are exporting span data to Zipkin or Spring Cloud Stream, 
+ there is also an AlwaysSampler that exports everything and a PercentageBasedSampler that samples a fixed fraction of spans.
+
+https://thebasictechinfo.com/spring-azure-aws-cloud/spring-cloud-netflix-oss-tracing-in-microservices-with-sleuth-zipkin/
+@Bean
+public AlwaysSampler defaultSampler() {
+return new AlwaysSampler();
+}
+
+
+https://medium.com/oracledevs/setup-a-distributed-tracing-infrastructure-with-zipkin-kafka-and-cassandra-d0a68fb3eee6
+NOTE: By default spring.sleuth.sampler.probability=0.1 
+which means only 10% of tracing information will be exported to Zipkin. Make it to your desired percentage.
+spring:
+  sleuth:
+    traceId128: true
+    sampler:
+      probability: 1.0
+
+
+
+
+Registering a Spring Boot client application with Zipkin Server
+1)  one dependency in the pom.xml of your client application.
+
+<dependency>
+   <groupId>org.springframework.cloud</groupId>
+   <artifactId>spring-cloud-starter-zipkin</artifactId>
+</dependency>
+
+2) you need to add one property to the file application.properties…
+
+spring.zipkin.base-url=http://localhost:9411/
+spring.zipkin.sender.type=web
+spring.sleuth.sampler.probability=1.0
+
+
+
+
+
+
+	
+
+spring:
+  application:
+    name: project72
+  sleuth:
+    enabled: true
+    sampler:
+      probability: 1.0
+  zipkin:
+    base-url: http://localhost:9411/
+    enabled: true
+    sender:
+      type: web
+    service:
+      name: my-service
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: m1-microservice-sleuth
+  sleuth:
+    sampler:
+      percentage: 1
+  zipkin:
+    baseUrl: http://localhost:9090
+
+logging:
+  level:
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
+
+https://www.e4developer.com/2018/02/09/tracing-messages-in-choreography-with-sleuth-and-zipkin/
+spring.zipkin.service.name=food-order-consumer
+spring.zipkin.sender.type=web
+spring.zipkin.baseUrl=http://localhost:9411
+spring.sleuth.sampler.percentage=1.0
+
+
+
+
+spring.zipkin.base-url=http://localhost:9411/
+spring.sleuth.sampler.probability=1
+
+What are Span, Trace and Tracers in distributed tracing methodology?
+==========================================================================
+Span – A span is an individual operation.
+Trace – A Trace is an end-to-end latency graph, composed of spans.
+Tracers – Tracers records spans and passes context required to connect them into a trace.
+
+
+[application name, traceId, spanId, export]
+-----------------------------------------------
+    appname: It represents the name of the microservice, the log belongs to.
+
+    traceId: It is a unique Id assigned to the request and is the same across all the microservices.
+
+    spanId: It is a unique Id assigned to each operation.
+
+    exportable: It is a boolean value and represents whether the log should be exported to Zipkin or not.(false means that the log is not exportable to Zipkin)
+
+Manual Span Addition
+===========================================
+@Service
+public class SleuthService {
+
+    Logger logger = Logger.getLogger("SleuthService");
+
+    @Autowired
+    private Tracer tracer;
+
+    public void sameSpanWork(){
+        logger.info("Doing some work");
+
+    }
+
+    public void newSpanWork(){
+        logger.info("Original span going on");
+
+        Span newSpan = tracer.nextSpan().name("new sleuth span").start();
+
+        try(Tracer.SpanInScope span = tracer.withSpanInScope(newSpan.start())){
+            logger.info("This work is being done in the new span");
+        }finally {
+            newSpan.finish();
+        }
+
+        logger.info("Back to original span");
+    }
+}
+
+
+
+
+Types of Trace Context Propagation
+
+Today’s applications based on distributed systems are quite complex. 
+Multiple software components come together to serve users’ needs across many hosts and process boundaries. 
+There are mainly two types of context propagation to trace these complex systems:
+
+    A) In-process propagation
+    This type of context propagation involves passing the metadata inside a process. 
+    A request can do multiple logical operations inside a service itself. 
+    A process inside a service might involve possible thread switches and asynchronous tasks. 
+    In-process propagation takes care of correlating these events with context propagation.
+
+    2) Inter-process propagation
+    This type of context propagation happens between network calls, 
+    and the metadata is passed along with headers of different communication frameworks like HTTP.
+ 
+
+ import org.springframework.cloud.sleuth.Span;
+import org.springframework.cloud.sleuth.Tracer;
+
+@Component
+public class TraceService {
+
+    private final Tracer tracer;
+
+    public TraceService(Tracer tracer) {
+        this.tracer = tracer;
+    }
+
+    public String traceId() {
+        Span span = tracer.currentSpan();
+        String traceId = span.context().traceId();
+        System.out.println(traceId);
+        return traceId;  // return tracer.getCurrentSpan().traceIdString();
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+=====================******************************
+
+The filter is configured in the standard way:
+
+@Configuration
+public class InjectTraceFilterAutoConfigure {
+
+    @Bean
+    public InjectTraceFilter injectTraceFilter() {
+        return new InjectTraceFilter();
+    }
+
+}
+
+Inserting the Sleuth trace ID
+
+When a consumer requests status of a workflow they provide the breadcrumb ID to use, e.g.:
+GET /v1/workflow/92e9013d25cca084
+We want to set that value as the Sleuth trace ID.
+
+
+    is in the filter chain before TraceFilter
+    reads the breadcrumb ID from the request
+    constructs an appropriate Span object
+    adds the span as an attribute of the request with the correct key
+
+
+// Load this filter before TraceFilter
+@Order(TraceFilter.ORDER - 1)
+public class InjectTraceFilter extends GenericFilterBean {
+
+    // Only modify requests that match this pattern
+    private static final Pattern REQUEST_PATTERN = Pattern.compile("^/v1/workflow/(?<crumbId>[0-9a-f]+)$");
+    // Key of the request attribute that TraceFilter searches for
+    private static final String TRACE_REQUEST_ATTR = TraceFilter.class.getName() + ".TRACE";
+    // Used to construct the span name
+    private static final String SPAN_NAME_BASE = "http:/v1/workflow/";
+
+    private final Random random = new Random(System.currentTimeMillis());
+
+    @Override
+    public void doFilter(final ServletRequest request, final ServletResponse response,
+                         final FilterChain chain) throws IOException, ServletException {
+        final HttpServletRequest httpRequest = (HttpServletRequest) request;
+        final String breadcrumbId = extractBreadcrumbId(httpRequest);
+        if (breadcrumbId != null) {
+            // Set up a span with this breadcrumb ID as the trace ID
+            httpRequest.setAttribute(TRACE_REQUEST_ATTR, spanForId(breadcrumbId));
+            chain.doFilter(httpRequest, response);
+        } else {
+            chain.doFilter(request, response);
+        }
+    }
+
+    /**
+     * Returns the breadcrumb ID if a GET request matches the pattern, otherwise null. 
+     */
+    private String extractBreadcrumbId(final HttpServletRequest httpRequest) {
+        if ("GET".equals(httpRequest.getMethod())) {
+            final Matcher matcher = REQUEST_PATTERN.matcher(httpRequest.getRequestURI());
+            if (matcher.matches()) {
+                return matcher.group("crumbId");
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Constructs a span for the specified trace ID with a random span ID. 
+     */
+    private Span spanForId(final String traceId) {
+        return Span.builder()
+                .traceId(Span.hexToId(traceId))
+                .spanId(random.nextLong())
+                .exportable(false)
+                .name(SPAN_NAME_BASE + traceId)
+                .build();
+    }
+}    
+
+
+
+
+
+
+
+
+@Service
+public class FooService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(FooService.class);
+
+	@Autowired
+	private Tracer tracer;
+
+	public void fooLogic() {
+		LOGGER.info("Inside fooLogic");
+
+		Span fooLogicSpan = tracer.createSpan("fooLogic-span");
+		LOGGER.info("Doing some logging inside a new span");
+		LOGGER.info("Doing some more logging inside the span");
+		tracer.close(fooLogicSpan);
+
+		LOGGER.info("Exiting fooLogic");
+	}
+}
+
+
+
+
+@Configuration
+public class SleuthConversationConfiguration {
+  public static final String TAG_NAME = "X-B3-CONVID";
+ 
+  @Bean
+  @Order(TraceFilter.ORDER + 5)
+  public GenericFilterBean customTraceFilter(final Tracer tracer) {
+    return new GenericFilterBean() {
+ 
+      @Override
+      public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
+          FilterChain filterChain) throws IOException, ServletException {
+        Span span = tracer.getCurrentSpan();
+        String existingConversationId = span.getBaggage().get(TAG_NAME.toLowerCase());
+        if(existingConversationId == null){
+          existingConversationId = UUID.randomUUID().toString();
+          span.setBaggageItem(TAG_NAME, existingConversationId);
+        }
+        tracer.addTag(TAG_NAME, existingConversationId);
+        MDC.put(TAG_NAME, existingConversationId);
+        tracer.continueSpan(span);
+        filterChain.doFilter(servletRequest, servletResponse);
+      }
+    };
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Internally it has 4 modules –
+--------------------------------------
+Collector – Once any component sends the trace data arrives to Zipkin collector daemon, it is validated, stored, and indexed for lookups by the Zipkin collector.
+Storage – This module store and index the lookup data in backend. Cassandra, ElasticSearch and MySQL are supported.
+Search – This module provides a simple JSON API for finding and retrieving traces stored in backend. The primary consumer of this API is the Web UI.
+Web UI – A very nice UI interface for viewing traces.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Start a span. If there was a span present in this thread it will become
+// the `newSpan`'s parent.
+Span newSpan = this.tracer.nextSpan().name("calculateTax");
+try (Tracer.SpanInScope ws = this.tracer.withSpan(newSpan.start())) {
+    // ...
+    // You can tag a span
+    newSpan.tag("taxValue", taxValue);
+    // ...
+    // You can log an event on a span
+    newSpan.event("taxCalculated");
+}
+finally {
+    // Once done remember to end the span. This will allow collecting
+    // the span to send it to a distributed tracing system e.g. Zipkin
+    newSpan.end();
+}
+
+
+
+
+
+
+
+
+Span spanFromThreadX = this.tracer.nextSpan().name("calculateTax");
+try (Tracer.SpanInScope ws = this.tracer.withSpan(spanFromThreadX.start())) {
+    executorService.submit(() -> {
+        // Pass the span from thread X
+        Span continuedSpan = spanFromThreadX;
+        // ...
+        // You can tag a span
+        continuedSpan.tag("taxValue", taxValue);
+        // ...
+        // You can log an event on a span
+        continuedSpan.event("taxCalculated");
+    }).get();
+}
+finally {
+    spanFromThreadX.end();
+}
+
+
+
+
+
+
+
+// let's assume that we're in a thread Y and we've received
+// the `initialSpan` from thread X. `initialSpan` will be the parent
+// of the `newSpan`
+Span newSpan = null;
+try (Tracer.SpanInScope ws = this.tracer.withSpan(initialSpan)) {
+    newSpan = this.tracer.nextSpan().name("calculateCommission");
+    // ...
+    // You can tag a span
+    newSpan.tag("commissionValue", commissionValue);
+    // ...
+    // You can log an event on a span
+    newSpan.event("commissionCalculated");
+}
+finally {
+    // Once done remember to end the span. This will allow collecting
+    // the span to send it to e.g. Zipkin. The tags and events set on the
+    // newSpan will not be present on the parent
+    if (newSpan != null) {
+        newSpan.end();
+    }
+}

@@ -1,0 +1,22 @@
+https://asbnotebook.com/jpa-many-to-many-example-spring-boot/
+https://codebun.com/how-to-implement-many-to-many-mapping-in-spring-data-jpa/
+https://www.codementor.io/@frankcolaco/bidirectional-relationship-using-spring-boot-and-spring-jpa-1k8e1qihtx
+https://www.codementor.io/@frankcolaco/bidirectional-relationship-using-spring-boot-and-spring-jpa-1k8e1qihtx
+
+
+
+
+
+
+Java 8
+----------
+https://www.codementor.io/@eh3rrera/using-java-8-method-reference-du10866vx
+First of all, a method reference can't be used for any method. They can only be used to replace a single-method lambda expression.
+In other words:
+---------------------
+Instead of using
+    AN ANONYMOUS CLASS
+you can use
+    A LAMBDA EXPRESSION
+And if this just calls one method, you can use
+    A METHOD REFERENCE

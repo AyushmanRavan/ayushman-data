@@ -1,0 +1,143 @@
+https://refactorfirst.com/spring-boot-with-kafka-communication
+
+https://www.code4copy.com/java/kafka-spring-boot-producer-consumer/
+
+https://www.maestralsolutions.com/spring-boot-implementation-for-apache-kafka-with-kafka-tool/
+
+https://itnext.io/event-driven-architectures-with-kafka-and-java-spring-boot-revision-1-c0d43d103ee7
+
+
+https://memorynotfound.com/spring-kafka-json-serializer-deserializer-example/
+
+https://thebasictechinfo.com/java-8/spring-boot-spring-kafka-with-zookeeper-json-serialization-deserialization-example/
+
+
+echo "export KAFKA_HOME=/opt/kafka" >> .bashrc
+echo "export PATH=$PATH:$KAFKA_HOME/bin" >> .bashrc
+echo "export PATH=$KAFKA_HOME/bin:$PATH" >> .bashrc
+then execute bellow command .................
+source ~/.bashrc
+
+
+Step 1 – Download Latest Apache Kafka
+----------------------------------------------
+$ wget https://dlcdn.apache.org/kafka/3.2.0/kafka_2.13-3.2.0.tgz 
+
+OR===
+
+$ wget https://dlcdn.apache.org/kafka/3.2.0/kafka_2.13-3.2.0.tgz -P /tmp/
+
+Then extract the archive file
+-------------------------------
+sudo mkdir /opt/kafka/ && cd /opt/kafka/
+sudo tar -xvzf kafka_2.13-3.2.0.tgz         
+sudo mv kafka_2.13-3.2.0 /opt/kafka/   \\\\\\//////sudo cp -r kafka_2.13-3.2.0 /opt/kafka/
+
+OR==========
+=====OR=====   
+sudo tar -xvzf kafka_2.13-3.0.0.tgz --strip 1 -C /opt/kafka/
+
+
+Step 3: Setting the Path   :  https://codingskills.dev/linux/how-to-install-apache-kafka-on-ubuntu-2004/
+----------------------------------------
+We are going to set the path locally so as we can access Kafka from any location (by default we access it from the installation folder we unzipped)
+open " .bashrc " file,
+vim .bashrc
+at the end, set the path where we installed kafka,  for our example we installed at " /opt/kaka/bin "
+export PATH=/usr/local/kafka/bin:$PATH
+Save the file  ( Ctrl + O )and exit  ( Ctrl + X )
+
+Reload the configuration
+source ~/.bashrc
+
+
+
+
+
+File: /usr/local/kafka/config/server.properties
+..........................
+delete.topic.enable = true
+
+
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now zookeeper
+sudo systemctl enable --now kafka
+
+now you check services status.
+
+systemctl status zookeeper.service
+systemctl status kafka.service
+
+For zookeeper
+------------------------------
+cd /usr/local/kafka 
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+OR 
+
+sudo nano /etc/systemd/system/zookeeper.service
+And add the following
+
+[Unit]
+Description=Apache Zookeeper Server
+Requires=network.target remote-fs.target
+After=network.target remote-fs.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/kafka/bin/zookeeper-server-start.sh /usr/local/kafka/config/zookeeper.properties
+ExecStop=/usr/local/kafka/bin/zookeeper-server-stop.sh
+Restart=on-abnormal
+
+[Install]
+WantedBy=multi-user.target
+
+
+For Kafka server
+------------------------------       
+cd /usr/local/kafka 
+bin/kafka-server-start.sh config/server.properties
+
+OR 
+
+sudo nano /etc/systemd/system/kafka.service
+Add this content
+
+[Unit]
+Description=Apache Kafka Server
+Documentation=http://kafka.apache.org/documentation.html
+Requires=zookeeper.service
+After=zookeeper.service
+
+[Service]
+Type=simple
+Environment="JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64"
+ExecStart=/usr/local/kafka/bin/kafka-server-start.sh /usr/local/kafka/config/server.properties
+ExecStop=/usr/local/kafka/bin/kafka-server-stop.sh
+Restart=on-abnormal
+
+[Install]
+WantedBy=multi-user.target
+
+Step X – Create a Topic in Kafka :
+------------------------------------------
+cd /usr/local/kafka
+bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic testTopic
+bin/kafka-topics.sh --list --zookeeper localhost:9092  ------------ display topic 
+
+
+Step 6 – Send and Receive Messages in Kafka
+------------------------------------------------
+cd /usr/local/kafka
+bin/kafka-console-producer.sh --broker-list localhost:9092 --topic testTopic
+
+
+Step 7 – Using Kafka Consumer :
+-----------------------------------------------
+cd /usr/local/kafka
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic testTopic --from-beginning
+
+
+
+

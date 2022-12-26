@@ -1,0 +1,147 @@
+
+
+{"from":0,"query":{"function_score":{"query":{"bool":{"must":[{"match_phrase_prefix":{"clinicalFindingType.name":{"query":"salim ahmed","slop":5,
+"max_expansions":50,"boost":1.0}}}],"should":[{"prefix":{"clinicalFindingType.name":{"value":"salim ahmed","boost":10.0}}}],
+"adjust_pure_negative":true,"boost":1.0}},"functions":[{"filter":{"match_all":{"boost":1.0}},
+"script_score":{"script":{"source":"def str = doc['clinicalFindingType.name.keyword'].value.trim(); (str.length() >= params.length) ? str.substring(0, params.length).equalsIgnoreCase(params.searchQuery) ? str.substring(0, str.length()).equalsIgnoreCase(params.searchQuery) ? 15 : 10 : 1 : 1","lang":"painless","params":{"searchQuery":"salim ahmed","length":11}}}}],"score_mode":"multiply","max_boost":3.4028235E38,"boost":1.0}},"version":true}
+
+
+
+
+2022-10-21 15:51:22.437  INFO 432074 --- [  XNIO-1 task-1] io.undertow.servlet                      : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-10-21 15:51:22.439  INFO 432074 --- [  XNIO-1 task-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2022-10-21 15:51:22.475  INFO 432074 --- [  XNIO-1 task-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 35 ms
+**********************************
+Hibernate: 
+    select
+        clinicdiag0_.id as id1_21_0_,
+        clinic1_.id as id1_16_1_,
+        diagnostic2_.id as id1_54_2_,
+        diagnostic3_.id as id1_53_3_,
+        clinicdiag0_.clinic_id as clinic_i7_21_0_,
+        clinicdiag0_.code as code2_21_0_,
+        clinicdiag0_.created_at as created_3_21_0_,
+        clinicdiag0_.diagnostic_type_in_lab_id as diagnost8_21_0_,
+        clinicdiag0_.is_active as is_activ4_21_0_,
+        clinicdiag0_.last_modified as last_mod5_21_0_,
+        clinicdiag0_.version as version6_21_0_,
+        clinic1_.abh_name as abh_name2_16_1_,
+        clinic1_.abh_phone as abh_phon3_16_1_,
+        clinic1_.address as address4_16_1_,
+        clinic1_.cgst as cgst5_16_1_,
+        clinic1_.city as city6_16_1_,
+        clinic1_.clinic_email as clinic_e7_16_1_,
+        clinic1_.clinic_image as clinic_i8_16_1_,
+        clinic1_.clinic_manager_name as clinic_m9_16_1_,
+        clinic1_.clinic_manager_phone as clinic_10_16_1_,
+        clinic1_.clinic_phone as clinic_11_16_1_,
+        clinic1_.cluster as cluster12_16_1_,
+        clinic1_.co_branding_image as co_bran13_16_1_,
+        clinic1_.co_branding_name as co_bran14_16_1_,
+        clinic1_.code as code15_16_1_,
+        clinic1_.created_at as created16_16_1_,
+        clinic1_.disable_clinic_restrictions as disable17_16_1_,
+        clinic1_.invoice_code as invoice18_16_1_,
+        clinic1_.is_active as is_acti19_16_1_,
+        clinic1_.is_co_branded as is_co_b20_16_1_,
+        clinic1_.is_hospital as is_hosp21_16_1_,
+        clinic1_.is_popular as is_popu22_16_1_,
+        clinic1_.is_test as is_test23_16_1_,
+        clinic1_.lab_code as lab_cod24_16_1_,
+        clinic1_.last_modified as last_mo25_16_1_,
+        clinic1_.latitude as latitud26_16_1_,
+        clinic1_.logo_url as logo_ur27_16_1_,
+        clinic1_.longitude as longitu28_16_1_,
+        clinic1_.map_link as map_lin29_16_1_,
+        clinic1_.name as name30_16_1_,
+        clinic1_.phone_number as phone_n31_16_1_,
+        clinic1_.pincode as pincode32_16_1_,
+        clinic1_.sgst as sgst33_16_1_,
+        clinic1_.short_address as short_a34_16_1_,
+        clinic1_.slug as slug35_16_1_,
+        clinic1_.store_code as store_c36_16_1_,
+        clinic1_.username as usernam37_16_1_,
+        clinic1_.version as version38_16_1_,
+        clinic1_.warehouse_code as warehou39_16_1_,
+        clinic1_.zbh_name as zbh_nam40_16_1_,
+        clinic1_.zbh_phone as zbh_pho41_16_1_,
+        diagnostic2_.category as category2_54_2_,
+        diagnostic2_.code as code3_54_2_,
+        diagnostic2_.created_at as created_4_54_2_,
+        diagnostic2_.diagnostic_lab_id as diagnos33_54_2_,
+        diagnostic2_.diagnostic_type_id as diagnos34_54_2_,
+        diagnostic2_.display_price as display_5_54_2_,
+        diagnostic2_.is_active as is_activ6_54_2_,
+        diagnostic2_.is_address_mandatory as is_addre7_54_2_,
+        diagnostic2_.is_fasting as is_fasti8_54_2_,
+        diagnostic2_.is_pickup as is_picku9_54_2_,
+        diagnostic2_.last_modified as last_mo10_54_2_,
+        diagnostic2_.latitude as latitud11_54_2_,
+        diagnostic2_.longitude as longitu12_54_2_,
+        diagnostic2_.margin as margin13_54_2_,
+        diagnostic2_.on_premise as on_prem14_54_2_,
+        diagnostic2_.online_discount as online_15_54_2_,
+        diagnostic2_.online_display_price as online_16_54_2_,
+        diagnostic2_.other_charges as other_c17_54_2_,
+        diagnostic2_.precautions as precaut18_54_2_,
+        diagnostic2_.price as price19_54_2_,
+        diagnostic2_.processing_time as process20_54_2_,
+        diagnostic2_.procurement_price as procure21_54_2_,
+        diagnostic2_.quantity as quantit22_54_2_,
+        diagnostic2_.report_tat as report_23_54_2_,
+        diagnostic2_.required_docs as require24_54_2_,
+        diagnostic2_.service_key_unit as service25_54_2_,
+        diagnostic2_.special_instruction as special26_54_2_,
+        diagnostic2_.special_instruction_for_patient as special27_54_2_,
+        diagnostic2_.specimen_for_patient as specime28_54_2_,
+        diagnostic2_.tat as tat29_54_2_,
+        diagnostic2_.taxes_id as taxes_i35_54_2_,
+        diagnostic2_.test_purpose as test_pu30_54_2_,
+        diagnostic2_.version as version31_54_2_,
+        diagnostic2_.viles as viles32_54_2_,
+        diagnostic3_.abbreviation as abbrevia2_53_3_,
+        diagnostic3_.alias as alias3_53_3_,
+        diagnostic3_.code as code4_53_3_,
+        diagnostic3_.created_at as created_5_53_3_,
+        diagnostic3_.department_id as departm25_53_3_,
+        diagnostic3_.description as descript6_53_3_,
+        diagnostic3_.diagnostic_category as diagnost7_53_3_,
+        diagnostic3_.diagnostic_type_status as diagnost8_53_3_,
+        diagnostic3_.is_active as is_activ9_53_3_,
+        diagnostic3_.is_camp as is_camp10_53_3_,
+        diagnostic3_.is_combo as is_comb11_53_3_,
+        diagnostic3_.is_fasting as is_fast12_53_3_,
+        diagnostic3_.last_modified as last_mo13_53_3_,
+        diagnostic3_.name as name14_53_3_,
+        diagnostic3_.parent_id as parent_26_53_3_,
+        diagnostic3_.popularity as popular15_53_3_,
+        diagnostic3_.pre_condition as pre_con16_53_3_,
+        diagnostic3_.precautions as precaut17_53_3_,
+        diagnostic3_.procurement_price as procure18_53_3_,
+        diagnostic3_.sample_type as sample_19_53_3_,
+        diagnostic3_.slug as slug20_53_3_,
+        diagnostic3_.special_instruction_for_patient as special21_53_3_,
+        diagnostic3_.specimen_for_patient as specime22_53_3_,
+        diagnostic3_.version as version23_53_3_,
+        diagnostic3_.why_needed as why_nee24_53_3_ 
+    from
+        clinic_diagnostic_type_availability clinicdiag0_ 
+    inner join
+        clinic clinic1_ 
+            on clinicdiag0_.clinic_id=clinic1_.id 
+    inner join
+        diagnostic_type_in_lab diagnostic2_ 
+            on clinicdiag0_.diagnostic_type_in_lab_id=diagnostic2_.id 
+    inner join
+        diagnostic_type diagnostic3_ 
+            on diagnostic2_.diagnostic_type_id=diagnostic3_.id 
+    where
+        (
+            diagnostic3_.name like concat('%', ?, '%') 
+            or diagnostic3_.alias like concat('%', ?, '%') 
+            or diagnostic3_.abbreviation like concat('%', ?, '%')
+        ) 
+        and diagnostic3_.diagnostic_type_status=? 
+        and diagnostic2_.is_active=1 
+        and diagnostic3_.is_active=1 
+        and clinicdiag0_.is_active=1 limit ?

@@ -1,0 +1,113 @@
+https://www.toptal.com/spring/spring-security-tutorial
+https://velog.io/@csh0034/Spring-Cloud-Gateway-JWT-%EC%9D%B8%EC%A6%9D
+https://programmer.ink/think/620af52c8af92.html
+
+There are two types of filters: 
+------------------------------------------
+A) GatewayFilter , which is processed when it corresponds to Predicate, (In order to implement GatewayFilter, AbstractGatewayFilterFactory must be implemented) 
+B) GlobalFilter , which is conditionally applied to all routes .
+
+    Predicates – match requests based on their feature (path, hostname, headers, cookies, query) 
+    Filters – process and modify requests in a variety of ways. Can be divided depending on their purpose: 
+    gateway filter – modify the incoming http request or outgoing http response  
+    global filter – special filters applying to all routes so long as some conditions are fulfilled 
+
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+@Configuration
+public class SpringCloudGatewayRouting {
+
+    @Bean
+    public RouteLocator configureRoute(RouteLocatorBuilder builder) {
+       return builder.routes()
+      .route("paymentId", r->r.path("/payment/**").uri("http://localhost:9009")) //static routing
+      .route("orderId", r->r.path("/order/**").uri("lb://ORDER-SERVICE")) //dynamic routing
+      .build();
+    }
+}
+
+Route Predicate Factories
+------------------------------------------
+Required: uri, predicates
+Optional: filters
+
+1) Route	A route is defined by a unique ID, a destination URI, a list of predicates, and a list of filters.
+Matches only when all predicates are met.
+
+2) Predicate	Before processing each request, various HTTP requests such as logic executed, header and parameter values, etc.
+are checked whether they meet the defined criteria.
+
+3) Filter	Requests and responses can be modified before or after sending them downstream.
+Not a required component.
+
+ @Bean
+    public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+        return builder.routes()
+                .route("car-service", r -> r.path("/cars")
+                        .uri("lb://car-service"))
+                .build();
+    }
+
+@Bean
+CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration corsConfig = new CorsConfiguration();
+    corsConfig.setAllowedOrigins(List.of("*"));
+    corsConfig.setMaxAge(3600L);
+    corsConfig.addAllowedMethod("*");
+    corsConfig.addAllowedHeader("*");
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", corsConfig);
+    return source;
+}
+
+ // Used by spring security if CORS is enabled.
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source =
+            new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
+
+
+@Bean
+public RouteLocator customRouteLocator(RouteLocatorBuilder builder, DebugGatewayFilter debugGatewayFilter) {
+  return builder.routes()
+      .route("order_route", r -> r
+          .path("/order/**")
+          .filters(f -> f
+              .rewritePath("/order/(.*)", "/$1")
+              .addRequestHeader("X-Order-Header", "order"))
+          .metadata("orderKey", "orderValue")
+          .uri("http://localhost:9999"))
+    
+      .route("host_rewrite_route", r -> r
+          .host("*.test.com")
+          .filters(f -> f
+              .prefixPath("/v1")
+              .addResponseHeader("X-TestHeader", "rewrite_empty_response")
+              .modifyResponseBody(String.class, String.class,
+                  (exchange, s) -> {
+                    if (s == null) {
+                      return Mono.just("emptybody");
+                    }
+                    return Mono.just(s.toUpperCase());
+                  }))
+          .uri("http://localhost:9999"))
+    
+      .route("debug_route", r -> r
+          .order(-1)
+          .query("debug", "1")
+          .filters(f -> f
+              .filter(debugGatewayFilter))
+          .uri("http://localhost:9999"))
+      .build();
+}

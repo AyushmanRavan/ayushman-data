@@ -1,0 +1,479 @@
+resilience4j.circuitbreaker:
+  instances:
+    myProjectAllRemoteCallsCB:
+      registerHealthIndicator: true
+      slidingWindowSize: 10
+      slidingWindowType: COUNT_BASED
+      permittedNumberOfCallsInHalfOpenState: 4
+      minimumNumberOfCalls: 10
+      waitDurationInOpenState: 5s
+      slowCallRateThreshold: 50
+      slowCallDurationThreshold: 10
+      failureRateThreshold: 50
+      
+registerHealthIndicator: By default the CircuitBreaker or RateLimiter health indicators are disabled, but we can enable them via the configuration by setting it true.
+slidingWindowType: COUNT_BASED/TIME_BASED. Configures the type of the sliding window which is used to record the outcome of calls when the CircuitBreaker is closed
+Default value is COUNT_BASED.
+
+slidingWindowSize:Configures the size of the sliding window which is used to record the outcome of calls when the CircuitBreaker is closed. 
+Its value will be in count based if slidingWindowType is COUNT_BASED.
+Its value will be in seconds based if slidingWindowType is TIME_BASED.
+Default value is 100.
+
+permittedNumberOfCallsInHalfOpenState: Configures the number of permitted calls when the CircuitBreaker is half open.
+Default value is 10.
+
+minimumNumberOfCalls:Configures the minimum number of calls which are required (per sliding window  period) before the CircuitBreaker can calculate the error rate.
+Default value is 100
+
+waitDurationInOpenState: Configures the wait duration (in seconds) which specifies how long the  CircuitBreaker should stay open, before it switches to half open.
+Default value is 60 seconds.
+s
+lowCallRateThreshold: Configures a threshold in percentage. The CircuitBreaker considers a  call as slow when the call duration is greater than  slowCallDurationThreshold
+Default value is 100.
+
+slowCallDurationThreshold: Configures the duration threshold (seconds) above which calls are considered as slow and increase the slow calls percentage.
+Default value is 60.
+
+failureRateThreshold: Configures the failure rate threshold in percentage. If the failure rate  is equal or greater than the threshold the CircuitBreaker transitions  to open and starts short-circuiting calls.
+Default value is 50.
+
+example : 
+---------------------------------------
+@CircuitBreaker(name = "myProjectAllRemoteCallsCB", fallbackMethod = "getAPIFallBack")
+public String getFromRemoteAPI(String searchVal) throws Exception{
+    String response = "";
+    UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(REMOTE_API_URL)
+            .queryParam("q", searchVal);
+    URI uri = builder.build().toUri();
+    try {
+      RestTemplate restTemplate = new RestTemplate();
+      HttpEntity<String> response = restTemplate.exchange(
+              uri,httpMethod,httpEntity,String.class);
+      String response = response.getBody();
+    } catch (HttpClientErrorException | HttpServerErrorException e) {
+        throw new Exception();
+    }
+    return response;
+}
+
+public String  getAPIFallBack(String topicPage, Exception e){
+    log.error("getAPIFallBack::{}", e);
+    return "";
+}
+
+
+
+
+https://nathan98.gitee.io/post/d0cc1785
+https://segmentfault.com/a/1190000041049180/en
+https://www.vinsguru.com/circuit-breaker-pattern/
+https://refactorfirst.com/spring-cloud-resiliance4j-circuitbreaker-and-retry.html
+
+Resilience4j supports both count-based and time-based circuit breakers. 
+
+
+CircuitBreakerRegistry is a factory used to create and manage CircuitBreaker
+
+CircuitBreakerConfig encapsulates all the configurations in the previous section. 
+
+Each CircuitBreaker object is associated with a CircuitBreakerConfig .
+
+
+@SpringBootApplication
+@Configuration
+public class ServiceProviderResilience4j8082Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ServiceProviderResilience4j8082Application.class, args);
+    }
+
+    //配置两个CircuitBreaker
+    @Bean
+    public Customizer<Resilience4JCircuitBreakerFactory> defaultCustomizer() {
+        return factory -> factory.configureDefault(
+                id -> new Resilience4JConfigBuilder(id)
+                        .timeLimiterConfig(TimeLimiterConfig.custom()
+                                .timeoutDuration(Duration.ofSeconds(3)).build())
+                        .circuitBreakerConfig(CircuitBreakerConfig.custom()
+                                .failureRateThreshold(30f) //失败率阈值设置
+                                .minimumNumberOfCalls(10)
+                                .build())
+                        .build());
+    }
+
+    @Bean
+    public Customizer<Resilience4JCircuitBreakerFactory> slowCustomizer() {
+        return factory -> factory.configure(builder -> builder
+                .timeLimiterConfig(TimeLimiterConfig.custom()
+                        .timeoutDuration(Duration.ofSeconds(3)).build())
+                .circuitBreakerConfig(
+                        CircuitBreakerConfig.ofDefaults()), "slow");
+    }
+}
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/circuitBreaker")
+public class CircuitBreakerController {
+
+    private final CircuitBreakerService service;
+
+    @GetMapping("/slow")
+    public String hello() {
+        return service.slow();
+    }
+
+    @GetMapping("/mayFail")
+    public String mayFail(int number) {
+        return service.mayFail(number);
+    }
+}
+
+
+@Service
+@RequiredArgsConstructor
+public class CircuitBreakerService {
+
+    private final CircuitBreakerFactory cbFactory;
+
+    public String slow() {
+        return cbFactory.create("slow")
+                .run(this::getString, throwable -> "fallback");
+    }
+
+    public String mayFail(int number) {
+        return cbFactory.create("default")
+                .run(() -> {
+                    if (number < 0) {
+                        int a = number / 0;
+                    }
+                    return String.valueOf(number);
+                }, throwable -> "fallback");
+    }
+
+    private String getString() {
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return "slow";
+    }
+}
+
+
+@Bean
+public Customizer<Resilience4JCircuitBreakerFactory> defaultCustomizer() {
+  TimeLimiterConfig timeLimiterConfig = TimeLimiterConfig
+      .custom()
+      .timeoutDuration(Duration.ofSeconds(4))
+      .build();
+  return factory ->
+      factory.configureDefault(id -> new Resilience4JConfigBuilder(id)
+          .timeLimiterConfig(timeLimiterConfig)
+          .circuitBreakerConfig(CircuitBreakerConfig.ofDefaults())
+          .build());
+}
+
+@Retry(name = "ratingService", fallbackMethod = "getDefault")
+@CircuitBreaker(name = "ratingService", fallbackMethod = "getDefault")
+public ProductRatingDto getProductRatingDto(int productId){
+    return this.restTemplate.getForEntity(this.ratingService + productId, ProductRatingDto.class)
+            .getBody();
+}
+
+
+    public ProductRatingDto getDefault(int productId, Throwable throwable){
+        
+    }
+
+ @Bean
+    public Customizer<Resilience4JCircuitBreakerFactory> globalConfig(){
+        CircuitBreakerConfig circuitBreakerConfig = CircuitBreakerConfig.custom()
+                .failureRateThreshold(50)
+                .waitDurationInOpenState(Duration.ofMillis(1000))
+                .slidingWindowSize(2)
+                .build();
+        TimeLimiterConfig timeLimiterConfig = TimeLimiterConfig.custom()
+                .timeoutDuration(Duration.ofSeconds(3))
+                .build();
+        return factory -> factory.configureDefault(id -> new Resilience4JConfigBuilder(id)
+                .timeLimiterConfig(timeLimiterConfig)
+                .circuitBreakerConfig(circuitBreakerConfig)
+                .build());
+    }
+
+
+
+
+
+
+
+
+https://github.com/resilience4j/resilience4j-spring-boot2-demo/blob/master/src/main/java/io/github/robwin/service/BackendCService.java
+
+
+
+
+
+    spring:
+    application.name: resilience4j-demo
+    jackson.serialization.indent_output: true
+
+server:
+    port: 9080
+
+management.endpoints.web.exposure.include: '*'
+management.endpoint.health.show-details: always
+
+management.health.diskspace.enabled: false
+management.health.circuitbreakers.enabled: true
+management.health.ratelimiters.enabled: false
+
+info:
+    name: ${spring.application.name}
+    description: resilience4j demo
+    environment: ${spring.profiles.active}
+    version: 0.0.1
+
+management.metrics.tags.application: ${spring.application.name}
+management.metrics.distribution.percentiles-histogram.http.server.requests: true
+management.metrics.distribution.percentiles-histogram.resilience4j.circuitbreaker.calls: true
+
+#resilience4j.circuitbreaker.metrics.use_legacy_binder: true
+
+resilience4j.circuitbreaker:
+    configs:
+        default:
+            registerHealthIndicator: true
+            slidingWindowSize: 10
+            minimumNumberOfCalls: 5
+            permittedNumberOfCallsInHalfOpenState: 3
+            automaticTransitionFromOpenToHalfOpenEnabled: true
+            waitDurationInOpenState: 5s
+            failureRateThreshold: 50
+            eventConsumerBufferSize: 10
+            recordExceptions:
+                - org.springframework.web.client.HttpServerErrorException
+                - java.util.concurrent.TimeoutException
+                - java.io.IOException
+            ignoreExceptions:
+                - io.github.robwin.exception.BusinessException
+        shared:
+            slidingWindowSize: 100
+            permittedNumberOfCallsInHalfOpenState: 30
+            waitDurationInOpenState: 1s
+            failureRateThreshold: 50
+            eventConsumerBufferSize: 10
+            ignoreExceptions:
+                - io.github.robwin.exception.BusinessException
+    instances:
+        backendA:
+            baseConfig: default
+        backendB:
+            registerHealthIndicator: true
+            slidingWindowSize: 10
+            minimumNumberOfCalls: 10
+            permittedNumberOfCallsInHalfOpenState: 3
+            waitDurationInOpenState: 5s
+            failureRateThreshold: 50
+            eventConsumerBufferSize: 10
+            recordFailurePredicate: io.github.robwin.exception.RecordFailurePredicate
+resilience4j.retry:
+    configs:
+        default:
+            maxAttempts: 3
+            waitDuration: 100
+            retryExceptions:
+                - org.springframework.web.client.HttpServerErrorException
+                - java.util.concurrent.TimeoutException
+                - java.io.IOException
+            ignoreExceptions:
+                - io.github.robwin.exception.BusinessException
+    instances:
+        backendA:
+            baseConfig: default
+        backendB:
+            baseConfig: default
+resilience4j.bulkhead:
+    configs:
+        default:
+            maxConcurrentCalls: 100
+    instances:
+        backendA:
+            maxConcurrentCalls: 10
+        backendB:
+            maxWaitDuration: 10ms
+            maxConcurrentCalls: 20
+
+resilience4j.thread-pool-bulkhead:
+    configs:
+        default:
+            maxThreadPoolSize: 4
+            coreThreadPoolSize: 2
+            queueCapacity: 2
+    instances:
+        backendA:
+            baseConfig: default
+        backendB:
+            maxThreadPoolSize: 1
+            coreThreadPoolSize: 1
+            queueCapacity: 1
+
+resilience4j.ratelimiter:
+    configs:
+        default:
+            registerHealthIndicator: false
+            limitForPeriod: 10
+            limitRefreshPeriod: 1s
+            timeoutDuration: 0
+            eventConsumerBufferSize: 100
+    instances:
+        backendA:
+            baseConfig: default
+        backendB:
+            limitForPeriod: 6
+            limitRefreshPeriod: 500ms
+            timeoutDuration: 3s
+
+resilience4j.timelimiter:
+    configs:
+        default:
+            cancelRunningFuture: false
+            timeoutDuration: 2s
+    instances:
+        backendA:
+            baseConfig: default
+        backendB:
+            baseConfig: default
+
+
+
+
+
+
+
+
+
+
+
+Circuit breaker can take the following approaches when OPEN
+----------------------------------------------------------------
+Return an error
+Return cached/default response (sometimes it’s fine to return a stale response)
+call fallback service(internal/external)
+count-based sliding window: aggregates the outcome of the last N calls. For instance, if the count window size is 10 and the failure threshold is 50% when the circuit breaker detects 5 failures out of the last 10 calls, it changes from CLOSED to OPEN.
+time-based sliding window: aggregates the outcome of the calls of the last N seconds. For instance, if the time window size is 10 seconds and the failure threshold is 50% when the circuit breaker detects 5 failures out of the last 10 seconds calls, it changes from CLOSED to OPEN.
+failure rate threshold: The state of the Circuit Breaker changes from CLOSED to OPEN when the failure rate is equal to or greater than a configurable threshold. For instance when more than 50% of the recorded calls have failed.
+slow call rate threshold: The circuit breaker changes from CLOSED to OPEN when slow calls are equal to or greater than a configurable threshold. For instance when more than 50% of the recorded calls took longer than 5 seconds. This helps reduce the load on an external system before it is actually unresponsive.
+minimum number of calls: The failure rate and slow call rate can only be calculated if a minimum number of calls are recorded. For instance, if the minimum number of required calls is 10, then at least 10 calls must be registered before the failure rate can be calculated. 
+If only 9 calls have been evaluated the circuit breaker will not trip open even if all 9 calls have failed.
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      order:
+        failureRateThreshold: 50
+        slowCallRateThreshold: 50
+        slowCallDurationThreshold: 500ms
+        permittedNumberOfCallsInHalfOpenState: 4
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 4
+        waitDurationInOpenState: 30s
+        
+We use the COUNT_BASED sliding window whose size is 10 and set failure and slow call rate thresholds to 50.
+This means that if 50% per cent of out of the last 10 calls are failure or timeout which is 500 milliseconds, the circuit breaker transition from CLOSED to OPEN.
+After 30 seconds duration has elapsed in an OPEN state, the circuit breaker state transitions HALF_OPEN and permits 4 calls.
+If these calls are equal to or greater than the threshold, the state changes back to OPEN. Otherwise, the state changes back to CLOSED.
+When the circuit breaker trips OPEN, we can make it return a default response instead of throwing an exception. 
+We need to use the fallback mechanism to handle exceptions. In order to implement fallback, we add fallbackMethod to @CircuitBreaker annotation and 
+create a new method with the same name and signature.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"/api/v1/emr/recommendation/clinical-finding-type/all": {
+			"get": {
+				"tags": [
+					"recommendation-controller"
+				],
+				"summary": "fetchAllClinicalFindingTypeBasedOnClinicalFinding",
+				"operationId": "fetchAllClinicalFindingTypeBasedOnClinicalFindingUsingGET",
+				"produces": [
+					"*/*"
+				],
+				"parameters": [{
+						"name": "page",
+						"in": "query",
+						"required": false,
+						"type": "integer",
+						"format": "int32"
+					},
+					{
+						"name": "size",
+						"in": "query",
+						"required": false,
+						"type": "integer",
+						"format": "int32"
+					},
+					{
+						"name": "sort",
+						"in": "query",
+						"required": false,
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/PaginatedRecommendationClinicalFindingTypeBody"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
+					}
+				}
+			}
+		},
+
+
+
+
+
+        "PaginatedRecommendationClinicalFindingTypeBody": {
+			"type": "object",
+			"properties": {
+				"pages": {
+					"type": "integer",
+					"format": "int32"
+				},
+				"clinicalFindingTypes": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/RecommendationClinicalFindingTypeDto"
+					}
+				}
+			},
+			"title": "PaginatedRecommendationClinicalFindingTypeBody"
+		},

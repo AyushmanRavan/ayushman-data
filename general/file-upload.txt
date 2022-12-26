@@ -1,0 +1,129 @@
+ Spring Converters and Formatters
+ https://reflectoring.io/spring-resttemplate/
+ @PostMapping(
+        value = "/postbody",
+        consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+
+@Slf4j
+@Controller
+public class Example {
+
+    private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+    @PostMapping(value = "/examplefileupload/withrequestbody",
+        consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},  //"multipart/form-data"
+        produces = {MediaType.APPLICATION_JSON_VALUE} )
+    public ResponseEntity<String> uploadFileWithRequestBody(@RequestBody FileDetails fileDetails) {
+        log.info("Request file with request body" + file.getOriginalFilename());
+        return ResponseEntity.ok("Success");
+    }
+}
+
+@PostMapping(value = "/example8/upload",
+     consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+     produces = {MediaType.APPLICATION_JSON_VALUE} )
+public String uploadFilesExample8(@RequestBody List<Gallery> galleries) {
+  log.info("galleries details: "     );
+  // Add your processing logic here
+  return "success";
+}
+
+public class Gallery {
+  private String title;
+  private String desc;
+  private MultipartFile file;
+ 
+    // Add Getters and setters
+}
+
+
+public class FileDetails {
+private String title;
+private String description;
+private MultipartFile file;
+
+public String getTitle() {
+return title;
+}
+
+public void setTitle(String title) {
+this.title = title;
+}
+
+public String getDescription() {
+return description;
+}
+
+public void setDescription(String description) {
+this.description = description;
+}
+
+public MultipartFile getFile() {
+return file;
+}
+
+public void setFile(MultipartFile file) {
+this.file = file;
+}
+}
+
+Read more: https://www.java67.com/2022/05/how-to-upload-file-and-json-data-in.html#ixzz7UeUhpdyp
+@SpringBootApplication
+public class ExampleApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ExampleApplication.class, args);
+    }
+
+    @Data
+    public static class User {
+        private String name;
+        private String lastName;
+    }
+
+    @Component
+    public static class StringToUserConverter implements Converter<String, User> {
+
+        @Autowired
+        private ObjectMapper objectMapper;
+
+        @Override
+        @SneakyThrows
+        public User convert(String source) {
+            return objectMapper.readValue(source, User.class);
+        }
+    }
+
+    @RestController
+    public static class MyController {
+
+        @PostMapping("/upload")
+        public String upload(@RequestParam("file") MultipartFile file, 
+                             @RequestParam("user") User user) {
+            return user + "\n" + file.getOriginalFilename() + "\n" + file.getSize();
+        }
+
+    }
+
+}
+
+
+
+https://velocitybytes.com/spring-boot-file-upload-and-download-rest-api
+
+# The files uploaded through the API will be stored in this directory
+file.upload-dir=./uploads
+
+package com.fileapi.property;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@Getter
+@Setter
+@ConfigurationProperties(prefix = "file")
+public class FileStorageProperties {
+
+    private String uploadDir;
+
+}

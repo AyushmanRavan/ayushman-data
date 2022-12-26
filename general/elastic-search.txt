@@ -1,0 +1,743 @@
+Java REST client is the official client for Elasticsearch. It comes in 2 flavors:
+==========================================================================================
+Java Low-Level REST client :
+— It allows communicating with an Elasticsearch cluster through HTTP and leaves requests marshalling & responses un-marshalling to users.
+Java High-Level REST client :
+— It is based on low-level client and exposes API specific methods, taking care of requests marshalling and responses un-marshalling.
+
+
+Text	                        Keyword
+Is tokenized	                Can not be tokenized
+Is analyzed	                    Can be normalized
+Can perform term based search	Can only match exact text
+
+                           
+
+Elasticsearch Index ~ Database
+Types ~ Tables
+Mapping ~ Schema
+shard = hash(document_id) % (num_of_primary_shards)
+
+NOTE: For a production cluster, it is recommended to have 3 dedicated master nodes, which do not serve any client requests, out of which 1 is active at any given time.
+
+
+Master Node
+=============
+It controls the Elasticsearch cluster and is responsible for all clusterwide operations like creating/deleting an index, keeping track of which nodes are part of the cluster and assigning shards to nodes. The master node processes one cluster state at a time and broadcasts the state to all the other nodes which respond with confirmation to the master node.
+A node can be configured to be eligible to become a master node by setting the node.master property to be true (default) in elasticsearch.yml.
+For large production clusters, it’s recommended to have a dedicated master node to just control the cluster and not serve any user requests.
+
+Data Node
+============
+It holds the data and the inverted index. By default, every node is configured to be a data node and the property node.data is set to true in elasticsearch.yml. If you would like to have a dedicated master node, then change the node.data property to false.
+
+Client Node:
+==============
+If you set both node.master and node.data to false, then the node gets configured as a client node and acts as a load balancer routing incoming requests to different nodes in the cluster.
+
+The node in the Elasticsearch cluster that you connect with as a client is called the coordinating node. The coordinating node routes the client requests to the appropriate shard in the cluster. For read requests, the coordinating node selects a different shard every time to serve the request in order to balance the load.
+
+We have two ways to access Elasticsearch using Spring Data, as follows:
+----------------------------------------------------------------------------------
+A) Repositories: We define methods in the interface, and Elasticsearch queries are generated based on the method name at runtime.
+B) ElasticsearchRestTemplate: We use method chains and native queries to create queries in order to better control the creation of 
+    Elasticsearch queries in relatively complex scenarios.
+
+Data Node :  operations are I/O-, memory-, and CPU-intensive.
+ If shard on one node then replica of shard will store on another node.
+Once index created we can’t change shards configuration but modify in replica. If need to update in shards only option is re-indexing.
+Type is logical category/grouping/partition of index 
+Execute advanced search operations such as paging, sorting, filtering, scripting, aggregations, and many others
+Elasticsearch supports custom scripting available in Lucene Expression, Groovy, Python,Java Script and Painless.
+
+For pointing to external path there are two ways to do :
+----------------------------------------------------------------
+A) First : Set static path on elasticsearch.yml file as below .
+path.data: /opt/app/FacingIssuesOnIT/data
+
+B) Second : By Passing argument from command line while starting Elasticsearch.
+./bin/elasticsearch –Epath.data=/opt/app/FacingIssuesOnIT/data
+
+
+@Configuration
+@PropertySource(value = {"classpath:applications.properties"})
+@EnableElasticsearchRepositories(basePackages = "org.springdataes.dao/repository")
+public class ElasticsearchConfig {
+    @Value("${elasticsearch.host}")
+    private String EsHost;
+
+    @Value("${elasticsearch.port}")
+    private int EsPort;
+
+    @Value("${elasticsearch.clustername}")
+    private String EsClusterName;
+
+    @Bean
+    public Client client() throws Exception {
+        Settings esSettings = Settings.settingsBuilder()
+                .put("cluster.name", EsClusterName)
+                .build();
+
+        return TransportClient.builder()
+                .settings(esSettings)
+                .build()
+                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(EsHost), EsPort));
+    }
+
+    @Bean
+    public ElasticsearchOperations elasticsearchTemplate() throws Exception {
+        return new ElasticsearchTemplate(client());
+    }
+}
+
+There is a query builder for every type of query supported by the Query DSL (Domain Specific Language). Each query builder implements the QueryBuilder interface and it allows us to set the specific options for a given type of query.
+==================================================================
+//imports
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
+public class EsConfig {
+
+    @Value("${es.index-name}")
+    private String indexName;
+
+    public String getIndexName() {
+        return indexName;
+    }
+
+    public void setIndexName(String indexName) {
+        this.indexName = indexName;
+    }
+
+    @Value("${elasticsearch.cluster.medicine.index:emr-api-staging-medicines}")
+    private String esMedicineIndex;
+
+    @Value("${elasticsearch.cluster.medicine.type:emr-api-staging-medicine}")
+    private String esMedicineType;
+
+    @Bean
+    public String elasticSearchMedicineIndexName() {
+        return esMedicineIndex;
+    }
+
+    @Bean
+    public String elasticSearchMedicineTypeName() {
+        return esMedicineType;
+    }
+
+}
+
+
+@NoArgsConstructor
+@Data
+@AllArgsConstructor
+public class Location implements Serializable {
+
+    private Double lon;
+
+    private Double lat;
+}
+
+@Document(indexName = "product", shards = 1, replicas = 0, refreshInterval = "5s", createIndex = true)
+@Document(indexName = "#{esConfig.indexName}", type = "movie", shards = 1, replicas = 0, refreshInterval = "5s", createIndex = true)
+@Document(indexName = "#{@elasticSearchMedicineIndexName}", type = "#{@elasticSearchMedicineTypeName}")
+public class Movie {
+ 
+    @Id
+    private String id;
+ 
+    @Field(type = FieldType.Text)
+    private String name;
+
+    @Field(type = FieldType.Keyword)
+    private Category category;
+
+     public enum Category {
+        CLOTHES,
+        ELECTRONICS,
+        GAMES;
+    }
+ 
+    @Field(type = FieldType.Nested)
+    private List < Genre >  genre;
+
+    @Field(type = FieldType.Object)
+    private Department department;
+
+      @Field(type = FieldType.Double, name = "price")
+      private Double price;
+  
+      @Field(type = FieldType.Integer, name = "quantity")
+      private Integer quantity;
+
+      private Location location;
+
+}
+
+
+public List<Product> getProductsByName(String name) {
+    Query query = new NativeSearchQueryBuilder()
+        .withQuery(QueryBuilders.matchQuery("name", name))
+        .build();
+    SearchHits<Product> searchHits = elasticsearchRestTemplate.search(query, Product.class);
+
+    return searchHits.get().map(SearchHit::getContent).collect(Collectors.toList());
+  }
+
+  public Map<String, Long> aggregateTerm(String term) {
+    Query query = new NativeSearchQueryBuilder()
+        .addAggregation(new TermsAggregationBuilder(term).field(term).size(10))
+        .build();
+
+    SearchHits<Product> searchHits = elasticsearchRestTemplate.search(query, Product.class);
+    Map<String, Long> result = new HashMap<>();
+    searchHits.getAggregations().asList().forEach(aggregation -> {
+      ((Terms) aggregation).getBuckets()
+          .forEach(bucket -> result.put(bucket.getKeyAsString(), bucket.getDocCount()));
+    });
+
+    return result;
+  }
+
+
+{
+    "city": "St. Louis",
+    "country": "United States",
+    "state": "Missouri",
+    "name": "Cardinals",
+    "league": "National",
+    "division": "Central",
+    "world_series_champions": 11,
+    "stadium_location": {
+        "lat": 38.622641,
+        "lon": -90.192819
+    }
+}
+
+What about teams that have won between 2 and 5 world series in the National League?
+===========================================================================================
+GET /teams/_search “filter range 2 >= world_series_champions >= 5 National league”
+ GET /teams/_search
+ {
+     "query": {
+         "bool": {
+             "must": { "match": { "league": "National" } },
+             "filter": {
+                 "range": {
+                     "world_series_champions": {
+                         "gte": 2,
+                         "lte":  5
+                         }
+                 }
+             }
+         }
+     }
+ }
+
+The range query gives us a few options:
+ ===============================================
+“gte” - greater than or equal to
+“lte” - less than or equal to
+“lt” - less than
+“gt” - greater than
+
+What about the world series average for the National league?
+========================================================================
+GET /teams/_search “aggregation National league average world_series_champions”
+ GET /teams/_search
+ {
+     "query": {
+         "match": {
+             "league": "National"
+         }
+     },
+     "aggs": {
+         "avg_world_series_wins": {
+             "avg/min/max": {
+                 "field": "world_series_champions"
+                 }
+             }
+     }
+ }
+
+
+ Let’s find the baseball stadiums within 20km of the LaunchCode Mentor Center (“lat”: 38.651522, “lon”: -90.259495).
+=================================================================================
+geo_distance 20km¶
+GET /teams/_search
+{
+    "query": {
+        "bool": {
+            "filter": {
+                "geo_distance": {
+                    "distance": "20km",
+                    "stadium_location": {
+                        "lat": 38.651522,
+                        "lon": -90.259495
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+ @Override
+    public List<Book> findByTitleAndAuthor(String title, String author) {
+        BoolQueryBuilder criteria = QueryBuilders.boolQuery();
+        criteria.must().addAll(List.of(QueryBuilders.matchQuery("authorName", author), QueryBuilders.matchQuery("title", title)));
+        return elasticsearchTemplate.queryForList(new NativeSearchQueryBuilder().withQuery(criteria).build(), Book.class);
+    }
+
+
+    Create elasticsearch.yml in src/main/docker
+cd spring-data-elasticsearch-example
+mkdir -p src/main/docker && touch src/main/docker/elasticsearch.yml
+
+docker-compose -f src/main/docker/elasticsearch.yml up -d
+
+
+public SearchPage<Book> searchBooks(BookSearchInput searchInput, Pageable pageable) {
+
+        // query
+        QueryBuilder queryBuilder;
+        if(searchInput == null || isEmpty(searchInput.getSearchText())) {
+            // search text is empty, match all results
+            queryBuilder = QueryBuilders.matchAllQuery();
+        } else {
+            // search text is available, match the search text in name, summary, and authors.name
+            queryBuilder = QueryBuilders.multiMatchQuery(searchInput.getSearchText())
+                    .field("name", 3)
+                    .field("summary")
+                    .field("authors.name")
+                    .fuzziness(Fuzziness.ONE) //fuzziness means the edit distance: the number of one-character changes that need to be made to one string to make it the same as another string
+                    .prefixLength(2);//The prefix_length parameter is used to improve performance. In this case, we require that the first three characters should match exactly, which reduces the number of possible combinations.;
+        }
+
+        // filter by author name
+        BoolQueryBuilder filterBuilder = boolQuery();
+        if(searchInput.getFilter() != null && isNotEmpty(searchInput.getFilter().getAuthorName())){
+            filterBuilder.must(termQuery("authors.name.raw", searchInput.getFilter().getAuthorName()));
+        }
+
+        NativeSearchQuery query = new NativeSearchQueryBuilder().withQuery(queryBuilder)
+                .withFilter(filterBuilder)
+                .withPageable(pageable)
+                .build();
+
+        SearchHits<Book> hits = operations.search(query, Book.class);
+
+        return SearchHitSupport.searchPageFor(hits, query.getPageable());
+    }
+}
+
+
+public List<Producto> getProductosByName(String nombre) {
+    Query query = new NativeSearchQueryBuilder()
+        .withQuery(QueryBuilders.matchQuery("nombre", nombre))
+        .build();
+
+    SearchHits<Producto> searchHits = elasticsearchRestTemplate.search(query, Producto.class);
+
+    return searchHits.get().map(SearchHit::getContent).collect(Collectors.toList());
+
+  }
+
+
+  public Map<String, Long> aggregateTerm(String term) {
+    Query query = new NativeSearchQueryBuilder()
+        .addAggregation(new TermsAggregationBuilder(term).field(term).size(10))
+        .build();
+
+    SearchHits<Producto> searchHits = elasticsearchRestTemplate.search(query, Producto.class);
+
+    Map<String, Long> result = new HashMap<>();
+    searchHits.getAggregations().asList().forEach(aggregation -> {
+      ((Terms) aggregation).getBuckets()
+          .forEach(bucket -> result.put(bucket.getKeyAsString(), bucket.getDocCount()));
+    });
+
+    return result;
+  }
+
+
+
+    public Page<Doctor> fetchDoctors(String keyword, Double longitude, Double latitude, Boolean isActive, Boolean isListed, Boolean isAvailableOnline, Boolean isAvailableAtClinic, String sortBy, String sortDirection, String auth, Pageable pageable) throws BadParameterException {
+
+        if (sortBy != null && sortBy.equalsIgnoreCase("location") && (longitude == null || latitude == null)) {
+            throw new BadParameterException();
+        } else {
+            sortBy = "popularity";
+        }
+
+        SearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(buildQuery(keyword, longitude, latitude, isActive, isListed, isAvailableOnline, isAvailableAtClinic))
+                .withSort(applySorting(sortBy, sortDirection, longitude, latitude, isAvailableOnline))
+                .withPageable(pageable)
+                .build();
+        log.info(" Elastic search query " + searchQuery.getQuery().toString());
+        Page<Doctor> doctors = elasticsearchTemplate.queryForPage(searchQuery, Doctor.class);
+        return doctors;
+    }
+
+    public BoolQueryBuilder buildQuery(String keyword, Double longitude, Double latitude, Boolean isActive, Boolean isListed, Boolean isAvailableOnline, Boolean isAvailableAtClinic) {
+        BoolQueryBuilder qb = QueryBuilders.boolQuery();
+
+        if (keyword != null && keyword.toLowerCase().startsWith("dr")) {
+            keyword = keyword.replaceFirst(".", "");
+            keyword = keyword.replaceFirst("^dr", "");
+        }
+        if (isActive != null) {
+            BoolQueryBuilder qbForIsActive = QueryBuilders.boolQuery();
+            qb.must(qbForIsActive.should(QueryBuilders.matchQuery("isActive", isActive)));
+        }
+        if (isListed != null) {
+            BoolQueryBuilder qbForIsListed = QueryBuilders.boolQuery();
+            qb.must(qbForIsListed.should(QueryBuilders.matchQuery("doctorInClinics.isListed", true)));
+        }
+        if (isAvailableOnline != null) {
+            qb.must(QueryBuilders.boolQuery().should(QueryBuilders.matchQuery("doctorInClinics.isAvailableOnline", isAvailableOnline)));
+        }
+        if (isAvailableAtClinic != null) {
+            qb.must(QueryBuilders.boolQuery().should(QueryBuilders.matchQuery("doctorInClinics.isAvailableAtClinic", isAvailableAtClinic)));
+        }
+
+        if (doctorSearchRadiusFilter != null && longitude != null && latitude != null) {
+            if (isAvailableAtClinic != null && isAvailableAtClinic) {
+                qb.must(QueryBuilders
+                        .geoDistanceQuery("doctorInClinics.clinic.location")
+                        .point(latitude, longitude)
+                        .distance(doctorSearchRadiusFilter, DistanceUnit.KILOMETERS));
+            }
+        }
+        if (keyword != null && !keyword.isEmpty()) {
+
+            BoolQueryBuilder searchQb = QueryBuilders.boolQuery()
+                    .should(QueryBuilders.matchQuery("name", keyword).operator(Operator.OR).boost(10f))
+                    .should(QueryBuilders.matchPhrasePrefixQuery("name", keyword).boost(5f))
+                    .should(QueryBuilders.matchQuery("doctorInClinics.clinic.name", keyword).operator(Operator.AND).boost(3f))
+                    .should(QueryBuilders.matchPhrasePrefixQuery("doctorInClinics.clinic.name", keyword).boost(1f));
+
+            Map<String, Object> map = new HashMap<>();
+            String drPrefix = "Dr " + keyword.trim();
+            String drDotPrefix = "Dr. " + keyword.trim();
+            map.put("searchQueryDrPrefix", drPrefix);
+            map.put("searchQueryDrPrefixLength", drPrefix.length());
+            map.put("searchQueryDrDotPrefix", drDotPrefix);
+            map.put("searchQueryDrDotPrefixLength", drDotPrefix.length());
+
+            Script nameScript = new Script(
+                    ScriptType.INLINE,
+                    "painless",
+                    "def str = doc['name.keyword'].value.trim(); "
+                            + "str.length() >= params.searchQueryDrDotPrefixLength ? (str.substring(0, params.searchQueryDrPrefixLength).equalsIgnoreCase(params.searchQueryDrPrefix) || str.substring(0, params.searchQueryDrDotPrefixLength).equalsIgnoreCase(params.searchQueryDrDotPrefix) ? "
+                            + "str.substring(0, str.length()).equalsIgnoreCase(params.searchQueryDrPrefix) || str.substring(0, str.length()).equalsIgnoreCase(params.searchQueryDrDotPrefix) ? 5 : 2 "
+                            + ": 1) : 1",
+                    map
+            );
+
+            List<FunctionScoreQueryBuilder.FilterFunctionBuilder> functionBuilderList = new ArrayList<>();
+            functionBuilderList.add(new FunctionScoreQueryBuilder.FilterFunctionBuilder(ScoreFunctionBuilders.scriptFunction(nameScript)));
+
+            qb.must(QueryBuilders.functionScoreQuery(searchQb, functionBuilderList.toArray(new FunctionScoreQueryBuilder.FilterFunctionBuilder[0])));
+        }
+
+        return qb;
+    }
+
+
+    protected SortBuilder applySorting(String sortBy, String sortDirection, Double latitude, Double longitude, Boolean isAvailableOnline) {
+        SortOrder sortOrder = SortOrder.valueOf(sortDirection);
+        switch (sortBy.toLowerCase()) {
+            case "fee":
+                return SortBuilders.fieldSort((isAvailableOnline != null && isAvailableOnline) ? "doctorInClinics.econsultationFee" : "doctorInClinics.consultationFee")
+                        .order(sortOrder);
+
+            case "location":
+                GeoDistanceSortBuilder a = SortBuilders.geoDistanceSort("doctorInClinics.clinic.location", latitude, longitude)
+                        .unit(DistanceUnit.KILOMETERS)
+                        .order(sortOrder)
+                        .ignoreUnmapped(true);
+                return null;
+
+            case "popularity":
+                return SortBuilders.fieldSort("popularity").order(sortOrder);
+
+            case "rating":
+                return SortBuilders.fieldSort("rating").order(sortOrder);
+
+            default:
+                return SortBuilders.fieldSort("doctorInClinics.year_of_exp").order(sortOrder);
+        }
+    }
+
+
+
+
+----------------------------------------------------------------------------------------------------
+    public List<PatientHistory> forRecentCareProvider(Long[] id) {
+
+        BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
+        if (id.length > 0) {
+            for (Long ids : id) {
+                queryBuilder.should(QueryBuilders.matchQuery("patient.id", ids));
+            }
+        }
+
+        SearchQuery build = new NativeSearchQueryBuilder()
+                .withQuery(matchAllQuery())
+                .withFilter(boolQuery()
+                        .must(queryBuilder)
+                        .must(QueryBuilders
+                                .rangeQuery("consultation.appointmentTime")
+                                .gte("now-365d/d")))
+                .withSort(SortBuilders
+                        .fieldSort("consultation.appointmentTime")
+                        .order(SortOrder.DESC))
+                .build();
+
+        return Lists.newArrayList(elasticsearchTemplate.stream(build, PatientHistory.class));
+    }
+ --------------------------------------------------------------------------------------------------
+
+    public Page<PatientHistory> basedOnPatientNameAndPhone(
+            String searchText,
+            Long[] id,
+            String[] conditions,
+            Date startDate,
+            Date endDate,
+            Pageable pageable) {
+
+        if (searchText != null && !searchText.isEmpty()) searchText = searchText.trim();
+        BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
+        if (searchText != null) {
+            if (searchText.length() > 0) {
+                queryBuilder.should(QueryBuilders.prefixQuery("patient.phone", searchText))
+                        .should(QueryBuilders.matchPhrasePrefixQuery("patient.name", searchText));
+            } else {
+                queryBuilder.should(QueryBuilders.matchAllQuery());
+            }
+        }
+
+        BoolQueryBuilder queryBuilder1 = QueryBuilders.boolQuery();
+        for (Long ids : id) {
+            queryBuilder1.should(nestedQuery("consultation",
+                    QueryBuilders.boolQuery()
+                            .must(nestedQuery("consultation.doctorInClinic",
+                                    QueryBuilders
+                                            .boolQuery()
+                                            .must(matchQuery("consultation.doctorInClinic.id", ids)),
+                                    ScoreMode.Avg))
+                    , ScoreMode.Avg));
+        }
+
+        BoolQueryBuilder queryBuilder2 = QueryBuilders.boolQuery();
+        if (conditions != null) {
+            for (String condition : conditions) {
+                queryBuilder2
+                        .should(QueryBuilders.multiMatchQuery(condition,
+                                "consultation.symptoms.symptomType.name",
+                                "consultation.existingConditions.existingConditionType.name"));
+            }
+        }
+
+        QueryBuilder queryBuilder3 = QueryBuilders.boolQuery();
+        if (startDate != null && endDate != null) {
+            Long now = 0l;
+            Long startDateDiff = DateUtil.diffBetween(new Date(), startDate);
+            if (DateUtil.equilityOfTwoDate(endDate, new Date()) == 1 || DateUtil.equilityOfTwoDate(endDate, new Date()) == 0) {
+                if (startDateDiff != 0) {
+                    queryBuilder3 = QueryBuilders.rangeQuery("consultation.appointmentTime")
+                            .gte("now" + startDateDiff + "d" + "/d");
+//                        .lte("now");
+                } else {
+                    queryBuilder3 = QueryBuilders.rangeQuery("consultation.appointmentTime")
+                            .gte("now" + "/d");
+                }
+            } else {
+                queryBuilder3 = QueryBuilders.rangeQuery("consultation.appointmentTime")
+                        .gte("now" + startDateDiff + "d" + "/d")
+                        .lte("now" + DateUtil.diffBetween(new Date(), endDate) + "d" + "/d");
+            }
+        }
+
+
+        SortBuilder sortBuilder = SortBuilders
+                .fieldSort("consultation.appointmentTime")
+                .order(SortOrder.DESC)
+                .setNestedPath("consultation");
+
+        BoolQueryBuilder must = boolQuery()
+                .must(queryBuilder1)
+                .must(queryBuilder)
+                .must(queryBuilder2)
+                .must(queryBuilder3);
+
+        SearchQuery build = new NativeSearchQueryBuilder()
+                .withQuery(matchAllQuery())
+                .withFilter(must)
+                .withSort(sortBuilder)
+                .withPageable(pageable)
+                .build();
+
+        return elasticsearchTemplate.queryForPage(build, PatientHistory.class);
+    }
+
+=========================================================================================
+public BoolQueryBuilder applyFilters(Long clinicId, String search, Long[] specialities,
+                                         String[] cities, String[] clusters, String slug, Boolean isCamp,
+                                         Long doctorId, Boolean forDoctor, List<Long> recentlyVisitedDoctorIds,
+                                         Boolean isListed, Boolean isAvailableOnline, Boolean isAvailableAtClinic,
+                                         String doctorAvailabilityFilter, Double longitude, Double latitude) {
+        if (search != null) {
+            search = search.toLowerCase();
+            if (search.startsWith("dr")) {
+                search = search.replaceFirst(".", "");
+                search = search.replaceFirst("^dr", "");
+            }
+        }
+        BoolQueryBuilder qb = QueryBuilders.boolQuery();
+        qb.must(QueryBuilders.matchQuery("isCamp", isCamp));
+        qb.must(QueryBuilders.matchQuery("isActive", true));
+        qb.mustNot(QueryBuilders.termQuery("doctorInClinics.usingMeddoLite", true));
+        if (forDoctor) {
+            if (BooleanUtils.isTrue(isListed)) {
+                BoolQueryBuilder qbForIsListed = QueryBuilders.boolQuery();
+                qb.must(qbForIsListed.should(QueryBuilders.matchQuery("doctorInClinics.isListed", true)));
+            }
+            if (isAvailableOnline != null) {
+                qb.must(QueryBuilders.boolQuery().should(QueryBuilders.matchQuery("doctorInClinics.isAvailableOnline", isAvailableOnline)));
+            }
+            if (isAvailableAtClinic != null) {
+                qb.must(QueryBuilders.boolQuery().should(QueryBuilders.matchQuery("doctorInClinics.isAvailableAtClinic", isAvailableAtClinic)));
+            }
+            if (clinicId != null) {
+                BoolQueryBuilder qbForClinicId = QueryBuilders.boolQuery();
+                qb.must(qbForClinicId.should(QueryBuilders.matchQuery("doctorInClinics.clinic.id", clinicId)));
+            }
+
+            if (doctorAvailabilityFilter!=null && !doctorAvailabilityFilter.isEmpty()) {
+                if (isAvailableAtClinic!=null && isAvailableAtClinic) {
+                    switch (doctorAvailabilityFilter.toLowerCase().trim()) {
+                        case "today":
+                            qb.must(QueryBuilders.boolQuery().should(QueryBuilders.matchQuery("availableTodayInClinic", true)));
+                        case "tomorrow":
+                            qb.must(QueryBuilders.boolQuery().should(QueryBuilders.matchQuery("availableTomorrowInClinic", true)));
+                        case "next7days":
+                            qb.must(QueryBuilders.boolQuery().should(QueryBuilders.matchQuery("availableNext7DayInClinic", true)));
+                    }
+                }
+                if (isAvailableOnline!=null && isAvailableOnline) {
+                    switch (doctorAvailabilityFilter.toLowerCase().trim()) {
+                        case "today":
+                            qb.must(QueryBuilders.boolQuery().should(QueryBuilders.matchQuery("availableTodayOnline", true)));
+                        case "tomorrow":
+                            qb.must(QueryBuilders.boolQuery().should(QueryBuilders.matchQuery("availableTomorrowOnline", true)));
+                        case "next7days":
+                            qb.must(QueryBuilders.boolQuery().should(QueryBuilders.matchQuery("availableNext7DayOnline", true)));
+                    }
+                }
+                if (isAvailableAtClinic == null && isAvailableOnline == null) {
+                    switch (doctorAvailabilityFilter.toLowerCase().trim()) {
+                        case "today":
+                            qb.should(QueryBuilders.termQuery("availableTodayOnline", true)).should(QueryBuilders.termQuery("availableTodayOnline", true));
+                        case "tomorrow":
+                            qb.should(QueryBuilders.termQuery("availableTomorrowOnline", true)).should(QueryBuilders.termQuery("availableTomorrowInClinic", true));
+                        case "next7days":
+                            qb.should(QueryBuilders.termQuery("availableNext7DayOnline", true)).should(QueryBuilders.termQuery("availableNext7DayInClinic", true));
+                    }
+                }
+            }
+        }
+        if (doctorId != null) {
+            qb.must(QueryBuilders.matchQuery("id", doctorId));
+        }
+
+        if (doctorSearchRadiusFilter != null && longitude != null && latitude != null) {
+            if (isAvailableAtClinic !=null && isAvailableAtClinic) {
+                qb.must(QueryBuilders
+                        .geoDistanceQuery("doctorInClinics.clinic.location")
+                        .point(latitude, longitude)
+                        .distance(doctorSearchRadiusFilter, DistanceUnit.KILOMETERS));
+            }
+        }
+
+        if (search != null && !search.isEmpty()) {
+
+            BoolQueryBuilder searchQb = QueryBuilders.boolQuery()
+                    .should(QueryBuilders.matchQuery("name", search).operator(Operator.OR).boost(10f))
+                    .should(QueryBuilders.matchPhrasePrefixQuery("name", search).boost(5f))
+                    .should(QueryBuilders.matchQuery("doctorInClinics.clinic.name", search).operator(Operator.AND).boost(3f))
+                    .should(QueryBuilders.matchPhrasePrefixQuery("doctorInClinics.clinic.name", search).boost(1f));
+
+            Map<String, Object> map = new HashMap<>();
+            String drPrefix = "Dr " + search.trim();
+            String drDotPrefix = "Dr. " + search.trim();
+            map.put("searchQueryDrPrefix", drPrefix);
+            map.put("searchQueryDrPrefixLength", drPrefix.length());
+            map.put("searchQueryDrDotPrefix", drDotPrefix);
+            map.put("searchQueryDrDotPrefixLength", drDotPrefix.length());
+
+            Script nameScript = new Script(
+                    ScriptType.INLINE,
+                    "painless",
+                    "def str = doc['name.keyword'].value.trim(); "
+                            + "str.length() >= params.searchQueryDrDotPrefixLength ? (str.substring(0, params.searchQueryDrPrefixLength).equalsIgnoreCase(params.searchQueryDrPrefix) || str.substring(0, params.searchQueryDrDotPrefixLength).equalsIgnoreCase(params.searchQueryDrDotPrefix) ? "
+                            + "str.substring(0, str.length()).equalsIgnoreCase(params.searchQueryDrPrefix) || str.substring(0, str.length()).equalsIgnoreCase(params.searchQueryDrDotPrefix) ? 5 : 2 "
+                            + ": 1) : 1",
+                    map
+            );
+
+            Script recentlyVisitedScript = new Script(
+                    ScriptType.INLINE,
+                    "painless",
+                    "for(entry in params.visitCount.entrySet()){ if(doc['id'].value.toString().equals(entry.getKey())) { return entry.getValue()+1; } } return 1;",
+                    Collections.singletonMap(
+                            "visitCount",
+                            recentlyVisitedDoctorIds.stream()
+                                    .collect(Collectors.groupingBy(e -> e.toString(), Collectors.counting()))
+                    )
+            );
+ 
+            List<FunctionScoreQueryBuilder.FilterFunctionBuilder> functionBuilderList = new ArrayList<>();
+            functionBuilderList.add(new FunctionScoreQueryBuilder.FilterFunctionBuilder(ScoreFunctionBuilders.scriptFunction(nameScript)));
+            if (!CollectionUtils.isEmpty(recentlyVisitedDoctorIds)) {
+                functionBuilderList.add(new FunctionScoreQueryBuilder.FilterFunctionBuilder(ScoreFunctionBuilders.scriptFunction(recentlyVisitedScript)));
+            }
+
+            qb.must(QueryBuilders.functionScoreQuery(searchQb, functionBuilderList.toArray(new FunctionScoreQueryBuilder.FilterFunctionBuilder[0])));
+        }
+
+        if (specialities != null) {
+
+            BoolQueryBuilder specialityQb = QueryBuilders.boolQuery();
+            for (Long speciality : specialities) {
+                specialityQb.should(QueryBuilders.matchQuery("speciality.id", speciality));
+            }
+            qb.must(specialityQb);
+        }
+
+        if (cities != null) {
+            BoolQueryBuilder cityQb = QueryBuilders.boolQuery();
+            for (String city : cities) {
+                cityQb.should(QueryBuilders.matchQuery("doctorInClinics.clinic.city", city));
+            }
+            qb.must(cityQb);
+        }
+
+        if (slug != null) {
+            BoolQueryBuilder slugQb = QueryBuilders.boolQuery();
+            slugQb.should(QueryBuilders.multiMatchQuery(slug, "slug", "doctorInClinics.clinic.slug"));
+            qb.must(slugQb);
+        }
+
+        if (clusters != null) {
+            BoolQueryBuilder clusterQb = QueryBuilders.boolQuery();
+            for (String cluster : clusters) {
+                clusterQb.should(QueryBuilders.matchQuery("doctorInClinics.clinic.cluster", cluster));
+            }
+            qb.must(clusterQb);
+        }
+        return qb;
+    }

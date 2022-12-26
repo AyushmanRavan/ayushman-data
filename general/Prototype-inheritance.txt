@@ -1,0 +1,52 @@
+
+https://cinthialandia.com/blog/prototype/
+1) Problem with the constructor function :: Every object has its own instance of the function
+2) Problem with the prototype :: Modifying a property using one object reflects the other object also
+ANS : To solve both problems, we can define all the object-specific properties inside the constructor 
+      and all shared properties and methods inside the prototype..
+
+Object.create
+------------------
+Prototype inheritance can be easily done using the Object.create method, which is used to create a new object by using the existing object.
+The new object just inherits the prototype of the given object
+ex : Object.create(object, { newObjectproperties });
+
+
+How to add variables to an object using the Prototype in JavaScript?
+ClassName.prototype.variableName = value;
+
+How to add methods to the object using the Prototype in JavaScript?
+className.prototype.functionname = ()=>{ console.log("...") };
+className.prototype.functionname = function() { console.log("...") }
+
+
+function Car(brand) {
+  this.brand = brand
+}
+
+Car.prototype.start = function () {
+  console.log("starting car of brand", this.brand)
+}
+
+function Ferrari(color) {
+  Car.call(this, "Ferrari") // Constructor call to also initialize whatever Car does.
+
+  // throw an error if setting an invalid color
+  if (color !== "Yellow" && color !== "Red") {
+    throw new Error("Ferrari should only be of color yellow or red...")
+  }
+
+  this.color = color // otherwise, set the color.
+}
+
+// Object.create creates an empty object, and link it to a given object
+// Kind of like step 1 and 2 of calling `new`.
+Ferrari.prototype = Object.create(Car.prototype)
+
+Ferrari.prototype.printColor = function () {
+  console.log("This Ferrari is of color", this.color)
+}
+
+const ferrari = new Ferrari("Red")
+ferrari.start() // starting car of brand Ferrari
+console.printColor() // This Ferrari is of color Red

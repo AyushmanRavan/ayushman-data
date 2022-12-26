@@ -1,0 +1,180 @@
+lenovo@lenovo-Pc:~/JHipster/vbot$ sudo ./mvnw 
+[sudo] password for lenovo: 
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------------< com.mgmt.vbot:vbot >-------------------------
+[INFO] Building Vbot 0.0.1-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot-maven-plugin:2.7.3:run (default-cli) > test-compile @ vbot >>>
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.0:copy-resources (default-resources) @ vbot ---
+[INFO] Copying 6 resources
+[INFO] Copying 6 resources
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.0:resources (default-resources) @ vbot ---
+[INFO] Copying 6 resources
+[INFO] Copying 6 resources
+[INFO] 
+[INFO] --- maven-enforcer-plugin:3.1.0:enforce (enforce-versions) @ vbot ---
+[INFO] 
+[INFO] --- maven-enforcer-plugin:3.1.0:enforce (enforce-dependencyConvergence) @ vbot ---
+[WARNING] 
+Dependency convergence error for org.checkerframework:checker-qual:jar:3.22.0:compile paths to dependency are:
++-com.mgmt.vbot:vbot:jar:0.0.1-SNAPSHOT
+  +-com.github.ben-manes.caffeine:caffeine:jar:3.1.1:compile
+    +-org.checkerframework:checker-qual:jar:3.22.0:compile
+and
++-com.mgmt.vbot:vbot:jar:0.0.1-SNAPSHOT
+  +-io.mongock:mongodb-springdata-v3-driver:jar:5.1.5:compile
+    +-io.mongock:mongock-driver-core:jar:5.1.5:compile
+      +-io.mongock:mongock-driver-api:jar:5.1.5:compile
+        +-com.google.guava:guava:jar:31.1-jre:compile
+          +-org.checkerframework:checker-qual:jar:3.12.0:compile
+
+[WARNING] 
+Dependency convergence error for com.google.errorprone:error_prone_annotations:jar:2.14.0:compile paths to dependency are:
++-com.mgmt.vbot:vbot:jar:0.0.1-SNAPSHOT
+  +-com.github.ben-manes.caffeine:caffeine:jar:3.1.1:compile
+    +-com.google.errorprone:error_prone_annotations:jar:2.14.0:compile
+and
++-com.mgmt.vbot:vbot:jar:0.0.1-SNAPSHOT
+  +-io.mongock:mongodb-springdata-v3-driver:jar:5.1.5:compile
+    +-io.mongock:mongock-driver-core:jar:5.1.5:compile
+      +-io.mongock:mongock-driver-api:jar:5.1.5:compile
+        +-com.google.guava:guava:jar:31.1-jre:compile
+          +-com.google.errorprone:error_prone_annotations:jar:2.11.0:compile
+
+[WARNING] 
+Dependency convergence error for org.apiguardian:apiguardian-api:jar:1.1.2:compile paths to dependency are:
++-com.mgmt.vbot:vbot:jar:0.0.1-SNAPSHOT
+  +-org.zalando:problem-spring-web:jar:0.27.0:compile
+    +-org.zalando:problem-violations:jar:0.27.0:compile
+      +-org.apiguardian:apiguardian-api:jar:1.1.2:compile
+and
++-com.mgmt.vbot:vbot:jar:0.0.1-SNAPSHOT
+  +-org.zalando:problem-spring-web:jar:0.27.0:compile
+    +-org.zalando:problem-spring-common:jar:0.27.0:compile
+      +-org.apiguardian:apiguardian-api:jar:1.1.2:compile
+and
++-com.mgmt.vbot:vbot:jar:0.0.1-SNAPSHOT
+  +-org.zalando:problem-spring-web:jar:0.27.0:compile
+    +-org.apiguardian:apiguardian-api:jar:1.1.2:compile
+and
++-com.mgmt.vbot:vbot:jar:0.0.1-SNAPSHOT
+  +-org.zalando:problem-spring-web:jar:0.27.0:compile
+    +-org.zalando:faux-pas:jar:0.9.0:compile
+      +-org.apiguardian:apiguardian-api:jar:1.1.1:compile
+
+[WARNING] Rule 0: org.apache.maven.plugins.enforcer.DependencyConvergence failed with message:
+Failed while enforcing releasability. See above detailed error message.
+[INFO] 
+[INFO] --- jacoco-maven-plugin:0.8.8:prepare-agent (pre-unit-tests) @ vbot ---
+[INFO] argLine set to -javaagent:/root/.m2/repository/org/jacoco/org.jacoco.agent/0.8.8/org.jacoco.agent-0.8.8-runtime.jar=destfile=/home/lenovo/JHipster/vbot/target/jacoco.exec -Djava.security.egd=file:/dev/./urandom -Xmx1G
+[INFO] 
+[INFO] --- properties-maven-plugin:1.1.0:read-project-properties (default) @ vbot ---
+[INFO] 
+[INFO] --- checksum-maven-plugin:1.11:files (create-pre-compiled-webapp-checksum) @ vbot ---
+[INFO] 
+[INFO] --- maven-antrun-plugin:3.1.0:run (eval-frontend-checksum) @ vbot ---
+[INFO] Executing tasks
+[INFO] Executed tasks
+[INFO] 
+[INFO] --- frontend-maven-plugin:1.12.1:install-node-and-npm (install-node-and-npm) @ vbot ---
+[INFO] Node v16.17.0 is already installed.
+[INFO] NPM 8.19.1 is already installed.
+[INFO] 
+[INFO] --- frontend-maven-plugin:1.12.1:npm (npm install) @ vbot ---
+[INFO] Skipping execution.
+[INFO] 
+[INFO] --- frontend-maven-plugin:1.12.1:npm (webapp build dev) @ vbot ---
+[INFO] Skipping execution.
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.10.1:compile (default-compile) @ vbot ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- checksum-maven-plugin:1.11:files (create-compiled-webapp-checksum) @ vbot ---
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.0:testResources (default-testResources) @ vbot ---
+[INFO] Copying 6 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.10.1:testCompile (default-testCompile) @ vbot ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] <<< spring-boot-maven-plugin:2.7.3:run (default-cli) < test-compile @ vbot <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:2.7.3:run (default-cli) @ vbot ---
+[INFO] Attaching agents: []
+11:36:02.050 [Thread-0] DEBUG org.springframework.boot.devtools.restart.classloader.RestartClassLoader - Created RestartClassLoader org.springframework.boot.devtools.restart.classloader.RestartClassLoader@2082b7ef
+
+        ██╗ ██╗   ██╗ ████████╗ ███████╗   ██████╗ ████████╗ ████████╗ ███████╗
+        ██║ ██║   ██║ ╚══██╔══╝ ██╔═══██╗ ██╔════╝ ╚══██╔══╝ ██╔═════╝ ██╔═══██╗
+        ██║ ████████║    ██║    ███████╔╝ ╚█████╗     ██║    ██████╗   ███████╔╝
+  ██╗   ██║ ██╔═══██║    ██║    ██╔════╝   ╚═══██╗    ██║    ██╔═══╝   ██╔══██║
+  ╚██████╔╝ ██║   ██║ ████████╗ ██║       ██████╔╝    ██║    ████████╗ ██║  ╚██╗
+   ╚═════╝  ╚═╝   ╚═╝ ╚═══════╝ ╚═╝       ╚═════╝     ╚═╝    ╚═══════╝ ╚═╝   ╚═╝
+
+:: JHipster 🤓  :: Running Spring Boot 2.7.3 ::
+:: https://www.jhipster.tech ::
+
+2022-12-05T11:36:02.495+05:30 DEBUG 15390 --- [kground-preinit] org.jboss.logging                        : Logging Provider: org.jboss.logging.Log4j2LoggerProvider 
+2022-12-05T11:36:02.508+05:30  INFO 15390 --- [  restartedMain] com.mgmt.vbot.VbotApp                    : Starting VbotApp using Java 11.0.17 on lenovo-Pc with PID 15390 (/home/lenovo/JHipster/vbot/target/classes started by root in /home/lenovo/JHipster/vbot) 
+2022-12-05T11:36:02.509+05:30 DEBUG 15390 --- [  restartedMain] com.mgmt.vbot.VbotApp                    : Running with Spring Boot v2.7.3, Spring v5.3.22 
+2022-12-05T11:36:02.510+05:30  INFO 15390 --- [  restartedMain] com.mgmt.vbot.VbotApp                    : The following 2 profiles are active: "dev", "api-docs" 
+2022-12-05T11:36:04.266+05:30 DEBUG 15390 --- [  restartedMain] i.m.c.u.i.logging.InternalLoggerFactory  : Using SLF4J as the default logging framework 
+2022-12-05T11:36:04.474+05:30 DEBUG 15390 --- [  restartedMain] s.n.www.protocol.http.HttpURLConnection  : sun.net.www.MessageHeader@401889d25 pairs: {GET /realms/jhipster/.well-known/openid-configuration HTTP/1.1: null}{Accept: application/json, application/*+json}{User-Agent: Java/11.0.17}{Host: localhost:9080}{Connection: keep-alive} 
+2022-12-05T11:36:04.798+05:30 DEBUG 15390 --- [  restartedMain] s.n.www.protocol.http.HttpURLConnection  : sun.net.www.MessageHeader@4af9d8bf9 pairs: {null: HTTP/1.1 200 OK}{Referrer-Policy: no-referrer}{X-Frame-Options: SAMEORIGIN}{Strict-Transport-Security: max-age=31536000; includeSubDomains}{Cache-Control: no-cache, must-revalidate, no-transform, no-store}{X-Content-Type-Options: nosniff}{X-XSS-Protection: 1; mode=block}{Content-Type: application/json}{content-length: 5870} 
+2022-12-05T11:36:04.908+05:30 DEBUG 15390 --- [  restartedMain] com.mgmt.vbot.config.WebConfigurer       : Registering CORS filter 
+2022-12-05T11:36:04.943+05:30  INFO 15390 --- [  restartedMain] com.mgmt.vbot.config.WebConfigurer       : Web application configuration, using profiles: dev 
+2022-12-05T11:36:04.944+05:30  INFO 15390 --- [  restartedMain] com.mgmt.vbot.config.WebConfigurer       : Web application fully configured 
+2022-12-05T11:36:05.949+05:30 DEBUG 15390 --- [  restartedMain] c.ehcache.core.Ehcache-usersByLogin      : Initialize successful. 
+2022-12-05T11:36:05.969+05:30 DEBUG 15390 --- [  restartedMain] c.ehcache.core.Ehcache-usersByEmail      : Initialize successful. 
+2022-12-05T11:36:06.021+05:30 DEBUG 15390 --- [  restartedMain] com.mgmt.vbot.config.AsyncConfiguration  : Creating Async Task Executor 
+2022-12-05T11:36:06.218+05:30  INFO 15390 --- [  restartedMain] i.m.r.core.builder.RunnerBuilderBase     : Mongock runner COMMUNITY version[5.1.5] 
+2022-12-05T11:36:06.219+05:30  INFO 15390 --- [  restartedMain] i.m.r.core.builder.RunnerBuilderBase     : Running Mongock with NO metadata 
+2022-12-05T11:36:06.219+05:30  WARN 15390 --- [  restartedMain] i.m.r.core.builder.RunnerBuilderBase     : Property transaction-enabled not provided. It will become true as default in next versions. Set explicit value to false in case transaction are not desired. 
+2022-12-05T11:36:06.219+05:30  WARN 15390 --- [  restartedMain] i.m.r.core.builder.RunnerBuilderBase     : Property transaction-enabled not provided and is unknown if driver is transactionable. BY DEFAULT MONGOCK WILL RUN IN NO-TRANSACTION MODE. 
+2022-12-05T11:36:06.438+05:30 DEBUG 15390 --- [  restartedMain] s.n.www.protocol.http.HttpURLConnection  : sun.net.www.MessageHeader@5c3a4b985 pairs: {GET /realms/jhipster/.well-known/openid-configuration HTTP/1.1: null}{Accept: application/json, application/*+json}{User-Agent: Java/11.0.17}{Host: localhost:9080}{Connection: keep-alive} 
+2022-12-05T11:36:06.446+05:30 DEBUG 15390 --- [  restartedMain] s.n.www.protocol.http.HttpURLConnection  : sun.net.www.MessageHeader@3a8d94df9 pairs: {null: HTTP/1.1 200 OK}{Referrer-Policy: no-referrer}{X-Frame-Options: SAMEORIGIN}{Strict-Transport-Security: max-age=31536000; includeSubDomains}{Cache-Control: no-cache, must-revalidate, no-transform, no-store}{X-Content-Type-Options: nosniff}{X-XSS-Protection: 1; mode=block}{Content-Type: application/json}{content-length: 5870} 
+2022-12-05T11:36:06.472+05:30 DEBUG 15390 --- [  restartedMain] s.n.www.protocol.http.HttpURLConnection  : sun.net.www.MessageHeader@bd0d11e5 pairs: {GET /realms/jhipster/protocol/openid-connect/certs HTTP/1.1: null}{Accept: application/json, application/jwk-set+json}{User-Agent: Java/11.0.17}{Host: localhost:9080}{Connection: keep-alive} 
+2022-12-05T11:36:06.512+05:30 DEBUG 15390 --- [  restartedMain] s.n.www.protocol.http.HttpURLConnection  : sun.net.www.MessageHeader@2ef113989 pairs: {null: HTTP/1.1 200 OK}{Referrer-Policy: no-referrer}{X-Frame-Options: SAMEORIGIN}{Strict-Transport-Security: max-age=31536000; includeSubDomains}{Cache-Control: no-cache}{X-Content-Type-Options: nosniff}{X-XSS-Protection: 1; mode=block}{Content-Type: application/json}{content-length: 1466} 
+2022-12-05T11:36:06.550+05:30 DEBUG 15390 --- [  restartedMain] jdk.event.security                       : X509Certificate: Alg:SHA256withRSA, Serial:184e0e3bc25, Subject:CN=jhipster, Issuer:CN=jhipster, Key type:RSA, Length:2048, Cert Id:-831489527, Valid from:05/12/22, 11:33 AM, Valid until:05/12/32, 11:35 AM 
+2022-12-05T11:36:06.897+05:30 DEBUG 15390 --- [  restartedMain] c.a.JHipsterSpringDocGroupsConfiguration : Initializing JHipster OpenApi customizer 
+2022-12-05T11:36:06.902+05:30 DEBUG 15390 --- [  restartedMain] c.a.JHipsterSpringDocGroupsConfiguration : Initializing JHipster OpenApi default group 
+2022-12-05T11:36:06.906+05:30 DEBUG 15390 --- [  restartedMain] c.a.JHipsterSpringDocGroupsConfiguration : Initializing JHipster OpenApi management group 
+2022-12-05T11:36:07.270+05:30 DEBUG 15390 --- [  restartedMain] c.m.v.w.f.OAuth2RefreshTokensWebFilter   : Filter 'OAuth2RefreshTokensWebFilter' configured for use 
+2022-12-05T11:36:07.320+05:30  INFO 15390 --- [  restartedMain] org.jboss.threads                        : JBoss Threads version 3.1.0.Final 
+2022-12-05T11:36:07.381+05:30  INFO 15390 --- [  restartedMain] com.mgmt.vbot.VbotApp                    : Started VbotApp in 5.321 seconds (JVM running for 5.701) 
+2022-12-05T11:36:07.396+05:30  INFO 15390 --- [  restartedMain] i.m.r.c.e.o.migrate.MigrateExecutorBase  : Mongock skipping the data migration. All change set items are already executed or there is no change set item. 
+2022-12-05T11:36:07.396+05:30  INFO 15390 --- [  restartedMain] i.m.driver.core.lock.LockManagerDefault  : Mongock releasing the lock 
+2022-12-05T11:36:07.396+05:30  INFO 15390 --- [  restartedMain] i.m.driver.core.lock.LockManagerDefault  : Mongock releasing the lock 
+2022-12-05T11:36:07.413+05:30  INFO 15390 --- [  restartedMain] i.m.driver.core.lock.LockManagerDefault  : Mongock released the lock 
+2022-12-05T11:36:07.414+05:30  INFO 15390 --- [  restartedMain] i.m.r.c.e.o.migrate.MigrateExecutorBase  : Mongock has finished 
+2022-12-05T11:36:07.418+05:30  INFO 15390 --- [  restartedMain] com.mgmt.vbot.VbotApp                    : 
+----------------------------------------------------------
+        Application 'vbot' is running! Access URLs:
+        Local:          http://localhost:8080/
+        External:       http://127.0.1.1:8080/
+        Profile(s):     [dev, api-docs]
+---------------------------------------------------------- 
+2022-12-05T11:36:15.009+05:30  WARN 15390 --- [  XNIO-1 task-2] o.z.problem.spring.common.AdviceTraits   : Unauthorized: Full authentication is required to access this resource 
+2022-12-05T11:36:15.050+05:30  WARN 15390 --- [  XNIO-1 task-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.security.authentication.InsufficientAuthenticationException: Full authentication is required to access this resource] 
+2022-12-05T11:36:25.683+05:30 DEBUG 15390 --- [  XNIO-1 task-2] s.n.www.protocol.http.HttpURLConnection  : sun.net.www.MessageHeader@4020c13b8 pairs: {POST /realms/jhipster/protocol/openid-connect/token HTTP/1.1: null}{Accept: application/json;charset=UTF-8}{Content-Type: application/x-www-form-urlencoded;charset=UTF-8}{Authorization: Basic d2ViX2FwcDp3ZWJfYXBw}{User-Agent: Java/11.0.17}{Host: localhost:9080}{Connection: keep-alive}{Content-Length: 219} 
+2022-12-05T11:36:25.768+05:30 DEBUG 15390 --- [  XNIO-1 task-2] s.n.www.protocol.http.HttpURLConnection  : sun.net.www.MessageHeader@2fd246b210 pairs: {null: HTTP/1.1 200 OK}{Referrer-Policy: no-referrer}{X-Frame-Options: SAMEORIGIN}{Strict-Transport-Security: max-age=31536000; includeSubDomains}{Cache-Control: no-store}{X-Content-Type-Options: nosniff}{Pragma: no-cache}{X-XSS-Protection: 1; mode=block}{Content-Type: application/json}{content-length: 3822} 
+2022-12-05T11:36:25.786+05:30 DEBUG 15390 --- [  XNIO-1 task-2] s.n.www.protocol.http.HttpURLConnection  : sun.net.www.MessageHeader@3bc9aceb5 pairs: {GET /realms/jhipster/protocol/openid-connect/certs HTTP/1.1: null}{Accept: application/json, application/jwk-set+json}{User-Agent: Java/11.0.17}{Host: localhost:9080}{Connection: keep-alive} 
+2022-12-05T11:36:25.794+05:30 DEBUG 15390 --- [  XNIO-1 task-2] s.n.www.protocol.http.HttpURLConnection  : sun.net.www.MessageHeader@3634cbd19 pairs: {null: HTTP/1.1 200 OK}{Referrer-Policy: no-referrer}{X-Frame-Options: SAMEORIGIN}{Strict-Transport-Security: max-age=31536000; includeSubDomains}{Cache-Control: no-cache}{X-Content-Type-Options: nosniff}{X-XSS-Protection: 1; mode=block}{Content-Type: application/json}{content-length: 1466} 
+2022-12-05T11:36:25.811+05:30 DEBUG 15390 --- [  XNIO-1 task-2] s.n.www.protocol.http.HttpURLConnection  : sun.net.www.MessageHeader@33c22a706 pairs: {GET /realms/jhipster/protocol/openid-connect/userinfo HTTP/1.1: null}{Accept: application/json}{Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIxZ1FvR3dCNmRYalNwQmZMR0hOQVlLanYtU01oVzdJR2xRRUVQZjNueHE4In0.eyJleHAiOjE2NzAyMjA2ODUsImlhdCI6MTY3MDIyMDM4NSwiYXV0aF90aW1lIjoxNjcwMjIwMzg1LCJqdGkiOiI5MWMxY2ViOS0zZDZmLTQzODctYWYxOS0xYmZhMDk2NzNkNWEiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwODAvcmVhbG1zL2poaXBzdGVyIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6IjRjOTczODk2LTU3NjEtNDFmYy04MjE3LTA3YzVkMTNhMDA0YiIsInR5cCI6IkJlYXJlciIsImF6cCI6IndlYl9hcHAiLCJub25jZSI6ImIwNVJMc1JLT2JIazVlaF9lRndWWVJfVE1QVl9nTmZpdDJPS1Nra3F3RDAiLCJzZXNzaW9uX3N0YXRlIjoiODdhMDRkNGYtNmRmYS00ODQzLWJmM2EtZmNhNTQ2NTkzMGFiIiwiYWxsb3dlZC1vcmlnaW5zIjpbIioiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIlJPTEVfVVNFUiIsIm9mZmxpbmVfYWNjZXNzIiwiUk9MRV9BRE1JTiIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQgZW1haWwgcHJvZmlsZSBvZmZsaW5lX2FjY2VzcyIsInNpZCI6Ijg3YTA0ZDRmLTZkZmEtNDg0My1iZjNhLWZjYTU0NjU5MzBhYiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJyb2xlcyI6WyJST0xFX1VTRVIiLCJvZmZsaW5lX2FjY2VzcyIsIlJPTEVfQURNSU4iLCJ1bWFfYXV0aG9yaXphdGlvbiJdLCJuYW1lIjoiQWRtaW4gQWRtaW5pc3RyYXRvciIsInByZWZlcnJlZF91c2VybmFtZSI6ImFkbWluIiwiZ2l2ZW5fbmFtZSI6IkFkbWluIiwiZmFtaWx5X25hbWUiOiJBZG1pbmlzdHJhdG9yIiwiZW1haWwiOiJhZG1pbkBsb2NhbGhvc3QifQ.L6aCMXsrsuxWB3cJVpp5l4iojQT2gYYuyglfMXLnjhjMVTyfIHCjjpXSv7PBaW9bOzRNT3OI0LhdBMlzUN21GuZA-_cWH78q7hcYzfcWFcGiwzGcUrFUqfN5NnKjfHG2VdEDcbwV_3biMY8DNaVfo5EpJESDvA8bIkyEe4wgpJp5Qn6IdEp3p7ZCORenyqGcDqf3URDT598Ydufr6VEn7IKiAcrDvPOSao_TctvK8iPHXL_Ya29K6C3myYLJA33q1jYA4CXH0VzqrAPMG-dXVWaNHtC2Gx-Bc0qxIBSAkPKCCAiROr5gHa8MpBQyiD1NXN1OM_acn-PASWSCw3oS2w}{User-Agent: Java/11.0.17}{Host: localhost:9080}{Connection: keep-alive} 
+2022-12-05T11:36:25.842+05:30 DEBUG 15390 --- [  XNIO-1 task-2] s.n.www.protocol.http.HttpURLConnection  : sun.net.www.MessageHeader@aed8109 pairs: {null: HTTP/1.1 200 OK}{Referrer-Policy: no-referrer}{X-Frame-Options: SAMEORIGIN}{Strict-Transport-Security: max-age=31536000; includeSubDomains}{Cache-Control: no-cache}{X-Content-Type-Options: nosniff}{X-XSS-Protection: 1; mode=block}{Content-Type: application/json}{content-length: 275} 
+2022-12-05T11:36:26.025+05:30 DEBUG 15390 --- [  XNIO-1 task-2] com.mgmt.vbot.web.rest.AccountResource   : Enter: getAccount() with argument[s] = [OAuth2AuthenticationToken [Principal=Name: [4c973896-5761-41fc-8217-07c5d13a004b], Granted Authorities: [[ROLE_USER, SCOPE_email, SCOPE_offline_access, SCOPE_openid, SCOPE_profile]], User Attributes: [{at_hash=nSGh4-9_pPEcKT4hLhK1YQ, sub=4c973896-5761-41fc-8217-07c5d13a004b, email_verified=true, roles=[ROLE_USER, offline_access, ROLE_ADMIN, uma_authorization], iss=http://localhost:9080/realms/jhipster, typ=ID, preferred_username=admin, given_name=Admin, nonce=b05RLsRKObHk5eh_eFwVYR_TMPV_gNfit2OKSkkqwD0, sid=87a04d4f-6dfa-4843-bf3a-fca5465930ab, aud=[web_app], azp=web_app, auth_time=2022-12-05T06:06:25Z, name=Admin Administrator, exp=2022-12-05T06:11:25Z, session_state=87a04d4f-6dfa-4843-bf3a-fca5465930ab, family_name=Administrator, iat=2022-12-05T06:06:25Z, email=admin@localhost, jti=edfadea6-0657-4cd3-8f0d-f51d94cef268}], Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=SeKbI2K45DPILCdNmxTu_6fuUvc5VJA9Up29A_0N], Granted Authorities=[ROLE_USER, ROLE_ADMIN]]] 
+2022-12-05T11:36:26.034+05:30 DEBUG 15390 --- [  XNIO-1 task-2] com.mgmt.vbot.service.UserService        : Enter: getUserFromAuthentication() with argument[s] = [OAuth2AuthenticationToken [Principal=Name: [4c973896-5761-41fc-8217-07c5d13a004b], Granted Authorities: [[ROLE_USER, SCOPE_email, SCOPE_offline_access, SCOPE_openid, SCOPE_profile]], User Attributes: [{at_hash=nSGh4-9_pPEcKT4hLhK1YQ, sub=4c973896-5761-41fc-8217-07c5d13a004b, email_verified=true, roles=[ROLE_USER, offline_access, ROLE_ADMIN, uma_authorization], iss=http://localhost:9080/realms/jhipster, typ=ID, preferred_username=admin, given_name=Admin, nonce=b05RLsRKObHk5eh_eFwVYR_TMPV_gNfit2OKSkkqwD0, sid=87a04d4f-6dfa-4843-bf3a-fca5465930ab, aud=[web_app], azp=web_app, auth_time=2022-12-05T06:06:25Z, name=Admin Administrator, exp=2022-12-05T06:11:25Z, session_state=87a04d4f-6dfa-4843-bf3a-fca5465930ab, family_name=Administrator, iat=2022-12-05T06:06:25Z, email=admin@localhost, jti=edfadea6-0657-4cd3-8f0d-f51d94cef268}], Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=SeKbI2K45DPILCdNmxTu_6fuUvc5VJA9Up29A_0N], Granted Authorities=[ROLE_USER, ROLE_ADMIN]]] 
+2022-12-05T11:36:26.161+05:30 DEBUG 15390 --- [  XNIO-1 task-2] com.mgmt.vbot.service.UserService        : Updating user 'admin' in local database 
+2022-12-05T11:36:26.229+05:30 DEBUG 15390 --- [  XNIO-1 task-3] com.mgmt.vbot.web.rest.AccountResource   : Enter: getAccount() with argument[s] = [OAuth2AuthenticationToken [Principal=Name: [4c973896-5761-41fc-8217-07c5d13a004b], Granted Authorities: [[ROLE_USER, SCOPE_email, SCOPE_offline_access, SCOPE_openid, SCOPE_profile]], User Attributes: [{at_hash=nSGh4-9_pPEcKT4hLhK1YQ, sub=4c973896-5761-41fc-8217-07c5d13a004b, email_verified=true, roles=[ROLE_USER, offline_access, ROLE_ADMIN, uma_authorization], iss=http://localhost:9080/realms/jhipster, typ=ID, preferred_username=admin, given_name=Admin, nonce=b05RLsRKObHk5eh_eFwVYR_TMPV_gNfit2OKSkkqwD0, sid=87a04d4f-6dfa-4843-bf3a-fca5465930ab, aud=[web_app], azp=web_app, auth_time=2022-12-05T06:06:25Z, name=Admin Administrator, exp=2022-12-05T06:11:25Z, session_state=87a04d4f-6dfa-4843-bf3a-fca5465930ab, family_name=Administrator, iat=2022-12-05T06:06:25Z, email=admin@localhost, jti=edfadea6-0657-4cd3-8f0d-f51d94cef268}], Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=SeKbI2K45DPILCdNmxTu_6fuUvc5VJA9Up29A_0N], Granted Authorities=[ROLE_USER, ROLE_ADMIN]]] 
+2022-12-05T11:36:26.231+05:30 DEBUG 15390 --- [  XNIO-1 task-3] com.mgmt.vbot.service.UserService        : Enter: getUserFromAuthentication() with argument[s] = [OAuth2AuthenticationToken [Principal=Name: [4c973896-5761-41fc-8217-07c5d13a004b], Granted Authorities: [[ROLE_USER, SCOPE_email, SCOPE_offline_access, SCOPE_openid, SCOPE_profile]], User Attributes: [{at_hash=nSGh4-9_pPEcKT4hLhK1YQ, sub=4c973896-5761-41fc-8217-07c5d13a004b, email_verified=true, roles=[ROLE_USER, offline_access, ROLE_ADMIN, uma_authorization], iss=http://localhost:9080/realms/jhipster, typ=ID, preferred_username=admin, given_name=Admin, nonce=b05RLsRKObHk5eh_eFwVYR_TMPV_gNfit2OKSkkqwD0, sid=87a04d4f-6dfa-4843-bf3a-fca5465930ab, aud=[web_app], azp=web_app, auth_time=2022-12-05T06:06:25Z, name=Admin Administrator, exp=2022-12-05T06:11:25Z, session_state=87a04d4f-6dfa-4843-bf3a-fca5465930ab, family_name=Administrator, iat=2022-12-05T06:06:25Z, email=admin@localhost, jti=edfadea6-0657-4cd3-8f0d-f51d94cef268}], Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=SeKbI2K45DPILCdNmxTu_6fuUvc5VJA9Up29A_0N], Granted Authorities=[ROLE_USER, ROLE_ADMIN]]] 
+2022-12-05T11:36:26.252+05:30 DEBUG 15390 --- [  XNIO-1 task-3] com.mgmt.vbot.service.UserService        : Updating user 'admin' in local database 
+2022-12-05T11:36:26.313+05:30 DEBUG 15390 --- [  XNIO-1 task-2] com.mgmt.vbot.service.UserService        : Changed Information for User: User{login='admin', firstName='Admin', lastName='Administrator', email='admin@localhost', imageUrl='null', activated='true', langKey='en'} 
+2022-12-05T11:36:26.325+05:30 DEBUG 15390 --- [  XNIO-1 task-2] com.mgmt.vbot.service.UserService        : Exit: getUserFromAuthentication() with result = AdminUserDTO{login='admin', firstName='Admin', lastName='Administrator', email='admin@localhost', imageUrl='null', activated=true, langKey='en', createdBy=null, createdDate=2022-12-05T06:06:26.039001Z, lastModifiedBy='null', lastModifiedDate=2022-12-05T06:06:26.039005Z, authorities=[ROLE_USER, ROLE_ADMIN]} 
+2022-12-05T11:36:26.341+05:30 DEBUG 15390 --- [  XNIO-1 task-2] com.mgmt.vbot.web.rest.AccountResource   : Exit: getAccount() with result = AdminUserDTO{login='admin', firstName='Admin', lastName='Administrator', email='admin@localhost', imageUrl='null', activated=true, langKey='en', createdBy=null, createdDate=2022-12-05T06:06:26.039001Z, lastModifiedBy='null', lastModifiedDate=2022-12-05T06:06:26.039005Z, authorities=[ROLE_USER, ROLE_ADMIN]} 
+2022-12-05T11:36:26.372+05:30 DEBUG 15390 --- [  XNIO-1 task-3] com.mgmt.vbot.service.UserService        : Changed Information for User: User{login='admin', firstName='Admin', lastName='Administrator', email='admin@localhost', imageUrl='null', activated='true', langKey='en'} 
+2022-12-05T11:36:26.372+05:30 DEBUG 15390 --- [  XNIO-1 task-3] com.mgmt.vbot.service.UserService        : Exit: getUserFromAuthentication() with result = AdminUserDTO{login='admin', firstName='Admin', lastName='Administrator', email='admin@localhost', imageUrl='null', activated=true, langKey='en', createdBy=null, createdDate=2022-12-05T06:06:26.231598Z, lastModifiedBy='null', lastModifiedDate=2022-12-05T06:06:26.231599Z, authorities=[ROLE_USER, ROLE_ADMIN]} 
+2022-12-05T11:36:26.372+05:30 DEBUG 15390 --- [  XNIO-1 task-3] com.mgmt.vbot.web.rest.AccountResource   : Exit: getAccount() with result = AdminUserDTO{login='admin', firstName='Admin', lastName='Administrator', email='admin@localhost', imageUrl='null', activated=true, langKey='en', createdBy=null, createdDate=2022-12-05T06:06:26.231598Z, lastModifiedBy='null', lastModifiedDate=2022-12-05T06:06:26.231599Z, authorities=[ROLE_USER, ROLE_ADMIN]} 

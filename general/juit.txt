@@ -1,0 +1,84 @@
+https://roytuts.com/junit-5-expected-exception-using-assertions-assertthrows/
+
+https://www.arhohuttunen.com/junit-5-expected-exception/
+
+https://howtodoinjava.com/junit5/expected-exception-example/
+
+https://medium.com/@shaunthomas999/junit-5-jupiter-dependency-management-with-maven-in-spring-boot-application-a5e7186b30eb
+
+
+https://bushansirgur.in/spring-boot-unit-testing-with-junit-mockito-and-mockmvc-2/
+
+https://programmingtechie.com/2020/10/16/spring-boot-testing-tutorial-unit-testing-with-junit-5-and-mockito/
+
+https://www.docsconsole.com/spring-boot/spring-boot-junit5-mockito
+
+https://www.geekyhacker.com/2018/10/05/using-mockito-annotations-in-junit-5/
+
+https://mromeh.com/2018/09/05/spring-boot-2-with-junit-5-and-mockito-2-for-unit-testing-and-integration-test/
+
+https://www.arhohuttunen.com/junit-5-mockito/
+
+
+https://www.appsdeveloperblog.com/getting-started-with-mockito-mock-and-injectmocks/
+
+
+
+
+
+ @Query("FROM ClinicDiagnosticTypeAvailability cdta " +
+            "JOIN FETCH cdta.clinic c " +
+            "JOIN FETCH cdta.diagnosticTypeInLab dtl " +
+            "JOIN FETCH dtl.diagnosticType dt " +
+            "WHERE (dt.name LIKE CONCAT('%',:value,'%') " +
+            "OR dt.alias LIKE CONCAT('%',:value,'%') " +
+            "OR dt.abbreviation LIKE CONCAT('%',:value,'%')) " +
+            "AND dt.diagnosticTypeStatus = :status " +
+            "AND dtl.isActive =1 " +
+            "AND dt.isActive = 1 " +
+            "AND cdta.isActive = 1 ")
+
+  @Query("FROM ClinicDiagnosticTypeAvailability cdta " +
+            "JOIN FETCH cdta.clinic c " +
+            "JOIN FETCH cdta.diagnosticTypeInLab dtl " +
+            "JOIN FETCH dtl.diagnosticType dt " +
+            "WHERE (dt.name LIKE CONCAT('%',:value,'%') " +
+            "OR dt.alias LIKE CONCAT('%',:value,'%') " +
+            "OR dt.abbreviation LIKE CONCAT('%',:value,'%')) " +
+            "AND dt.diagnosticTypeStatus = :status " +
+            "AND dtl.isActive =1 " +
+            "AND dt.isActive = 1 " +
+            "AND cdta.isActive = 1 ")
+
+@Query("FROM ClinicDiagnosticTypeAvailability cdta " +
+            "JOIN FETCH cdta.clinic c " +
+            "JOIN FETCH cdta.diagnosticTypeInLab dtl " +
+            "JOIN FETCH dtl.diagnosticType dt " +
+            "WHERE (dt.name LIKE CONCAT('%',:value,'%') " +
+            "OR dt.alias LIKE CONCAT('%',:value,'%') " +
+            "OR dt.abbreviation LIKE CONCAT('%',:value,'%')) " +
+            "AND dt.diagnosticTypeStatus = :status " +
+            "AND dtl.isActive =1 " +
+            "AND dt.isActive = 1 " +
+            "AND cdta.isActive = 1 ")
+
+
+    @Value("#{@diagnosticRevampService.transformPrecautions(target.getDiagnosticTypePrecautions())}")
+    List<Precautions> getPrecautions();
+
+    @Value("#{@diagnosticRevampService.transformSpecimenTypes(target.getDiagnosticTypeSpecimenTypes())}")
+    List<SpecimenTypes> getSpecimenTypes();
+
+
+    @Value("#{@diagnosticRevampService.transformPrecautions(target.getDiagnosticTypePrecautions())}")
+    List<Precautions> getPrecautions();
+
+    @Value("#{@diagnosticRevampService.transformSpecimenTypes(target.getDiagnosticTypeSpecimenTypes())}")
+    List<SpecimenTypes> getSpecimenTypes();
+
+
+                @Value("#{@diagnosticRevampService.transformPrecautions(target.getDiagnosticTypePrecautions())}")
+    List<Precautions> getPrecautions();
+
+    @Value("#{@diagnosticRevampService.transformSpecimenTypes(target.getDiagnosticTypeSpecimenTypes())}")
+    List<SpecimenTypes> getSpecimenTypes();

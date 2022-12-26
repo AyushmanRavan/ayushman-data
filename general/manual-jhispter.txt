@@ -1,0 +1,165 @@
+lenovo@lenovo-Pc:~/JHipster/React$ sudo jhipster entity product
+[sudo] password for lenovo: 
+INFO! Switching to JHipster installed locally in current project's node repository (node_modules)
+(node:14005) [DEP0148] DeprecationWarning: Use of deprecated folder mapping "./lib/util/" in the "exports" field module resolution of the package at /home/lenovo/JHipster/React/node_modules/yeoman-environment/package.json.
+Update this package.json to use a subpath pattern like "./lib/util/*".
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+        ██╗ ██╗   ██╗ ████████╗ ███████╗   ██████╗ ████████╗ ████████╗ ███████╗
+        ██║ ██║   ██║ ╚══██╔══╝ ██╔═══██╗ ██╔════╝ ╚══██╔══╝ ██╔═════╝ ██╔═══██╗
+        ██║ ████████║    ██║    ███████╔╝ ╚█████╗     ██║    ██████╗   ███████╔╝
+  ██╗   ██║ ██╔═══██║    ██║    ██╔════╝   ╚═══██╗    ██║    ██╔═══╝   ██╔══██║
+  ╚██████╔╝ ██║   ██║ ████████╗ ██║       ██████╔╝    ██║    ████████╗ ██║  ╚██╗
+   ╚═════╝  ╚═╝   ╚═╝ ╚═══════╝ ╚═╝       ╚═════╝     ╚═╝    ╚═══════╝ ╚═╝   ╚═╝
+                            https://www.jhipster.tech
+Welcome to JHipster v7.9.3
+
+
+The entity Product is being created.
+
+
+Generating field #1
+
+? Do you want to add a field to your entity? Yes
+? What is the name of your field? name
+? What is the type of your field? String
+? Do you want to add validation rules to your field? Yes
+? Which validation rules do you want to add? Required
+
+================= Product =================
+Fields
+name (String) required
+
+
+Generating field #2
+
+? Do you want to add a field to your entity? Yes
+? What is the name of your field? description
+? What is the type of your field? String
+? Do you want to add validation rules to your field? No
+
+================= Product =================
+Fields
+name (String) required
+description (String) 
+
+
+Generating field #3
+
+? Do you want to add a field to your entity? Yes
+? What is the name of your field? price
+? What is the type of your field? BigDecimal
+? Do you want to add validation rules to your field? Yes
+? Which validation rules do you want to add? Required
+
+================= Product =================
+Fields
+name (String) required
+description (String) 
+price (BigDecimal) required
+
+
+Generating field #4
+
+? Do you want to add a field to your entity? No
+
+================= Product =================
+Fields
+name (String) required
+description (String) 
+price (BigDecimal) required
+
+
+Generating relationships to other entities
+
+? Do you want to add a relationship to another entity? No
+
+================= Product =================
+Fields
+name (String) required
+description (String) 
+price (BigDecimal) required
+
+
+
+? Do you want to use separate service class for your business logic? Yes, generate a separate service interface and implementation
+? Do you want to use a Data Transfer Object (DTO)? Yes, generate a DTO with MapStruct
+? Is this entity read-only? No
+? Do you want pagination and sorting on your entity? Yes, with infinite scroll and sorting headers
+
+Everything is configured, generating the entity...
+
+    force .yo-rc-global.json
+    force .jhipster/Product.json
+    force .yo-rc.json
+   create src/test/java/com/chatbot/mgmt/domain/ProductTest.java
+   create src/test/java/com/chatbot/mgmt/service/dto/ProductDTOTest.java
+   create src/test/java/com/chatbot/mgmt/service/mapper/ProductMapperTest.java
+   create src/test/java/com/chatbot/mgmt/web/rest/ProductResourceIT.java
+   create src/main/java/com/chatbot/mgmt/web/rest/ProductResource.java
+   create src/main/java/com/chatbot/mgmt/repository/ProductRepository.java
+   create src/main/java/com/chatbot/mgmt/service/impl/ProductServiceImpl.java
+   create src/main/webapp/app/entities/product/product-detail.tsx
+   create src/main/java/com/chatbot/mgmt/service/ProductService.java
+   create src/main/webapp/app/entities/product/product-reducer.spec.ts
+   create src/main/webapp/app/entities/product/product.reducer.ts
+   create src/main/java/com/chatbot/mgmt/service/dto/ProductDTO.java
+ conflict src/main/webapp/app/entities/routes.tsx
+? Overwrite src/main/webapp/app/entities/routes.tsx? overwrite
+    force src/main/webapp/app/entities/routes.tsx
+   create src/main/java/com/chatbot/mgmt/service/mapper/EntityMapper.java
+   create src/main/java/com/chatbot/mgmt/domain/Product.java
+   create src/main/java/com/chatbot/mgmt/service/mapper/ProductMapper.java
+   create src/main/webapp/app/entities/product/index.tsx
+   create src/main/webapp/app/entities/product/product.tsx
+   create src/main/webapp/app/shared/model/product.model.ts
+   create src/main/webapp/app/entities/product/product-delete-dialog.tsx
+   create src/main/webapp/app/entities/product/product-update.tsx
+ conflict src/main/webapp/app/entities/reducers.ts
+? Overwrite src/main/webapp/app/entities/reducers.ts? overwrite this and all others
+    force src/main/webapp/app/entities/reducers.ts
+    force src/main/webapp/app/entities/menu.tsx
+    force .yo-rc.json
+    force .jhipster/Product.json
+
+No change to package.json was detected. No package manager install will be executed.
+Entity Product generated successfully.
+
+Running `webapp:build` to update client app
+
+
+> chatbot@0.0.1-SNAPSHOT webapp:build
+> npm run clean-www && npm run webapp:build:dev --
+
+
+> chatbot@0.0.1-SNAPSHOT clean-www
+> rimraf target/classes/static/app/{src,target/}
+
+
+> chatbot@0.0.1-SNAPSHOT webapp:build:dev
+> webpack --config webpack/webpack.dev.js --env stats=minimal
+
+Webpack: Starting ...
+
+  ✔ Compile modules
+  ✔ Build modules
+  ✔ Optimize modules
+  ✔ Emit files
+
+Finished after 4.351 seconds.
+
+Webpack: Starting ...
+
+  ✔ Compile modules
+  ✔ Build modules
+  ✔ Optimize modules
+  ✔ Emit files
+
+Finished after 0.555 seconds.
+
+46 assets
+590 modules
+webpack 5.74.0 compiled successfully in 4336 ms
+Congratulations, JHipster execution is complete!
+Sponsored with ❤️  by @oktadev.
+lenovo@lenovo-Pc:~/JHipster/React$ 

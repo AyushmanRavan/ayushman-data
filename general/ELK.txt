@@ -1,0 +1,882 @@
+https://akintola-lonlon.medium.com/elasticsearch-complete-guide-for-searching-100-practical-f82cbbfd21e2
+Elasticsearch: Complete Guide for Searching (100% Practical)
+https://appfabs.com/blog/2017/10/22/elk-log-aggregation
+Centralized Log Aggregation & Visualization using ELK Stack for Micro service Architecture with Spring Cloud for Centralized Configuration
+
+
+It is recommended to always give absolute path in production environment to avoid any error.
+# Absolute Path
+file:/app/store/truststore.jks 
+
+# Relative Path
+file:app/store/truststore.jsk  
+
+
+The two ways to access ElasticSearch index are…
+  HTTP RESTful API. === This is nothing but a set of REST endpoints you can access using one of many ways such as with CuRL or your favorite HTTP library or tools such as ElasticSearch HEAD plugin or the Chrome plugin Sense.
+  ElasticSearch Java API. === Programmatically you can use the Java API to access the index using a very expressive and concise API. The Java API “chats” with the ES server on port 9300, whereas the RESTful HTTP client uses port 9200.
+
+
+
+
+
+discovery.type=single-node
+----------------------------
+The first setting tells Elasticsearch server to run as a standalone node and to elect itself as master and not to join any clusters.
+
+
+
+    Transport Client
+    Rest Low Level Client
+    Rest High Level Client
+
+
+The ElasticsearchTemplate is an implementation of the ElasticsearchOperations interface using the Transport Client.
+The well known TransportClient is deprecated as of Elasticsearch 7 and will be removed in Elasticsearch 8.
+------------------------------------------------------------------------------------------------------------------------
+ex : @Configuration
+public class TransportClientConfig extends ElasticsearchConfigurationSupport {
+
+  @Bean
+  public Client elasticsearchClient() throws UnknownHostException {                 
+    Settings settings = Settings.builder().put("cluster.name", "elasticsearch").build();
+    TransportClient client = new PreBuiltTransportClient(settings);
+    client.addTransportAddress(new TransportAddress(InetAddress.getByName("127.0.0.1"), 9300));
+    return client;
+  }
+
+  @Bean(name = {"elasticsearchOperations", "elasticsearchTemplate"})
+  public ElasticsearchTemplate elasticsearchTemplate() throws UnknownHostException { 
+  	return new ElasticsearchTemplate(elasticsearchClient(), entityMapper());
+  }
+
+  // use the ElasticsearchEntityMapper
+  @Bean
+  @Override
+  public EntityMapper entityMapper() {                                               
+    ElasticsearchEntityMapper entityMapper = new ElasticsearchEntityMapper(elasticsearchMappingContext(),
+  	  new DefaultConversionService());
+    entityMapper.setConversions(elasticsearchCustomConversions());
+    return entityMapper;
+  }
+}
+The ElasticsearchRestTemplate is an implementation of the ElasticsearchOperations interface using the High Level REST Client.
+The Java High Level REST Client now is the default client of Elasticsearch, 
+RestHighLevelClient: works on top of the Java Low-Level REST client.
+Note that: RestHighLevelClient is deprecated for the newer versions of Elastichsearch. You should consider using Java API Client instead.
+-----------------------------------------------------------------------------------------------------------------------------------------
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.elasticsearch.client.ClientConfiguration;
+import org.springframework.data.elasticsearch.client.RestClients;
+import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfiguration;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+
+@Configuration
+@Slf4j
+public class ElkConfig extends AbstractElasticsearchConfiguration {
+
+    @Value("${elasticsearch.host}")
+    private String host;
+
+    @Value("${elasticsearch.port}")
+    private int port;
+
+    @Override
+    @Bean
+    public RestHighLevelClient elasticsearchClient() {
+        final ClientConfiguration clientConfiguration = ClientConfiguration.builder()
+                .connectedTo(host + ":" + port)
+                .build();
+        return RestClients.create(clientConfiguration).rest();
+    }
+
+    @Bean
+    public ElasticsearchOperations elasticsearchOperations() {
+        return new ElasticsearchRestTemplate(elasticsearchClient());
+    }
+}
+
+
+
+
+Uninstall Elasticsearch on Ubuntu (optional)
+========================================================
+In the future, if you want to uninstall ElasticSearch from your Linux (Ubuntu, Debian, or Linux Mint system)  then use the below command to do that:
+
+sudo apt-get --purge autoremove elasticsearch
+To completely remove it from the system also delete its directory if there is any using the below command:
+
+sudo rm -rf /var/lib/elasticsearch/
+sudo rm -rf /etc/elasticsearch
+
+
+
+Elasticsearch
+------------------------
+Add Elastic Repository :
+
+Download and install the PGP Key using wget command.
+    wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+
+Install the apt-transport-https package
+    sudo apt-get install apt-transport-https
+
+Next is to add the Elasticsearch repository to the system:
+    echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+
+Update apt-get package before installing Elasticsearch
+    sudo apt-get update
+
+Install Elasticsearch
+------------------------------
+Update the apt packages and install the Elasticsearch by issuing the following command:
+
+$ sudo apt-get update
+$ sudo apt-get install elasticsearch -y
+
+The default installation directory of elastic search is /usr/share/elasticsearch.
+Elasticsearch Main configuration file can be located at /etc/elasticsearch/elasticsearch.yml
+Logs are available in the /var/log/elasticsearch, 
+and data is stored in the /var/lib/elasticsearch directory.(https://rtfm.co.ua/en/elastic-stack-an-overview-and-elk-installation-on-ubuntu-20-04/)
+
+
+Configure Elasticsearch
+------------------------------
+echo 'transport.host: localhost' >> /etc/elasticsearch/elasticsearch.yml     ////
+echo 'transport.tcp.port: 9300' >> /etc/elasticsearch/elasticsearch.yml
+echo 'network.host: localhost' >> /etc/elasticsearch/elasticsearch.yml       ////network.host: 0.0.0.0
+echo 'http.port: 9200' >> /etc/elasticsearch/elasticsearch.yml
+echo 'discovery.type: single-node' >> /etc/elasticsearch/elasticsearch.yml
+echo 'setup.ilm.overwrite: true' >> /etc/elasticsearch/elasticsearch.yml
+echo 'xpack.security.enabled: false' >> /etc/elasticsearch/elasticsearch.yml
+echo 'discovery.seed_hosts: [ ]' >> /etc/elasticsearch/elasticsearch.yml
+
+
+echo '-Xms512m' >> /etc/elasticsearch/jvm.options
+echo '-Xmx512m' >> /etc/elasticsearch/jvm.options
+
+Reload and Start Elasticsearch
+--------------------------------------------
+systemctl daemon-reload
+systemctl start elasticsearch
+systemctl restart elasticsearch
+
+You have to change 192.168.0.0.1 to localhost. If not, you can change to 0.0.0.0 to allow access from an outside server, don’t forget to open port 9200.
+If your Elasticsearch does not support replication you can set more option discovery.type: single-node to help run in a single node (server).
+
+
+
+Steps : Install & run Kibana on Ubuntu
+1. Install Kibana, run command 
+sudo apt-get install kibana
+
+2. Configure Kibana by change kibana.yml file
+sudo vim /etc/kibana/kibana.yml
+
+Delete the # sign at the beginning of the lines below:
+.................................................
+server.port: 5601
+server.host: "your-hostname"
+elasticsearch.hosts: ["http://localhost:9200"]
+
+Change “your-hostname” to “0.0.0.0” to help access from the outside server. Don’t forget you need to open the publish port 5601. 
+If you use UFW firewall you can run the command sudo ufw allow 5601/tcp to publish that port for you.
+
+3. Start Kibana service
+sudo systemctl start kibana
+
+4. Enable Kinana to run at boot
+sudo systemctl enable kibana
+sudo systemctl enable --now kibana
+
+
+With all comment lines removed,====== grep -Ev '^#|^$' /etc/kibana/kibana.yml
+
+
+
+
+sudo apt install logstash -y
+There are 2 main files to consider one in /etc/logstash/logstash.yml and the other etc/logstash/pipelines.yml.
+Now the package is installed to /usr/share/logstash. 
+Logstash Main configurations are available at /etc/logstash/logstash.yml. 
+All custom Logstash configuration files are stored in /etc/logstash/conf.d/.
+Logstash will write to the /var/logs/syslog.
+
+Type	| Description |	Default Location	| Setting (in file logstash.yml)
+home	Home directory of the Logstash installation	/usr/share/logstash	
+bin	Binary scripts, including logstash to start Logstash and logstash-plugin to install plugins	/usr/share/logstash/bin	
+settings	Configuration files, including logstash.yml and jvm.options	/usr/share/logstash/config	path.settings
+conf	Logstash pipeline configuration files	/usr/share/logstash/pipeline	path.config
+plugins	Local, non Ruby-Gem plugin files. Each plugin is contained in a subdirectory. Recommended for development only	/usr/share/logstash/plugins	path.plugins
+data	Data files used by logstash and its plugins for any persistence needs	/usr/share/logstash/data	path.data
+
+/etc/logstash/pipelines.yml
+............................................
+- pipeline.id: main
+  path.config: "/etc/logstash/conf.d/*.conf"
+
+Create your Logstash pipeline config file : Example: /var/log/apache2/access.log
+---------------------------------------------
+cd /etc/logstash/conf.d/
+sudo nano /etc/logstash/conf.d/first-logstash-pipeline.conf
+input {
+        file {
+                path => "/path/to/your/log/file"
+                start_position => "beginning"
+        }
+      beats {
+        type => "test"
+        port => "5044"
+      }
+}
+
+filter {
+        grok {
+                match => {"message" => "%{COMBINEDAPACHELOG}"}
+        }
+        date {
+                match => ["timestamp", "dd/MM/yyyy:HH:mm:ss Z"]
+        }
+}
+
+output {
+        elasticsearch {
+                hosts => ["localhost:9200"],
+                index => "logs"
+        }
+        stdout {
+                codec => rubydebug
+        }
+}
+
+We can use the following instructions to test our configuration file:
+............................................................
+$ /filebeat -c filebeat_logstash.yml test config
+
+We can use the following commands to test our output:
+..........................................................
+$ ./filebeat -c filebeat_logstash.yml test output
+
+Run your pipeline with Logstash
+--------------------------------------
+cd /usr/share/logstash/   or
+$ sudo /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/first-logstash-pipeline.conf
+
+
+
+
+Logstash configuration
+-------------------------------------------
+Create a configuration file named ayush-log-configuration.conf at location /usr/share/Logstash/ with the below entries.
+sudo vim /etc/logstash/conf.d/30-elasticsearch-output.conf
+
+input {
+	tcp {
+    	port => 5043
+    	codec => json_lines
+	}
+   beats {
+    port => 5044
+  }
+}
+filter {
+}
+output {
+		stdout {
+  		codec => rubydebug
+		}
+    file {
+      path => "/var/log/pipeline.log"
+    }
+		elasticsearch {
+  		hosts=>"192.168.0.104:9200"
+  		index=>"appfabs-logback"
+		}
+}
+
+Running logstash
+------------------------------------------------
+In the terminal, goto /usr/share/Logstash. Enter the below command for running the configuration created above.
+$ sudo /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/crimes.conf
+crimes.conf
+=============================
+input {
+  beats {
+    port => 5044
+  }
+  file{
+    path => "/app/input.log"
+    start_position => "beginning"
+    sincedb_path => "/dev/null"
+    type => "apache-access"  # a type to identify those logs (will need this later)
+    codec => json
+  }
+}
+filter {
+   if [type] == "apache-access" {   # this is where we use the type from the input section
+    grok {
+      match => [ "message", "%{COMBINEDAPACHELOG}" ]
+    }
+  }
+}
+output {
+  file {
+   path => "/app/output.log"
+   file_mode => 0644
+    codec => rubydebug/"plain"
+ }
+}
+
+
+
+Configure Kibana
+-------------------------------
+echo -e "server.port: 5601" >> /etc/kibana/kibana.yml
+echo -e "server.host: $HOSTNAME" >> /etc/kibana/kibana.yml
+echo -e 'elasticsearch.hosts: ["http://localhost:9200"]' >> /etc/kibana/kibana.yml
+
+
+
+
+
+
+
+
+
+
+
+
+
+filebeat=================================================================================================================
+
+
+Handling multi-line logs
+We will go over two primary methods for collecting and processing multi-line logs in a way that aggregates them as single events:
+
+Log to JSON format
+Use a log shipper
+
+
+
+Filebeat: Filebeat is a log data shipper for local files. Filebeat agent will be installed on the server, which needs to monitor, 
+and filebeat monitors all the logs in the log directory and forwards to Logstash. 
+Filebeat works based on two components: prospectors/inputs and harvesters.
+
+Inputs are responsible for managing the harvesters and finding all sources from which it needs to read. Harvesters will read each file line by line, 
+and sends the content to the output and also the harvester is responsible for opening and closing of the file.
+
+STEP  - VALIDATE CONFIGURATION
+Let's check the configuration file is syntactically correct by running filebeat directly inside the terminal. 
+If the file is invalid, filebeat will print an error loading config file error message with details on how to correct the problem.
+
+sudo filebeat test output -c /etc/filebeat/filebeat.yml
+sudo filebeat test config -c /etc/filebeat/filebeat.yml
+sudo filebeat -e -c /etc/filebeat/filebeat.yml
+
+filebeat_to_logstash.yml
+-----------------------------------
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /Users/liuxg/tmp/spring-boot-elastic.log
+  multiline.pattern: '^[[:space:]]+(at|\.{3})[[:space:]]+\b|^Caused by:'
+  multiline.negate: true
+  multiline.match: after
+ 
+output.logstash:
+  hosts: ["localhost:5044"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.
+├─docker-compose.yml
+├─.env
+├─elasticsearch
+│  └─data
+├─filebeat
+│  ├─conf
+│  │  └─filebeat.yml
+│  └─log
+│      └─u_exyyyymmdd.log
+└─logstash
+    └─pipeline
+        └─logstash.conf
+
+
+docker-compose.yml
+--------------------------------
+version: "3"
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+    environment:
+      - discovery.type=single-node
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms4096m -Xmx4096m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9200:9200
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.2.0
+    ports:
+      - 5601:5601
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.2.0
+    ports:
+      - 5044:5044
+    environment:
+      - "LS_JAVA_OPTS=-Xms4096m -Xmx4096m"
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.2.0
+    volumes:
+      - ./filebeat/conf/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./filebeat/log:/usr/share/filebeat/log
+      - /var/run/docker.sock:/var/run/docker.sock
+    user: root
+
+
+--Set input to accept transfers from Filebeat. --Process IIS logs. --Set output so that it can be input to Elasticsearch.
+--------------------------------------------------------------------------------------------------------------------------
+input {
+# input from Filebeat
+  beats {
+    port => 5044
+  }
+}
+
+filter {
+  dissect {
+  # log format is TSV
+    mapping => {
+      "message" => "%{ts} %{+ts} %{s-ip} %{cs-method} %{cs-uri-stem} %{cs-uri-query} %{s-port} %{cs-username} %{c-ip} %{cs(User-Agent)} %{cs(Referer)} %{sc-status} %{sc-substatus} %{sc-win32-status} %{time-taken}"
+    }
+  }
+  date {
+    match => ["ts", "YYYY-MM-dd HH:mm:ss"]
+    timezone => "UTC"
+  }
+  ruby {
+    code => "event.set('[@metadata][local_time]',event.get('[@timestamp]').time.localtime.strftime('%Y-%m-%d'))"
+  }
+  mutate {
+    convert => { 
+      "sc-bytes" => "integer"
+      "cs-bytes" => "integer"
+      "time-taken" => "integer"
+    }
+    remove_field => "message"
+  }
+}
+
+output {
+  elasticsearch { 
+    hosts    => [ 'elasticsearch' ]
+    index => "iislog-%{[@metadata][local_time]}" 
+  }
+}
+
+
+--Set input to reference/usr/share/filebeat/log. --Actually, ./filebeat/log is mounted in/usr/share/filebeat/log, so if you store the IIS log in ./filebeat/log, Filebeat will automatically refer to it. --Set output to forward to Logstash.
+---------------------------------------------------------------
+filebeat.prospectors:
+# Older versions would be filebeat.inputs instead of prospectors.
+filebeat:
+  prospectors:
+  - type: log
+    enabled: true
+    paths:
+      - /usr/share/filebeat/log/*.log
+    exclude_lines: ['^#','HealthChecker']
+  
+output:
+  logstash:
+    hosts: ["logstash:5044"]
+
+
+Put the IIS log file
+Place the IIS log file in ./filebeat/log and Filebeat will detect it and send it to Logstash. 
+The transmitted data is processed by Logstash and submitted to Elasticsearch.
+
+
+
+  multiline.pattern: '^[[:space:]]+(at|\.{3})[[:space:]]+\b|^Caused by:'            Consecutive lines that do not match (END) are added before the next matching line.
+  multiline.negate: true
+  multiline.match: before/after
+
+multiline.pattern: ‘Start new event’     '^[[:space:]]+(at|\.{3})[[:space:]]+\b|^Caused by:'
+multiline.negate: true
+multiline.match: after
+multiline.flush_pattern: ‘End event’
+
+From the configuration options above, when the pattern “Start new event” is seen and the following lines do not match the pattern, 
+they will be appended to the previous line that does match the pattern. 
+The flush_pattern option will then signal that the multiline event is over when a line is seen beginning with “End event.”
+
+Policy 1: Read line by line into logstash. Save when the date comes and set the date saved on the following line in the timestamp field.
+Policy 2: Use filebeat to send End to logstash as one event, and logstash to decompose it line by line.
+
+    '^[[:space:]]+(at|\.{3})[[:space:]]+\b|^Caused by:'
+    ---------------------------------------------------------
+    This line starts with SPACE and is followed by the word "at."
+    This line starts with the phrase "Caused by."
+
+
+
+
+
+
+
+--------------------------------...................................------------------------
+If you apply the csv filter to multiline as it is, you can only parse Date, 2020/10 / 28,20: 19: 18 up to the first \ n. 
+split By using a filter, multiline can be decomposed again and divided into multiple events. ..
+
+As a final process, lines that start with a non-number are deleted with the drop filter and mutate Type conversion is performed from 
+String type with a filter.
+
+logstash.conf
+
+filter {
+  grok {
+    patterns_dir => ["/opt/logstash/extra_patterns"]
+    match => { "message" => "%{TIMESTAMP_JP:read_timestamp}" }
+  }
+
+  date {
+    match => ["read_timestamp", "yyyy/MM/dd,HH:mm:ss"]
+    timezone => "Asia/Tokyo"
+    target => "@timestamp"
+  }
+
+  split{}
+
+  csv {
+    columns => ["Step","TestName","Value1","Judge"]
+    separator => ","
+  }
+
+  if [Step] !~ /\d+/ {
+    drop{}
+  }
+
+  mutate {
+    convert => {
+      "Step" => "integer"
+      "Value1" => "float"
+    }
+  }
+}
+
+
+
+
+
+
+
+The structured key-value format enables log collectors (such as filebeat, fluentd)
+
+
+
+https://arnoldgalovics.com/java-multiline-logs-fluentd/
+https://keepgrowing.in/tools/parsing-logs-with-grok-2-how-to-parse-exceptions-alongside-regular-logs/
+https://www.innoq.com/en/blog/structured-logging/
+https://developpaper.com/springboot-kafka-elk-complete-massive-log-collection-super-detailed/
+https://liferay.dev/blogs/-/blogs/centralized-liferay-logging
+https://cdmana.com/2021/09/20210904192135233H.html
+https://hackernoon.com/m-logs-with-elasticsearch-kibana-logstash-and-docker-lw3334wb
+
+
+
+    The first one is when you use a logger to log a multiline message with explicit line breaks
+    The second one is when you have an exception stacktrace in the logs
+
+Stack traces are multiline messages or events.
+Logstash has the ability to parse a log file and merge multiple log lines into a single event. 
+You can do this using either the multiline codec or the multiline filter, depending on the desired effect.
+
+The pattern looks for log lines starting with a timestamp and, until a new match is found, 
+all lines are considered part of the event. This is done by setting the negate parameter to true.
+-------------------------------------------------------------------------------------------------------
+input {
+  file {
+    path => "/var/log/test.log"
+    start_position => "beginning"
+    type => "java"
+    add_field => { "service_name" => "service1" }
+    codec => multiline {
+      pattern => "^%{TIMESTAMP_ISO8601}"          ///////"^%{YEAR}-%{MONTHNUM}-%{MONTHDAY} %{TIME}.*"
+      negate => true
+      what => "previous"
+    }
+  }
+}
+
+Using the Grok Filter on Multiline Events
+
+The grok filter splits the event content into 3 parts: timestamp, severity and message (which overwrites original message). 
+filter {
+  mutate {
+    gsub => [ "message", "r", "" ]
+  }
+  grok {
+    match => [ "message", "(?m)%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:severity} %{GREEDYDATA:message}" ]
+    overwrite => [ "message" ]
+  }
+
+
+OR .....
+
+  #If log line contains tab character followed by 'at' then we will tag that entry as stacktrace
+  if [message] =~ "\tat" {
+    grok {
+      match => ["message", "^(\tat)"]
+      add_tag => ["stacktrace"]
+    }
+  }
+ 
+ grok {
+  # First pattern extracts timestamp, level, pid, thread, class name (this is actually logger name) and the log message.
+  # Unfortunately, some log messages don't have logger name that resembles a class name (for example, Tomcat logs) hence the second pattern that will skip the logger/class field and parse out timestamp, level, pid, thread and the log message.
+    match => [ "message", 
+               "(?<timestamp>%{YEAR}-%{MONTHNUM}-%{MONTHDAY} %{TIME})  %{LOGLEVEL:level} %{NUMBER:pid} --- \[(?<thread>[A-Za-z0-9-]+)\] [A-Za-z0-9.]*\.(?<class>[A-Za-z0-9#_]+)\s*:\s+(?<logmessage>.*)",
+               "message",
+               "(?<timestamp>%{YEAR}-%{MONTHNUM}-%{MONTHDAY} %{TIME})  %{LOGLEVEL:level} %{NUMBER:pid} --- .+? :\s+(?<logmessage>.*)"
+             ]
+  }
+# (?<timestamp>%{YEAR}-%{MONTHNUM}-%{MONTHDAY} %{TIME})\s*%{LOGLEVEL:level} %{NUMBER:pid} --- \[(?<thread>[A-Za-z0-9-]+)\] [A-Za-z0-9.]*\.(?<class>[A-Za-z0-9#_]+)\s*:\s+(?<logmessage>.*)
+
+
+
+  date {
+    match => [ "timestamp" , "yyyy-MM-dd HH:mm:ss,SSS" ]
+  }
+}
+
+output {
+  stdout { codec => rubydebug }
+}
+
+The (?m) in the beginning of the regexp is used for multiline matching and, without it, only the first line would be read.
+output {
+   # Sending properly parsed log events to elasticsearch
+  elasticsearch {
+    host => "logsene-receiver.sematext.com"
+    ssl => true
+    port => 443
+    index => "YOUR LOGSENE APP TOKEN GOES HERE"
+    protocol => http
+    manage_template => false
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+"^%{TIME:time}\.(?<millis>[0-9]{1,3})\s+\[(?<thread>[^\]]+)\]\s+%{LOGLEVEL:level}\s+%{JAVACLASS:logger}\s+-\s+(?<actual_message>[^\[]+)\s+\[CorrelationId=%{UUID:correlationId}\]([\n\r]{1,2}(?<stacktrace_el>([^\n\r]+[\n\r]{1,2})*))?"
+Pattern break down:
+----------------------------------
+    ^%{TIME:time} line starts with time, hour, minute and second;
+    \.(?<millis>[0-9]{1,3}) followed by a dot and milliseconds;
+    \s+\[(?<thread>[^\]]+)\] space(s) and thread name between square brackets follows;
+    \s+%{LOGLEVEL:level} more space(s) and the log level;
+    \s+%{JAVACLASS:logger} spaces and the java logger class;
+    \s+-\s+(?<actual_message>[^\[]+) a dash and the actual logging message that should not contain square brackets;
+    \s+\[CorrelationId=%{UUID:correlationId}\] and the correlation id, a UUID printed between square brackets;
+    ([\n\r]{1,2}(?<stacktrace_el>([^\n\r]+[\n\r]{1,2})*))? may be followed by stack trace lines;
+        [\n\r]{1,2} meaning that a new line may follow;
+        (?<stacktrace_el>([^\n\r]+[\n\r]{1,2})*) and the stacktrace element pattern, which is anything except new line, followed by new line, as many times as necessary.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ELK
+how ElasticsearchTemplate and ElasticsearchRepository works.
+
+AA) ElasticsearchRepository -  If we define an interface which extends the ElasticsearchRepository, which is provided by Spring data Elasticsearch, 
+it will provide the CRUD operations automatically for that Document.
+BB) ElasticsearchTemplate - It is a Template class which implements the ElasticsearchOperations. It is more powerful than ElasticsearchRepository as it can do more than CRUD operations. 
+It has operations to create, delete indexes, bulk upload. It can do aggregated search as well.
+
+https://medium.com/@sourav.pati09/how-to-use-java-high-level-rest-client-with-spring-boot-to-talk-to-aws-elasticsearch-2b6106f2e2c
+-------------------------------------------------------------------------------------------------------------------------------------
+Elasticsearch provides RestHighLevelClient  class which works well with latest version and uses RestClient  
+class to configure the host and port for the cluster. It uses index() method with IndexRequest as input to create a document. 
+It uses get() method with GetRequest as input to search a document. It does have update() and delete() method as well.
+
+
+
+
+Java Low-Level REST client 
+  – It allows communicating with an Elasticsearch cluster through HTTP and leaves requests marshalling & responses un-marshalling to users.
+Java High-Level REST client 
+  – It is based on low-level client and exposes API specific methods, taking care of requests marshalling and responses un-marshalling.
+
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class HighLevelClientProductServiceImpl implements HighLevelClientProductService {
+  private final RestHighLevelClient restHighLevelClient;
+  private final ObjectMapper objectMapper;
+
+  public Product createProducto(Producto producto) {
+    IndexRequest indexRequest = new IndexRequest("producto");
+    indexRequest.id(producto.getId());
+    indexRequest.source(producto);
+
+    try {
+      IndexResponse indexResponse = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
+      if (indexResponse.status() == RestStatus.ACCEPTED) {
+        return product;
+      }
+
+      throw new RuntimeException("Wrong status: " + indexResponse.status());
+    } catch (Exception e) {
+      log.error("Error indexando, producto: {}", producto, e);
+      return null;
+    }
+  }
+}
+
+
+
+Last but not least, it is worth mentioning the ELK stack. ELK stands for Elasticsearch, Logstash, and Kibana. They are all products of the company Elastic, very often used together, forming this well-know stack.
+
+    Elasticsearch. RESTful search and analytics engine which is also responsible for data storage.
+    Logstash. Pipelines that are collecting, parsing and transforming all incoming data.
+    Kibana. Web interface representing stored data. A place where you go to check logs.
+    Beats: Lightweight, single-use data senders that can send data from hundreds or thousands of machines to Logstash or Elasticsearch.
+
+version: '3'
+services:
+  elasticsearch:
+    image: elasticsearch:6.8.20
+    ports:
+      - "9200:9200"
+  logstash:
+    image: logstash:6.8.20
+    command: -f /etc/logstash/conf.d/
+    volumes:
+      - ./logstash.d:/etc/logstash/conf.d
+    depends_on:
+        - elasticsearch
+    ports:
+      - "5000:5000"
+  kibana:
+    image: kibana:6.8.20
+    depends_on:
+        - elasticsearch
+    ports:
+      - "5601:5601"
+
+The vm.max_map_count parameter should be set permanently in /etc/sysctl.conf:
+----------------------------------------------------------------------------------
+grep vm.max_map_count /etc/sysctl.conf
+vm.max_map_count=262144
+
+echo -e "\nvm.max_map_count=524288\n" | sudo tee -a /etc/sysctl.conf && sudo sysctl -w vm.max_map_count=524288
+
+Run the following command to apply the setting to a live system:
+------------------------------------------------------------------
+sysctl -w vm.max_map_count=262144
+
+
+
+
+      docker-compose up -d
+      docker-compose ps
+      docker-compose logs -f {serviceName}
+
+
+docker-compose down will bring the cluster to a halt. When you restart the cluster with docker-compose up, 
+the data in the Docker volumes is maintained and loaded. 
+
+When bringing down the cluster, use the -v option to destroy the data volumes: docker-compose down -v.

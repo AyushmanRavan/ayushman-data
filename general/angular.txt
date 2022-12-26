@@ -1,0 +1,165 @@
+https://www.edureka.co/blog/checkbox-in-angular8/
+https://stackblitz.com/edit/angular-at-least-one-checkbox-checked?file=src%2Fapp%2Fapp.component.ts,src%2Fapp%2Frequire-checkboxes-to-be-checked.validator.ts
+https://laratutorials.com/angular-12-dynamic-checkbox-list-with-reactive-forms/
+https://www.freakyjolly.com/angular-input-file-image-file-upload-to-base64-tutorial-by-example/
+
+FormGroup: Creates the form object in Reactive Forms, and It contains FormControl and FormArray properties.
+
+FormArray: FormArray is the same as FormGroup and holds the FormControl in an array form.
+
+FormControl: It refers to a specific input field which contains the user entered value and defined inside the FormGroup..
+
+Validators: It offers a set of pre-defined validators to validate a form in Angular and can be used by form controls. 
+ ====================https://laratutorials.com/angular-12-dynamic-checkbox-list-with-reactive-forms/===========================
+https://stackblitz.com/edit/angular-at-least-one-checkbox-checked?file=src%2Fapp%2Fapp.component.ts,src%2Fapp%2Frequire-checkboxes-to-be-checked.validator.ts
+form: FormGroup;
+  Data: Array<any> = [
+    { name: 'Pear', value: 'pear' },
+    { name: 'Plum', value: 'plum' },
+    { name: 'Kiwi', value: 'kiwi' },
+    { name: 'Apple', value: 'apple' },
+    { name: 'Lime', value: 'lime' },
+  ];
+  constructor(private fb: FormBuilder) {
+    this.form = this.fb.group({
+      checkArray: this.fb.array([], [Validators.required]),
+    });
+  }
+  onCheckboxChange(e: any) {
+    const checkArray: FormArray = this.form.get('checkArray') as FormArray;
+    if (e.target.checked) {
+      checkArray.push(new FormControl(e.target.value));
+    } else {
+      let i: number = 0;
+      checkArray.controls.forEach((item: any) => {
+        if (item.value == e.target.value) {
+          checkArray.removeAt(i);
+          return;
+        }
+        i++;
+      });
+    }
+  }
+  submitForm() {
+    console.log(this.form.value);
+  }
+<form [formGroup]="form" (ngSubmit)="submitForm()" novalidate>
+  <div *ngFor="let data of Data; let i=index">
+    <label>
+      <input type="checkbox" [value]="data.value" (change)="onCheckboxChange($event)" />
+      {{data.name}}
+    </label>
+  </div>
+  <p class="error" *ngIf="this.form.controls['checkArray'].errors?.['required']">
+    Checkbox is required, select atleast one value.
+  </p>
+  <input type="submit" value="Submit">
+</form>
+=========================================================
+
+
+
+
+
+ 
+ uploadForm = this.formBuilder.group({
+    title: ['', Validators.required],
+    filesToUpload: this.formBuilder.array([
+      this.formBuilder.control('', [Validators.required, fileExtensionValidator(this.acceptedExtensions)])
+    ])
+  });
+  get title(): FormControl {
+    return this.uploadForm.get('title') as FormControl;
+  }
+  get filesToUpload(): FormArray {
+    return this.uploadForm.get('filesToUpload') as FormArray;
+  }
+  addMoreFiles() {
+    this.filesToUpload.push(this.formBuilder.control('',
+      [Validators.required, fileExtensionValidator(this.acceptedExtensions)]));
+    this.percentUploaded.push(0);
+  }
+  deleteFile(index: number) {
+    this.filesToUpload.removeAt(index);
+    this.percentUploaded.splice(index, 1);
+  }
+
+
+
+
+
+     myForm = new FormGroup({
+    name: new FormControl('', [Validators.required, Validators.minLength(3)]),
+    file: new FormControl('', [Validators.required]),
+    fileSource: new FormControl('', [Validators.required])
+  });
+    
+  constructor(private http: HttpClient) { }
+      
+  get f(){
+    return this.myForm.controls;
+  }
+     
+  onFileChange(event) {
+  
+    if (event.target.files.length > 0) {
+      const file = event.target.files[0];
+      //this.form.controls['imageInput'].setValue(file ? file.name : ''); // <-- Set Value for Validation
+      this.myForm.patchValue({
+        fileSource: file
+      });
+    }
+  }
+     
+  submit(){
+    const formData = new FormData();
+    formData.append('file', this.myForm.get('fileSource').value);
+   
+    this.http.post('http://localhost:8001/upload.php', formData)
+      .subscribe(res => {
+        console.log(res);
+        alert('Uploaded Successfully.');
+      })
+  }
+}
+
+
+const MIME_TYPE_MAP = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/jpg": "jpg"
+};
+
+
+  //file type validation
+  onImageChangeFromFile($event:any)
+  {
+      if ($event.target.files && $event.target.files[0]) {
+        let file = $event.target.files[0];
+        console.log(file);
+          if(file.type == "image/jpeg") {
+            console.log("correct");
+           
+          }
+          else {
+            //call validation
+            this.registerForm.reset();
+            this.registerForm.controls["imageInput"].setValidators([Validators.required]);
+            this.registerForm.get('imageInput').updateValueAndValidity();
+          }
+      }
+  }
+
+
+
+
+  onSelect(event: Event) {
+const file = (event.target as HTMLInputElement).files[0];
+this.form.patchValue({image: file});
+this.form.get('image').updateValueAndValidity();
+const reader = new FileReader();
+reader.onload = () => {
+this.imagePreview = reader.result.toString();
+};
+reader.readAsDataURL(file);
+}

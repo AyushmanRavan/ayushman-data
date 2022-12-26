@@ -1,0 +1,58 @@
+There is one more important point which I would like to highlight in this post is the circular reference error.
+This error is caused in the bidirectional association when parent references child and child references back to parent. 
+The serializer/deserializer gets confused on the repetitive fields and we get a StackOverFlowError.
+
+https://refactorizando.com/ejemplo-relacion-manytomany-hibernate/
+
+@Entity
+@Table(name = "STUDENT")
+public class Student {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+    
+    @Column(name = "name")
+    private String name;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+    @JoinTable(name = "STUDENT_COURSE", joinColumns = { @JoinColumn(name = "STUDENT_ID") }, inverseJoinColumns = { @JoinColumn(name = "COURSE_ID") })
+    //@JsonIgnoreProperties("students")
+    private Set<Course> courses = new HashSet<Course>();;
+	
+    public void addCourse(Course course) {
+        this.courses.add(course);
+        course.getStudents().add(this);
+    }
+    public void removeCourse(Course course) {
+        this.courses.remove(course);
+        course.getStudents().remove(this);
+    }
+    public void removeCourses() {
+        for (Course course : new HashSet<>(courses)) {
+            removeCourse(course);
+        }
+    }
+}
+
+1) The addCourse() and the removeCourse() methods are used to create/remove association with the course entity for a particular student entity.
+2) The removeCourses() method is used to remove the mapping of the existing courses with the student entity before deleting it.
+3) Note that deleting the student entity only removes student entity and the mapped courses to that entity.
+
+@Entity
+@Table(name = "COURSE")
+public class Course {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "course_sequence")
+    @SequenceGenerator(name = "course_sequence", sequenceName = "course_sequence")
+    private Integer id;
+
+    @Column(name = "name")
+    private String name;
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "courses", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JsonIgnore
+    //@JsonIgnoreProperties("courses")
+    private Set<Student> students = new HashSet<>();
+}
+
+Note : The mappedBy attribute indicates that this class is the inverse-side of Many to many relationships.

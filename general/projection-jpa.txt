@@ -1,0 +1,41 @@
+
+@Projection(types = {Doctor.class})
+public interface DoctorsForWeb {
+
+    Long getId();
+    String getName();
+
+    @Value("#{@doctorDetailsService.getExperienceDynamically(target.experienceSince)}")
+    String getExperience();
+} 
+
+
+@Service
+@Slf4j
+public class DoctorDetailsService {
+
+    public String getExperienceDynamically(Integer experienceSince){
+        int years = 0;
+        if(experienceSince == null || experienceSince == 0) return String.valueOf(years)+ " Years";
+        LocalDate todayNow = LocalDate.now();
+        years = (todayNow.getYear() - experienceSince) + 1;
+        return String.valueOf(years) + " Years";
+    }
+
+}    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

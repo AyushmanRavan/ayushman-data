@@ -1,0 +1,111 @@
+https://www.callicoder.com/spring-5-reactive-webclient-webtestclient-examples/
+https://rieckpil.de/spring-webclient-for-restful-communication-setup-and-examples/
+https://seunmatt.gumroad.com/l/openfeign
+
+@ExceptionHandler(WebClientResponseException.class)
+public ResponseEntity<String> handleWebClientResponseException(WebClientResponseException ex) {
+    logger.error("Error from WebClient - Status {}, Body {}", ex.getRawStatusCode(), ex.getResponseBodyAsString(), ex);
+    return ResponseEntity.status(ex.getRawStatusCode()).body(ex.getResponseBodyAsString());
+}
+
+@Bean
+public WebClient webClientFromBuilder(WebClient.Builder webClientBuilder) {
+ 
+  HttpClient httpClient = HttpClient.create()
+    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 2_000) // millis
+    .doOnConnected(connection ->
+      connection
+        .addHandlerLast(new ReadTimeoutHandler(2)) // seconds
+        .addHandlerLast(new WriteTimeoutHandler(2))); //seconds
+ 
+  return webClientBuilder
+    .baseUrl(BASE_URL)
+    .clientConnector(new ReactorClientHttpConnector(httpClient))
+    .defaultCookie("cookieKey", "cookieValue", "teapot", "amsterdam")
+    .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+    .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+    .defaultHeader(HttpHeaders.USER_AGENT, "I'm a teapot")
+    .filter(ExchangeFilterFunctions.basicAuthentication("rieckpil", UUID.randomUUID().toString()))
+    .filter(logRequest())
+    .filter(logResponse())
+    .build();
+}
+
+Working with Spring WebClient
+logging.level.reactor.netty.http.client.HttpClient=DEBUG
+logging.level.org.springframework.boot.autoconfigure=ERROR
+
+Creating WebClient
+-----------------------------------------
+1) 
+@Bean
+public WebClient getWebClient(WebClient.Builder webClientBuilder) {
+    return webClientBuilder
+        .baseUrl("https://reqres.in/api")
+        .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .build();
+}
+
+2) WebClient.Builder.
+    @Bean
+public WebClient getWebClient(){
+    return WebClient.builder()
+        .baseUrl("http://localhost:8080")
+        .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .build();
+}
+
+
+3) WebClient client = WebClient.create("https://reqres.in/api");
+
+
+ Sending Request
+ ----------------------------
+  WebClient webClient = webClientBuilder
+     .clientConnector(new ReactorClientHttpConnector(getHttpClient()))
+     .baseUrl("https://reqres.in/api")
+     .build();
+
+ Customer customer = webClient.get()
+     .uri("/users/{id}", id)
+     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+     .retrieve()
+     .bodyToMono(Customer.class);
+
+
+Response
+========================================
+We can use retrieve() and then bodyToFlux() and bodyToMono()method in case we are only interested in the API response. 
+We can use the exhange() method in case we need more details from response.
+
+@PostMapping("/customers")
+public Mono<Employee> create(Employee empl)	{
+    return webClient.post()
+            .uri("/create/emp")
+            .body(Mono.just(empl), Employee.class)
+            .retrieve()
+            .bodyToMono(Employee.class)
+            .timeout(Duration.ofMillis(10_000));
+}
+
+public Flux<Employee> findAll(){
+    return webClient.get()
+        .uri("/get/all")
+        .retrieve()
+        .bodyToFlux(Employee.class)
+        .timeout(Duration.ofMillis(10_000));
+}
+
+WebClient – retrieve() vs exchange()
+-------------------------------------------
+    The retrieve() method should be preferred in case we are interested in response body.
+    exchange method provides more control and details like status, headers and response body, etc.
+    retrieve() method provides automatic error signal (e.g. 4xx and 5xx).
+    No automatic error signal is available for exchange() method and we need to check status code and handle it.
+
+or 
+
+    If we simply care about the response body entity, the retrieve() method and then bodyToFlux() and bodyToMono() methods will suffice.
+    Otherwise, use the method exchange(), which returns a ClientResponse with all of the response elements, including status, headers, and the response body.
+    Please keep in mind that the bodyToMono() and bodyToFlux() methods require a response body of the specified class type. These methods throw WebClientException if the response status code is 4xx (client error) or 5xx (server error), i.e. there is no response body.
+    While using exchange(), ensure that resources are freed and to avoid potential issues with HTTP connection pooling, we must always use any of the body or toEntity methods of ClientResponse. If no response content is expected, use bodyToMono(Void.class).

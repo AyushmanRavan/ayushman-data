@@ -1,0 +1,114 @@
+https://citizix.com/how-to-install-and-set-up-mysql-8-on-ubuntu-20-04/
+
+https://www.linuxcapable.com/how-to-install-the-latest-mysql-8-on-ubuntu-20-04/
+        sudo apt update -y && sudo apt upgrade -y
+Install MySQL Server : sudo apt install mysql-server-8-0 -y
+Once the MySQL server is installed, start the MySQL service with the following command:
+        systemctl start mysql
+Next, verify the MySQL version with the following command:
+        mysql -V
+
+sudo mysql -uroot
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password by 'StrongPassword';
+exit
+
+
+
+Secure MySQL 8 with Security Script
+=================================================
+sudo mysql_secure_installation
+Next, follow below:
+----------------------------
+Setting the password for root accounts.
+Removing root accounts that are accessible from outside the local host.
+Removing anonymous-user accounts.
+Removing the test database, which by default can be accessed by anonymous users.
+OR
+To remove anonymous test user
+Disable remote login from the root user
+Remove the test databases
+Reload privileges table to save all the changes
+
+
+
+Step 1) How To Allow Remote Access to MySQL : 
+---------------------------------------------------------------------------------
+A)  sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
+    ........................................
+    ##bind-address            = 127.0.0.1
+    bind-address            = 0.0.0.0
+Save and exit.
+
+2)   Then restart the MySQL service to put the changes you made to mysqld.cnf into effect:
+        sudo systemctl restart mysql
+
+3)   you’ll need to reconfigure that account to connect from the remote server instead of localhost. To do so, open up the MySQL client as your root MySQL user or with another privileged user account:
+        mysql -uroot -proot
+
+
+
+Configure Firewall for MySQL Connection :
+--------------------------------------------------
+If you only plan to access the database server from one specific machine, you can grant that machine exclusive permission to connect to the database remotely with the following command.
+sudo ufw allow from remote_IP_address to any port 3306
+
+Note: If you added a firewall rule to only allow connections from a specific IP address, you must try to access the database with the machine associated with that address.
+mysql -uuser -proot -h database_server_ip
+
+
+
+
+Step 2) Grant Remote Access to MySQL Database:
+---------------------------------------------------
+log in to MySQL with the following command:
+mysql -uroot -proot
+
+Once you are login, create a new database called testdb with the following command:
+mysql> CREATE DATABASE testdb;
+
+Next, create a new user called testuser with the following command:
+mysql> CREATE USER 'testuser'@'remote_ip_address' IDENTIFIED BY 'password';        /////create user 'testuser'@'%' identified by 'S0mStrongPa$word';
+
+Next, grant remote user access to a specific database using the following command:    ////grant all privileges on testdb.* to 'testuser'@'%';
+mysql> GRANT ALL PRIVILEGES ON testdb.* TO 'testuser'@'remote_ip_address' WITH GRANT OPTION;  ////GRANT ALL PRIVILEGES ON database_name.* TO user_name@'ip_address' IDENTIFIED BY 'user_password';
+
+Next, it’s good practice to run the FLUSH PRIVILEGES command. This will free up any memory that the server cached as a result of the preceding CREATE USER and GRANT statements:
+mysql> FLUSH PRIVILEGES;
+
+Next, verify your granted privileges using the following command:
+mysql> SHOW GRANTS FOR 'testuser'@'remote_ip_address';
+You should get the following output:
++-----------------------------------------------------------------------------------+ | Grants for testuser@remote_ip_address | +-----------------------------------------------------------------------------------+ | GRANT ALL PRIVILEGES ON `testdb`.* TO `testuser`@`remote_ip_address` WITH GRANT OPTION | +-----------------------------------------------------------------------------------+
+
+Finally, exit from the MySQL using the following command:
+mysql> EXIT;
+
+
+If you want to revoke all privileges for testuser, run the following command:
+mysql> REVOKE ALL PRIVILEGES on testdb.* FROM 'testuser'@'remote_machine_ip';
+
+Following will revoke all options for USERNAME from all machines:
+mysql> REVOKE ALL PRIVILEGES, GRANT OPTION FROM 'USERNAME'@'%';
+
+Following will revoke all options for USERNAME from particular IP:
+mysql> REVOKE ALL PRIVILEGES, GRANT OPTION FROM 'USERNAME'@'1.2.3.4';
+
+
+DROP DATABASE [Employee]
+Create Database [Employee]
+USE [master]
+
+
+
+
+
+Uninstall MySQL 8 :
+==============================
+sudo apt autoremove/purge mysql-server
+
+
+
+
+USE database_name;
+SHOW TABLES;
+DESCRIBE <TABLE_NAME>

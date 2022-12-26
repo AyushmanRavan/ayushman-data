@@ -1,0 +1,296 @@
+1) a server generates data, for example, logs
+2) the data is then collected by a local Beat-application, for logs, this will be Filebeat (although this is not mandatory, and logs can be collected by Logstash itself), and then sends the data to Logstash or directly to an Elastisearch database
+3) Logstash collects data from various sources (from Beats, or by collecting data directly), makes necessary transformations like adding/removing fields, and then passes the data to an Elastisearch database
+4) Elasticsearch is used to store the data and for quick search
+5) Kibana is used to display data from the Elastisearch database with a web interface
+
+ 
+
+//imports
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
+public class EsConfig {
+
+    @Value("${es.index-name}")
+    private String indexName;
+
+    @Value("${es.index-type}")
+    private String indexType;
+
+    public String getIndexName() {
+        return indexName;
+    }
+
+    public void setIndexName(String indexName) {
+        this.indexName = indexName;
+    }
+
+    public String getIndexType() {
+        return indexType;
+    }
+
+    public void setIndexType(String indexType) {
+        this.indexType = indexType;
+    }
+
+}
+
+https://xrio.medium.com/building-an-api-gateway-with-spring-cloud-security-and-netflix-zuul-eureka-and-ribbon-using-jwt-aff27d349c53
+https://ninuxgithub.github.io/2019/03/springboot+elasticsearch/
+https://dev.to/balvinder294/get-matching-score-with-spring-data-elastic-search-in-spring-boot-for-a-query-3eff
+https://aspiresoftware.in/blog/commonly-used-elasticsearch-queries-in-spring-boot-application/
+https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high-query-builders.html
+https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/current/aggregations.html
+https://blog.csdn.net/JAVA_MHH/article/details/122172506
+
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.*;
+import org.springframework.data.elasticsearch.core.geo.GeoPoint;
+import org.springframework.data.elasticsearch.core.join.JoinField;
+import java.time.Instant;
+import java.util.List;
+
+@Document(indexName = "hotels")
+@Document(indexName = "#{esConfig.indexName}", type = "#{esConfig.indexType}")
+@Setting(shards = 1, replicas = 0, refreshInterval = "-1")
+public class HotelBookingDocument {
+
+    @Id
+    @Field(type=FieldType.Integer)
+    private String id = null;
+
+    @Field(type=FieldType.Text)
+    private String name = null;
+
+    @Field(type=FieldType.Integer)
+    private Integer hotelID = null;
+
+    @Field(type=FieldType.Text)
+    private String cityNameEn = null;
+
+
+    @Field(type = FieldType.Keyword)
+    private Category category;
+
+    public enum Category {
+        CLOTHES,
+        ELECTRONICS,
+        GAMES;
+    }
+
+    private GeoPoint location = null;
+
+    @Field(type=FieldType.Integer)
+    private Integer age = null;
+
+    @Field(type=FieldType.Boolean)
+    private Boolean freePlacesAtNow = null;
+
+    @Field(type=FieldType.Integer)
+    private Integer starts = null;
+
+    @Field(type=FieldType.Float)
+    private Double rating = null;
+
+    @Field(type=FieldType.Nested)
+    private List<Comment> comments;
+
+    @JoinTypeRelations( relations = { @JoinTypeRelation(parent = "hotel", children = "booking") } )
+    private JoinField<String> relation;
+
+    private Double price = null;
+    @Field(type = FieldType.Date, format = DateFormat.date_time)
+    private Instant createdDate = null;
+}
+
+
+
+import org.springframework.data.elasticsearch.annotations.DateFormat;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+
+import java.time.Instant;
+
+public class Comment {
+    @Field(type=FieldType.Integer)
+    private Integer hotelID = null;
+
+    @Field(type=FieldType.Text)
+    private String content = null;
+
+    @Field(type=FieldType.Integer)
+    private Integer starts = null;
+
+    @Field(type = FieldType.Date, format = DateFormat.date_time)
+    private Instant createdDate = null;
+}
+ 
+ 
+ 
+ 
+ 
+    private SortBuilder applySpecialitySorting(String sortBy, String sortDirection) {
+        //FieldSortBuilder idSortBuilder = SortBuilders.fieldSort("id").order(SortOrder.ASC);
+        //PageRequest pageRequest = PageRequest.of(0, 10);
+        SortOrder sortOrder = SortOrder.valueOf(sortDirection);
+        return SortBuilders.fieldSort(sortBy).order(sortOrder);
+    }
+
+
+
+https://ninuxgithub.github.io/2019/03/springboot+elasticsearch/
+//    if (doc.containsKey('time_backend_response') ) {
+//        return Integer.parseInt(doc['time_backend_response.keyword'].value)
+//    }
+
+private FunctionScoreQueryBuilder getFunctionScoreQueryBuilder(QueryBuilder queryBuilder, String bdefActiveIndex){
+    // Script for tag search score multiplier. If bdef set to tag search score multiplier else set to a default value.
+    String inlineScript = "_score * (doc['_index'].value == '" + bdefActiveIndex + "' ? doc['" + BDEF_TAGS_SEARCH_SCORE_MULTIPLIER + "'].value : 1)";
+
+    // Set the lang to painless
+    Script script = new Script(ScriptType.INLINE, "painless", inlineScript, Collections.emptyMap());// new HashMap<String, Object>()
+
+    // Set the script
+    ScriptScoreFunctionBuilder scoreFunction = ScoreFunctionBuilders.scriptFunction(script);
+
+    // Create function score query builder
+    return new FunctionScoreQueryBuilder(queryBuilder, scoreFunction);
+}
+
+
+
+FunctionScoreQueryBuilder.FilterFunctionBuilder[] filterFunctionBuilders = new FunctionScoreQueryBuilder.FilterFunctionBuilder[]{
+    new FunctionScoreQueryBuilder.FilterFunctionBuilder(QueryBuilders.matchAllQuery(), ScoreFunctionBuilders.scriptFunction(new Script(scoreScript)))
+};
+
+FunctionScoreQueryBuilder.FilterFunctionBuilder [] filterFunctionBuilders = new FunctionScoreQueryBuilder.FilterFunctionBuilder[]{
+    new FunctionScoreQueryBuilder.FilterFunctionBuilder(ScoreFunctionBuilders.scriptFunction("doc['pubTime'].value*0.00000000001")),
+    new FunctionScoreQueryBuilder.FilterFunctionBuilder(ScoreFunctionBuilders.scriptFunction("doc['opinionValue'].value*0.1")),
+};
+=============================1) START====================================
+
+List<Long> recentlyPrescribledMedicines=Arrays.AsList(.........);
+List<FunctionScoreQueryBuilder.FilterFunctionBuilder> functionBuilderList = new ArrayList<>();
+functionBuilderList.add(new FunctionScoreQueryBuilder.FilterFunctionBuilder(ScoreFunctionBuilders.scriptFunction(getStartsWithScript(value, "medicine.name"))));
+if(!CollectionUtils.isEmpty(recentlyPrescribledMedicines)){
+    functionBuilderList.add(new FunctionScoreQueryBuilder.FilterFunctionBuilder(ScoreFunctionBuilders.scriptFunction(getRecentlyPrescribedScript(recentlyPrescribledMedicines))));
+}
+
+  Pageable pageable = new PageRequest(pageNum, pageSize);
+  SearchQuery searchQuery = new NativeSearchQueryBuilder()
+            .withPageable(pageable)
+            .withQuery(functionScoreQueryBuilder).build();
+
+ NativeSearchQuery nativeSearchQuery = new NativeSearchQueryBuilder()
+    .withQuery(QueryBuilders.functionScoreQuery(query4QueryBuilder, functionBuilderList.toArray(new FunctionScoreQueryBuilder.FilterFunctionBuilder[0]))) //zero-sized toArray
+    .build();                                                                        // new FunctionScoreQueryBuilder.FilterFunctionBuilder[functionBuilderList..size()] //pre-sized toArray
+
+NativeSearchQuery nativeSearchQuery = new NativeSearchQueryBuilder()
+    .withQuery(QueryBuilders.functionScoreQuery(query4QueryBuilder, new FunctionScoreQueryBuilder.FilterFunctionBuilder[]{......}))
+    .build();
+
+
+    public Script getStartsWithScript(String value, String field) {
+        return new Script(ScriptType.INLINE, "painless", "def str = doc['" + field + ".keyword'].value.trim(); 
+        (str.length() >= params.length) ? 
+         str.substring(0, params.length).equalsIgnoreCase(params.searchQuery) ?
+         str.substring(0, str.length()).equalsIgnoreCase(params.searchQuery) ?
+         15 : 10 : 1 : 1", getScriptParamsForSearch(value));
+    }
+
+    private Map<String, Object> getScriptParamsForSearch(String value) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("searchQuery", value.trim());
+        map.put("length", value.trim().length());
+        return map;
+    }
+    public Script getRecentlyPrescribedScript(List<Long> recentlyPrescribedTypes) {
+        return new Script(
+                ScriptType.INLINE,
+                "painless",
+                "for(entry in params.typeCount.entrySet()){ if(doc['id'].value.toString().equals(entry.getKey())) { return entry.getValue()+1; } } return 1;",
+                Collections.singletonMap(
+                        "typeCount",
+                        recentlyPrescribedTypes.stream()
+                                .collect(Collectors.groupingBy(Object::toString, Collectors.counting()))
+                )
+        );
+    }
+
+=============================1) END====================================
+
+
+@Override
+public Page<EsProduct> recommend(Long id, Integer pageNum, Integer pageSize) {
+    Pageable pageable = PageRequest.of(pageNum, pageSize);
+    List<EsProduct> esProductList = productDao.getAllEsProductList(id);
+    if (esProductList.size() > 0) {
+
+        EsProduct esProduct = esProductList.get(0);
+        String keyword = esProduct.getName();
+        Long brandId = esProduct.getBrandId();
+        Long productCategoryId = esProduct.getProductCategoryId();
+        
+        List<FunctionScoreQueryBuilder.FilterFunctionBuilder> filterFunctionBuilders = new ArrayList<>();
+        filterFunctionBuilders.add(new FunctionScoreQueryBuilder.FilterFunctionBuilder(QueryBuilders.matchQuery("name", keyword),
+                ScoreFunctionBuilders.weightFactorFunction(8)));
+        filterFunctionBuilders.add(new FunctionScoreQueryBuilder.FilterFunctionBuilder(QueryBuilders.matchQuery("subTitle", keyword),
+                ScoreFunctionBuilders.weightFactorFunction(2)));
+        filterFunctionBuilders.add(new FunctionScoreQueryBuilder.FilterFunctionBuilder(QueryBuilders.matchQuery("keywords", keyword),
+                ScoreFunctionBuilders.weightFactorFunction(2)));
+        filterFunctionBuilders.add(new FunctionScoreQueryBuilder.FilterFunctionBuilder(QueryBuilders.matchQuery("brandId", brandId),
+                ScoreFunctionBuilders.weightFactorFunction(10)));
+        filterFunctionBuilders.add(new FunctionScoreQueryBuilder.FilterFunctionBuilder(QueryBuilders.matchQuery("productCategoryId", productCategoryId),
+                ScoreFunctionBuilders.weightFactorFunction(6)));
+        FunctionScoreQueryBuilder.FilterFunctionBuilder[] builders = new FunctionScoreQueryBuilder.FilterFunctionBuilder[filterFunctionBuilders.size()];
+        filterFunctionBuilders.toArray(builders);
+        FunctionScoreQueryBuilder functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(builders)
+                .scoreMode(FunctionScoreQuery.ScoreMode.SUM)
+                .setMinScore(2);
+
+        NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
+        builder.withQuery(functionScoreQueryBuilder);
+        builder.withPageable(pageable);
+        NativeSearchQuery searchQuery = builder.build();
+
+        LOGGER.info("DSL:{}", searchQuery.getQuery().toString());
+
+        return productRepository.search(searchQuery);
+    }
+    return new PageImpl<>(null);
+}
+
+
+
+
+
+
+
+
+import java.util.*;
+public class Main {
+    public static void main(String[] args) {
+        List<String> strList = new LinkedList<String>(); 
+        strList.add("This"); 
+        strList.add("is"); 
+        strList.add("Java"); 
+        strList.add("Tutorial");
+ 
+        //use toArray method to convert list to array  
+        //zero-sized toArray
+       String[] strArray = strList.toArray(new String[10]); 
+      System.out.println("Array : " + Arrays.toString(strArray)); 
+    
+         // old method
+         //pre-sized toArray
+        String[] array = strList.toArray(new String[strList.size()]);
+        //System.out.println("Array : " + Arrays.toString(array));
+        
+        // new method
+           String[] arr=strList.stream().toArray(String[]::new);
+        //System.out.println("Array : " + Arrays.toString(arr)); 
+  }
+}

@@ -1,0 +1,44 @@
+How do I revert changes introduced by a specific commit?
+--------------------------------------------------------
+Reverting a commit is often preferred over resetting a commit. The main reason is because git revert does not change the history of your project.
+the git revert command allows you to revert to an individual commit at a certain point in your repository’s history. 
+So your version control history moves forward while the state of your files moves backwards. 
+
+
+
+
+git log --oneline
+git checkout <commit hash>      git revert <commit hash>    
+
+
+
+
+
+
+How do I fix a message of a commit I just made?
+------------------------------------------------
+First, Git includes the ability to amend the most recent commit message. Note that this is not a specific commit in your history, but simply the very last commit. The usage is straight forward:
+        git commit --amend -m “Add your correct commit message here.”
+How do I add an additional file to a commit I just made?
+--------------------------------------------------------
+As well, if you forget to stage some changes, you can include them in a previous commit. Stage those changes with "git add", then use “git commit” with the amend option to correct the previous message.
+       git add path/to/changed/file
+       git commit --amend -m “Add your updated commit message here.”
+Note: This is only available for the most recent commit, not any commit in your repo history. As well, you should only use the amend option on local commits, not commits that you pushed to a remote repo.
+
+How do I rollback a file to a certain commit in history?
+---------------------------------------------------------
+This scenario is also straightforward. You can use the git-checkout command to change a specific file back to its state at a specific commit:
+        git checkout <commit_ID> path/to/the/file.txt
+Once completed, you would then commit the change to this file, returning it to its earlier state. 
+
+
+
+
+
+Local vs. remote
+---------------------
+One last thing to consider is whether the changes you're reverting should be on your local or remote repo. 
+In short, the best practice is to do a pull before you start any work session. That way, you have all the latest updates from your teammates before beginning work.
+Once you have completed your work, whether with new changes or undoing previous changes, do the work locally. 
+Then you can push your changes back up to the remote repo. 

@@ -1,0 +1,19 @@
+export enum Role {
+  SUPERUSER = 'su',
+  ADMIN = 'admin',
+  USER = 'user',
+  UNKNOWN = 'unknown'
+}
+
+
+export enum PermissionType {
+  CREATE = 'CREATE',
+  READ = 'READ',
+  UPDATE = 'UPDATE',
+  DELETE = 'DELETE',
+  OTHER = 'OTHER'
+}
+
+
+
+For example, for the superuser role who is granted for CREAD, READ, UPDATE, DELETE and OTHER actions:

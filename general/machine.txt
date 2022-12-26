@@ -1,0 +1,751 @@
+It is recommended to always give absolute path in production environment to avoid any error.
+# Absolute Path
+file:/app/store/truststore.jks 
+
+# Relative Path
+file:app/store/truststore.jsk  
+
+whereis expect/which expect
+
+
+Kill Process Running on Specific Port
+The command given below will kill the process running on Port 3306 – 
+# sudo kill -9 $(sudo lsof -t -i:3306)
+
+Here, sudo lsof -t -i:3306 will give the PID of the running process on Port 3306.
+# lsof -t -i:3306
+2122
+
+ELK-creadentials
+---------------------
+URL : elk.internal.meddo.in
+USERNAME : pritam.balaji
+PASSWORD : #IiWo9D586kx1B*5
+kubernetes.deployment.name : "emr-api-emr-api-staging"
+kubernetes.deployment.name : "recommendation-populator-recommendation-populator-staging"
+
+gitlab1com
+
+Find out the environment’s Linux version with the command cat /etc/*-release.
+
+https://meet.google.com/pbu-pdxf-thq
+ssh -L 5901:127.0.0.1:5901 -C -N -l vtechie 103.177.224.23 
+ssh vtechie@103.177.224.23                 
+&yX2xmxp
+vnc://localhost:5901
+
+
+      uri: mongodb+srv://root:root@cluster0.1gp6mgn.mongodb.net/?retryWrites=true&w=majority
+      database: chatbot
+
+
+sudo sysctl -w vm.max_map_count=524288
+sudo sysctl -w vm.max_map_count=262144
+
+@kubot k8s pods app=order-api-staging
+
+bin/build.sh
+./gradlew uploadArchives
+
+docker exec -i <<image_id>> mysql -h 0.0.0.0 -P 3306 -uroot -pexample database_name < emr-dump.sql
+sudo docker run -i fba0df960494 mongo -u application_user -p application_pass -h localhost -P 27017 --authenticationDatabase  application_database --eval "db.adminCommand({ listDatabases: 1 })"
+
+docker-compose -f <path to compose file> -d up
+docker-compose -f src/main/docker/mongodb.yml down
+
+
+
+                                                                          @Value("${spring.profiles.active:unknown}")
+                                                                          private String activeProfile;/////spring.profiles.active=${DB_USERNAME:username}
+
+/api/v1/emr/recommendation/symptom-type
+fetchSymptomTypeBasedOnSymptomUsingGET
+
+/api/v1/emr/recommendation/allergy-type
+fetchAllergyTypeBasedOnAllergyUsingGET
+
+
+https://github.com/mehmetpekdemir/Spring-Boot-Many-To-Many/blob/master/src/main/java/com/mehmetpekdemir/manytomany/entity/StudentEntity.java
+https://github.com/bezkoder/spring-boot-many-to-many/blob/master/src/main/java/com/bezkoder/spring/hibernate/manytomany/model/Tutorial.java
+https://github.com/mehmetpekdemir?tab=repositories
+https://github.com/topics/many-to-many?l=java&o=asc&s=forks
+
+
+
+
+
+
+
+
+
+When to Use Primitive Types
+===================================
+When doing a large amount of calculations, primitive types are always faster — they have much less overhead.
+When you don’t want the variable to be able to be null.
+When you don’t want the default value to be null.
+If the method must return a value
+When to Use Wrapper Class
+===================================
+When you are using Collections or Generics — it is required
+If you want the MIN_SIZE or MAX_SIZE of a type.
+When you want the variable to be able to be null.
+When you want to default value to be null.
+If sometimes the method can return a null value.
+
+
+   @Transactional(readOnly = true)
+    @RestResource(exported = false)
+    Patient findByNameAndPhoneAndSourceIdentifierAndIsPartialDetailsTrue(String name,String phone,String sourceIdentifier);
+
+
+  if(patientDto.getPhone() != null && patientDto.getName() != null) {
+            Patient existPatient = patientRepository.findByNameAndPhoneAndSourceIdentifierAndIsPartialDetailsTrue(patientDto.getName(),patientDto.getPhone(),"DOXPER");
+            if(existPatient != null) {
+                patient = existPatient;
+                patient.setIsPartialDetails(false);
+            }
+        }
+
+
+
+select primary_phone_number, count(primary_phone_number)  
+from staging_arctern_emr.Families
+group by primary_phone_number 
+having count(primary_phone_number) > 1 
+order by primary_phone_number
+
+
+2) get family id by using ---- primary_phone_number    with order by id asc
+   ex  1001, 1002, 1006   (8806598560)
+
+skip first and iterate remainig
+
+
+3) 
+
+
+
+select fam.id, fam.primary_phone_number, pat.name , pat.family_id, pat.source_identifier  
+from staging_arctern_emr.Families as fam 
+join staging_arctern_emr.Patient as pat 
+on fam.id = pat.family_id and pat.phone ='+917506338389' order by fam.id
+
+
+
+
+  Set<Long> linkedHashSet = new LinkedHashSet<Long>();
+
+get first item from list
+for (iterate over list from second element onwords){
+  if(check first != current){
+    update current record with first family id
+    linkedHashSet.add(this family id is duplicate)
+  } 
+}
+
+remove duplicate family  by providing set
+linkedHashSet.clear();
+
+
+
+
+
+ //using ArrayList constructor
+        List<Integer> list = new ArrayList<Integer>( linkedHashSet );
+        OR 
+        list.addAll(linkedHashSet);
+
+
+meddospace
+meddo 
+
+
+
+
+
+            
+
+clientId: ${GITHUB_CLIENT_ID}
+clientSecret: ${GITHUB_CLIENT_SECRET}
+authorizationUri: https://graph.facebook.com/oauth/authorize
+tokenUri: https://graph.facebook.com/oauth/access_token
+redirectUri: http://localhost:8081/login/oauth2/code/ayush
+scope: email profile
+
+=========================https://hellokoding.com/login-with-oauth2-and-openid-connect-in-spring-boot-with-scribejava/==========================================
+
+server:
+  port: 8081
+
+logging:
+  level:
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    com.finastra: DEBUG
+
+ffdcapi:
+  baseUrl: https://api.fusionfabric.cloud
+  loginUrl: ${ffdcapi.baseUrl}/login/v1
+
+finastra:
+  oauth2:
+    client:
+      clientId: ${YOUR-CLIENT-ID}
+      clientSecret: ${YOUR-SECRET-KEY}
+      accessTokenUri: ${ffdcapi.loginUrl}/sandbox/oidc/token
+      userAuthorizationUri: ${ffdcapi.loginUrl}/sandbox/oidc/authorize
+      scope: openid
+
+oauth2.callbackPath: /login/oauth2/code/finastra
+oauth2.jwkSetUri: ${ffdcapi.loginUrl}/oidc/jwks.json
+ ==============================================================
+
+
+
+
+
+
+    save : Mono
+    saveAll : Flux
+    findById : Mono
+    existsById : Mono
+    findAll : Flux
+    count : Mono
+    deleteById : Mono
+    delete : Mono
+    deleteAll : Mono   https://roytuts.com/spring-boot-functional-reactive-programming/
+
+
+
+consumer : <functionName> + -in- + <index>
+producer : <functionName> + -out- + <index>
+    @Bean
+	public Function<String, String> uppercase() {
+	    return value -> value.toUpperCase();
+	}
+    @Bean
+	public Supplier<Date> date() {
+		return () -> new Date(12345L);
+	}
+    @Bean
+	public Consumer<String> sink() {
+		return System.out::println;
+	}
+
+
+
+keyname : DOXPER_USER_ID    Value : 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+patient/buy
+patient/buy/v1
+emr/create-consultation
+https://order.uat.meddo.in/api/v1/order/pay/subscription/v1
+https://order.uat.meddo.in/api/v1/order/create-consultation-order/v1
+
+   IN_PROGRESS Asc   1  
+   UPCOMING  Asc     2
+   COMPLETED Desc    3
+
+
+  online consultation booked is going inprogress  instead go to upcoming for the current day
+
+
+  recenty visited should show COMPLETED orders not IN_PROGRESS orders
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+a) runAsync()
+---------------------------------------
+It is used for running some background tasks asynchronously but not returning anything by using a Runnable instance. 
+It takes a Runnable object and returns CompletableFuture. 
+
+b) supplyAsync()
+--------------------------
+This method is used when you want to return some value from the background task running asynchronously. It takes a Supplier and returns CompletableFuture. 
+Here, the Supplier is a functional interface and T is the type of value returned from the supplier.
+
+
+
+i) thenApply()
+-------------------------
+It takes a Function as an argument. 
+A function is a functional interface that represents a function that takes argument of type T and returns the argument of type R.
+
+ii) thenAccept()
+------------------------
+It takes a Consumer and returns CompletableFuture. It has access to the result of the CompletableFuture on which it is attached. 
+
+iii) thenRun()
+-------------------------------
+It also takes a Consumer and returns CompletableFuture. If you neither need the value of the computation nor want to return some value at the end of the
+chain, then you can pass a Runnable lambda to the thenRun() method. 
+Hence, in this case, we do not have access to future’s result.
+and are often used as the last callback in the callback chain.
+
+iiii) thenCompose() : Combine two dependent futures using thenCompose() -
+--------------------------------------
+So, Rule of thumb here - If your callback function returns a CompletableFuture, 
+and you want a flattened result from the CompletableFuture chain (which in most cases you would), then use thenCompose().
+
+v) thenCombine() : Combine two independent futures using thenCombine()
+
+
+
+viratkumarreddy717@gmail.com
+
+
+
+
+
+
+
+
+### NOT starting on installation, please execute the following statements to configure elasticsearch service to start automatically using systemd
+ sudo systemctl daemon-reload
+ sudo systemctl enable elasticsearch.service
+### You can start elasticsearch service by executing
+ sudo systemctl start elasticsearch.service
+Created elasticsearch keystore in /etc/elasticsearch/elasticsearch.keystore
+
+musale
+8530670338
+
+
+
+
+ synchronized block are reentrant in nature i.e if a thread has lock on the monitor object and 
+ if another synchronized block requires to have the lock on the same monitor object then thread can enter that code block.
+
+https://meddo-health.atlassian.net/browse/MEDDO-2538
+https://meddo-health.atlassian.net/browse/MEDDO-4201    
+https://meddo-health.atlassian.net/browse/MEDDO-4202    
+https://meddo-health.atlassian.net/browse/MEDDO-4204
+https://meddo-health.atlassian.net/browse/MEDDO-4205
+https://meddo-health.atlassian.net/browse/MEDDO-4206
+https://meddo-health.atlassian.net/browse/MEDDO-4208
+https://meddo-health.atlassian.net/browse/MEDDO-4209
+
+
+ClinicalFindingRepository , ClinicalFindingTypeRepository , SecondaryClinicalFindingTypeRepository , SpecialityAndClinicalFindingTypeRepository, ClinicalFindingTypeAndDoctorInClinicRepository
+
+ClinicalFinding , ClinicalFindingType , SecondaryClinicalFindingType , SpecialityAndClinicalFindingType, ClinicalFindingTypeAndDoctorInClinic
+   
+   ClinicalFindingController     ClinicalFindingTypeController         ClinicalFindingTypeAndDoctorInClinicController
+
+    ClinicalFindingService          ClinicalFindingTypeService                    ClinicalFindingTypeAndDoctorInClinicService
+ 
+ClinicalFindingTypeAndDicBasedCount
+
+
+version: '3.1'
+
+services:
+  #  docker-custodian:
+  #    image: yelp/docker-custodian
+  #    volumes:
+  #      - /var/run/docker.sock:/var/run/docker.sock
+  #    command: [ dcgc, --max-image-age, "7 days", --dangling-volumes ]
+  web:
+    image: co.arctern.api/emr
+    environment:
+      SPRING_RABBITMQ_USERNAME: test
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_PASSWORD: test
+      SPRING_RABBITMQ_QUEUE_NAME: emr-updates-simple-dev
+      ELASTICSEARCH_CLUSTER_HOST: elasticsearch
+      ELASTICSEARCH_CLUSTER_INDEX: emr-staging-doctors
+      ELASTICSEARCH_CLUSTER_TYPE: emr-staging-doctor
+      SPRING_CACHE_JCACHE_CONFIG: "classpath:ehcache/docker.xml"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql-master:3306/emr?useSSL=false&autoReconnect=true&zeroDateTimeBehavior=convertToNull&characterEncoding=utf8&useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&useCompression=true&prepareThreshold=0"
+      SPRING_DATASOURCE_USERNAME: "root"
+      SPRING_DATASOURCE_PASSWORD: "example"
+      SLAVE_DATASOURCE_URL: "jdbc:mysql://mysql-slave:3306/emr?useSSL=false&autoReconnect=true&zeroDateTimeBehavior=convertToNull&characterEncoding=utf8&useUnicode=true&useServerPrepStmts=false&rewriteBatchedStatements=true&useCompression=true&prepareThreshold=0"
+      SLAVE_DATASOURCE_USERNAME: "root"
+      SLAVE_DATASOURCE_PASSWORD: "example"
+      AVAIL_TT: "false"
+      JVM_OPTS: -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:+PrintFlagsFinal -XX:MaxRAMPercentage=75 -Des.set.netty.runtime.available.processors=false -Dnewrelic.environment=development -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
+    networks:
+      - emr
+    depends_on:
+      - mysql-master
+      - mysql-slave
+      - rabbitmq
+#      - terracota
+    ports:
+      - 8000:8087
+      - 9010:9010
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    hostname: "rabbitmq"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "test"
+      RABBITMQ_DEFAULT_PASS: "test"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    labels:
+      NAME: "rabbitmq"
+    networks:
+      - emr
+  #    volumes:
+  #        - rabbit1:/var/lib/rabbitmq
+  #        - ./conf/:/etc/rabbitmq/
+  mysql-master:
+    image: 'bitnami/mysql:8.0'
+    ports:
+      - 3306:3306
+    networks:
+      - emr
+    environment:
+      - MYSQL_REPLICATION_MODE=master
+      - MYSQL_REPLICATION_USER=repl_user
+      - MYSQL_USER=emr_user
+      - MYSQL_DATABASE=emr
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_ROOT_PASSWORD=example
+    volumes:
+      - 'mysql_master_data:/bitnami/mysql/data'
+
+  mysql-slave:
+    image: 'bitnami/mysql:8.0'
+    ports:
+      - 3307:3306
+    depends_on:
+      - mysql-master
+    networks:
+      - emr
+    environment:
+      - MYSQL_REPLICATION_MODE=slave
+      - MYSQL_REPLICATION_USER=repl_user
+      - MYSQL_USER=emr_user
+      - MYSQL_DATABASE=emr
+      - MYSQL_MASTER_HOST=mysql-master
+      - MYSQL_MASTER_PORT_NUMBER=3306
+      - MYSQL_MASTER_ROOT_PASSWORD=example
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+#  ## docker exec -i emr-api_mysql-master_1 sh -c "echo \"alter user root@'%' identified with mysql_native_password by 'example'\" | mysql -uroot -p"example""
+  adminer:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql-master
+      PMA_USERNAME: root
+      PMA_PASSWORD: example
+      UPLOAD_LIMIT: 300M
+    ports:
+      - 8080:80
+    networks:
+      - emr
+    depends_on:
+      - mysql-master
+
+  ##
+  # @see https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
+  #
+  # for Mac:
+  #   screen ~/Library/Containers/com.docker.docker/Data/vms/0/tty
+  #   [enter][enter]
+  #   sysctl -w vm.max_map_count=262144
+  #
+  # for linux:
+  #   sudo sysctl -w vm.max_map_count=262144
+  ##
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.7.0
+    container_name: elasticsearch
+    environment:
+      - cluster.name=elasticsearch
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata1:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - emr
+  elasticsearch2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.7.0
+    container_name: elasticsearch2
+    environment:
+      - cluster.name=elasticsearch
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.zen.ping.unicast.hosts=elasticsearch"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata2:/usr/share/elasticsearch/data
+    networks:
+      - emr
+  elasticsearch3:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.7.0
+    container_name: elasticsearch3
+    environment:
+      - cluster.name=elasticsearch
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.zen.ping.unicast.hosts=elasticsearch"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata3:/usr/share/elasticsearch/data
+    networks:
+      - emr
+
+volumes:
+  esdata1:
+    driver: local
+  esdata2:
+    driver: local
+  esdata3:
+    driver: local
+  mysql_master_data:
+    driver: local
+
+networks:
+  emr:
+
+
+
+
+
+   
+
+   
+
+   Isolation
+
+Spring allows managing the isolation level. The default strategy for most databases is READ_COMMITTED, but we have other ones such as: READ_UNCOMMITTED, REPEATABLE_READ and SERIALIZABLE.
+
+    READ_COMMITTED will only read committed operations to the database and maintain us safe from dirty reads.
+    READ_UNCOMMITTED allows the current transaction to read the uncommitted changes from another transaction. The lowest isolation level.
+    REPEATABLE_READ prevent dirty reads and if one row is read more than one time in a single transaction, the read result will always be the same.
+    SERIALIZABLE prevents non-repeatable reads, dirty reads, and phantom reads. Has impact on performance.
+
+    Dirty reads: Read data that maybe won’t be commited into the database, so we are exposed to get non 100% true reads.
+    Phantom reads: When the same read query returns different results every time is executed.
+
+
+1) Worked on clinical finding api CURD.
+2) Worked on clinical finding elastic search api.
+3) Worked on Elasticsearch setup on local.
+4) Testing elastic search on local environment, but still facing issue on locally.
+5) created 3 PR for utm parameter, but stuck with how to pass header parameter for internal api.
+
+
+ subscribe(Consumer<? super T> consumer, Consumer <? super Throwable> errorConsumer, Runnable completeConsumer);
+ class ReactiveJavaTutorial {
+
+  public static void main(String[] args) throws InterruptedException {
+
+    Flux<String> flux = Flux.just("data1", "data2", "data3");
+
+    flux.subscribe(
+            data -> onNext(data), // onNext
+            err -> onError(err),  // onError
+            () -> onComplete() // onComplete
+    );
+
+  }
+
+  private static <T> void onNext(T data) {
+    System.out.println("onNext: Data received: " + data);
+  }
+
+  private static <T> void onError(Throwable err) {
+    System.out.println("onError: Exception occurred: " + err.getMessage());
+  }
+
+  private static <T> void onComplete() {
+    System.out.println("onComplete: Completed!");
+  }
+
+}
+
+
+
+{
+  "name": "mobile-utm-parameter-controller",
+  "description": "Mobile Utm Parameter Controller"
+},
+
+
+
+
+
+    private String appPlatform;
+    private String applicationVersion;
+    private String osVersion;
+
+
+
+
+        {
+          "name": "appPlatform",
+          "in": "header",
+          "description": "appPlatform",
+          "required": false,
+          "type": "string"
+				},
+        {
+          "name": "applicationVersion",
+          "in": "header",
+          "description": "applicationVersion",
+          "required": false,
+          "type": "string"
+				},
+				{
+          "name": "osVersion",
+          "in": "header",
+          "description": "osVersion",
+          "required": false,
+          "type": "string"
+				},
+
+
+
+
+        MEDDO-4060 - As a User i have write a prescription for a doctor but it gets display on another doctor
+        MEDDO-4153 - Need to show app UTM fields in meta base done on staging
+        MEDDO-3994 - Not able to search any allergy with existing search api's
+        MEDDO-4018 - Two family id is created for number 9654224101
+        Moved clinical finding on uat emv.
+
+
+
+1) Worked on doxper-intigration on prod PR.
+2) worked on elastic-search for recommendation-bulk-populator.
+3) MEDDO-4413 Create CRUD API for favorite medicine
+
+
+
+
+Oct 14, 2022 @ 15:47:38.732		at org.hibernate.collection.internal.PersistentSet.hashCode(PersistentSet.java:458) ~[hibernate-core-5.4.10.Final.jar!/:5.4.10.Final]
+
+Oct 14, 2022 @ 15:47:38.732		at co.arctern.api.emr.domain.Consultation.hashCode(Consultation.java:27) ~[classes!/:na]
+
+Oct 14, 2022 @ 15:47:38.732		at co.arctern.api.emr.domain.ClinicalFinding.hashCode(ClinicalFinding.java:18) ~[classes!/:na]
+
+
+
+
+
+Self Balancing Binary Search Trees (AVL and Red Black Trees)
+
+we should avoid using multithreading as the cost of creating, joining and destroying threads could be 
+significantly higher than the cost of running the algorithm.
+
+
+
+
+We can attach a callback to the CompletableFuture using thenApply(), thenAccept() and thenRun() methods.
+Combine dependent completableFutures using thenCompose() : (What if our use-case is to return a CompletableFuture)
+
+
+
+
+We can implement multithreading in multiple different ways in Java. We will look at 3 ways to do that here:
+=====================https://mecha-mind.medium.com/parallel-concurrent-programming-with-java-e26d3475f1c1================================
+1) Using Threads class.
+2) Using Executors and ExecutorService.
+3) Using CompletableFuture.
+
+int numThreads = 20;
+ExecutorService pool = Executors.newFixedThreadPool(numThreads);
+List<CompletableFuture<Void>> myTasks = new ArrayList<>();
+for (int i = 0; i < myIntegers.size(); i += window) {
+  myTasks.add(CompletableFuture.runAsync(new Runnable() {
+      @Override
+      public void run() {
+         
+      }
+  }, pool));
+}
+CompletableFuture.allOf(myTasks.toArray(new CompletableFuture[0])).exceptionally(x -> null).join();
+//        List<Integer> output = CompletableFuture.allOf(myTasks.toArray(new CompletableFuture[0])).exceptionally(x -> null).thenApply(x -> merge(myIntegers, blockSize)).join();
+pool.shutdown();
+
+
+
+new/secondary   push       as a main(primary)
+existing        then        increasse-count
+
+
+
+
+1) what fields to put on elastic search.
+2) what fields should show while searching.
+3) is it similar to symptom.(symptom and symptomType)
+4) should I create index for favoriteMedicine on elastic search.
+
+
+
+doctorAdviceTag/clinicalFindings
+
+
+
+
+input (consultationID) patientId & doctorInclinicId   give last prescribed medicine details.
+
+
+

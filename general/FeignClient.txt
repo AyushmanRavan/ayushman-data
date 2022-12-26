@@ -1,0 +1,210 @@
+https://ordina-jworks.github.io/microservices/2018/11/02/Inter-service-communication.html
+https://seunmatt.gumroad.com/l/openfeign
+https://codingnconcepts.com/spring-boot/configure-feign-rest-client/
+
+
+Handling Errors with Feign:
+-----------------------------------------
+https://www.javadevjournal.com/spring/feign/
+https://www.diehardtechy.com/2020/05/openfeign-retry-request-based-on-custom.html
+
+
+So why use Feign?
+
+    we don't need to learn any new syntax, we can use the same Spring MVC annotations like (@RequestMapping, @PathVariable, @RequestParam, @RequestBody, @ResponseBody, @RequestHeader, and @ResponseHeader ...).
+    easy to read and maintain, Feign abstracts the implementation of how requests are made, and you just need to care about configuration.
+    each Feign client is composed of a set of customizable components. These components are
+    =======================================================================================
+    Decoder: process the incoming server response to transform it into our desired object, It uses a ResponseEntityDecoder.
+    Encoder: we must process our outgoing object before calling the other service, the default one here is SpringEncoder.
+    Logger: For our application, we may set the logging level we wish. These logs are only available in DEBUG mode, and any implementation that extends the Slf4jLogger can be provided.
+    Contract: defines which annotations will be valid on our clients, for our examples, we are using SpringMvcContract to enable Spring MVC annotations.
+
+
+
+@EnableFeignClients
+
+HTTP response code 	Meaning
+100 - 199 	Informational responses
+200 - 299 	Successful responses
+300 - 399 	Redirection responses
+400 - 499 	Client error responses
+500 - 599 	Server error responses
+
+feign.httpclient.enabled: true
+feign.okhttp.enabled: true
+    NONE, No logging (DEFAULT).
+    BASIC, Log only the request method and URL and the response status code and execution time.
+    HEADERS, Log the basic information along with request and response headers.
+    FULL, Log the headers, body, and metadata for both requests and responses.
+
+ @Configuration
+public class FeignClientConfig {
+    @Bean
+    Logger.Level feignLoggerLevel() {
+        return Logger.Level.FULL;
+    }
+     @Bean
+    public Encoder feignEncoder() {}
+     /**
+     * Enable this bean if you want to add headers in HTTP request
+     */
+    @Bean
+    public RequestInterceptor requestInterceptor() {
+        return requestTemplate -> {
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            HttpServletRequest request = attributes.getRequest();
+            requestTemplate.header("Content-Type", "application/json");
+            requestTemplate.header("Accept", "application/json");
+            requestTemplate.header("header_1", "value_1");
+            requestTemplate.header("header_2", "value_2");
+            requestTemplate.header("header_3", "value_3");
+        };
+    }
+
+    /**
+     * Enable this bean if you want to add basic Authorization header
+     * for e.g. Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=
+     */
+    @Bean
+    public BasicAuthRequestInterceptor basicAuthRequestInterceptor() {
+        return new BasicAuthRequestInterceptor("username", "password");
+    }
+
+     /**
+     * Enable this bean if you want to setup HTTP proxy for Default Feign Client
+     */
+    @Bean
+    public Client feignClient() {
+      return new Client.Proxied(null, null, 
+          new Proxy(Proxy.Type.HTTP,
+              new InetSocketAddress(proxyHost, proxyPort)));
+    }
+
+    /**
+     * Enable this bean if you want to setup HTTP proxy for ApacheHttpClient Feign Client
+     */
+    @Bean
+    public CloseableHttpClient feignClient() {
+      return HttpClientBuilder.create().setProxy(
+          new HttpHost(proxyHost, proxyPort)).build();
+    }
+
+    /**
+     * Enable this bean if you want to setup HTTP proxy for OkHttpClient Feign Client
+     */
+    @Bean
+    public OkHttpClient okHttpClient() {
+      return new OkHttpClient.Builder()
+          .proxy(new Proxy(Proxy.Type.HTTP, 
+              new InetSocketAddress(proxyHost, proxyPort)))
+          .build();
+    }
+}
+
+
+public class CustomErrorDecoder implements ErrorDecoder {
+
+    @Override
+    public Exception decode(String methodKey, Response response) {
+        String requestUrl = response.request().url();
+        Response.Body responseBody = response.body();
+        HttpStatus responseStatus = HttpStatus.valueOf(response.status());
+
+        if (responseStatus.is5xxServerError()) {
+            return new RestApiServerException(requestUrl, responseBody);
+        } else if (responseStatus.is4xxClientError()) {
+            return new RestApiClientException(requestUrl, responseBody);
+        } else {
+            return new Exception("Generic exception");
+        }
+    }
+}
+Return @Bean of above class in anycodings_exception FeignClientConfiguration class.
+public class MyFeignClientConfiguration {
+
+    @Bean
+    public ErrorDecoder errorDecoder() {
+        return new CustomErrorDecoder();
+    }
+}
+
+
+@FeignClient(value = "auth", fallback = FallbackAuthClient.class, configuration = FeignClientConfig.class)
+public interface AuthClient { 
+    @RequestMapping(method = RequestMethod.GET, value = "checkToken")
+    boolean isTokenValid(@RequestHeader("Authorization") String token);
+}
+
+
+
+Spring Cloud Netflix provides the following beans by default for feign (BeanType beanName: ClassName):
+
+    Decoder feignDecoder: ResponseEntityDecoder (which wraps a SpringDecoder)
+    Encoder feignEncoder: SpringEncoder
+    Logger feignLogger: Slf4jLogger
+    Contract feignContract: SpringMvcContract
+    Feign.Builder feignBuilder: HystrixFeign.Builder
+    Client feignClient: if Ribbon is enabled it is a LoadBalancerFeignClient, otherwise the default feign client is used.
+
+Spring Cloud Netflix does not provide the following beans by default for feign, but still looks up beans of these types from the application context to create the feign client:
+
+    Logger.Level
+    Retryer
+    ErrorDecoder
+    Request.Options
+    RequestInterceptor
+    SetterFactory
+
+
+import java.util.List;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+@FeignClient(name = "site-service", fallbackFactory = SiteClientFallbackFactory.class)
+public interface SiteClient {
+
+    @GetMapping("/api/sites/{userId}")
+    List findAllByUser(@PathVariable(value="userId") Long userId);
+}
+
+Sometimes we want to create a fallback method to be executed if the feign client is not able to reach the target service. 
+SiteClientFallbackFactory helps in archiving that.
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
+import feign.hystrix.FallbackFactory;
+import lombok.extern.slf4j.Slf4j;
+
+@Component
+@Slf4j
+public class SiteClientFallbackFactory implements FallbackFactory<SiteClient> {
+    @Override
+    public SiteClient create(Throwable cause) {
+        return new SiteClient() {
+            @Override
+            public List findAllByUser(Long id) {
+                log.error(cause.getMessage(), cause);
+                return new ArrayList<>();
+            }
+        };
+    }
+}
+
+
+
+
+
+
+
+private PrimeBillingClient getPrimeBillingClient() {
+        return Feign.builder()
+                .encoder(new JacksonEncoder())
+                .decoder(new JacksonDecoder())
+                .target(PrimeBillingClient.class, primeBillingUrl);
+    }

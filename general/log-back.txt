@@ -1,0 +1,807 @@
+Spring Boot Profiles in Logging (logback-spring.xml)
+While developing in your local machine, it is common to set the log level to  DEBUG. This will give you detailed log messages for your development use. 
+While on production, it is typical to set the log level to  WARN or above. 
+This is to avoid filling your logs with excessive debug information and logging overhead while running in production.
+
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+    <springProfile name="dev,staging">
+        <logger name="guru.springframework.controllers" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE" />
+        </logger>>
+    </springProfile>
+    <springProfile name="production">
+        <logger name="guru.springframework.controllers" level="WARN" additivity="false">
+            <appender-ref ref="FILE" />
+        </logger>
+    </springProfile>
+ </configuration>
+ 
+ 
+A) Logger - a context for log messages. This is the class that applications interact with to create log messages.
+
+B) Appender - place log messages in which destinations such as console, file. A Logger can have more than one Appender.
+There are several appenders which are ready for use out of the box. Let’s see few here:
+
+ConsoleAppender: writes messages to the system console
+FileAppender: appends messages to a file
+RollingFileAppender extends FileAppender: To back up the log files when they reach a certain size.
+TimeBasedRollingPolicy: To back up the log files based on time (Example: by day or month)
+SizeAndTimeBasedRollingPolicy: To archive files by date and also once the size of the log file reaches a limit
+SocketAppender – appends the log events to a socket
+SSLSocketAppender – appends the log events to a socket using secure connection
+SMTPAppender – accumulates data in batches and send the content of the batch to a user-defined email after a user-specified event occurs
+DBAppender – appends data into a database tables
+SyslogAppender – appends data into Syslog compatible destination
+SiftingAppender – appender that is able to separate logging according to a given runtime attribute
+AsyncAppender – appends the logs events asynchronously
+
+C) Layout - it is used to format our message to display in console or file. Logback supports the creation of custom classes for formatting messages, as well as robust configuration options for the existing ones.
+
+Logback Encoders
+Logback encoder is responsible for transforming a log event into a byte array and writing that byte array to an OutputStream.
+
+Right now there are two encoders available in Logback: https://sematext.com/blog/logback-tutorial/
+=========================================================
+A) PatternLayoutEncoder – encoder that takes a pattern and encodes the log event based on that pattern
+B) LayoutWrappingEncoder – encoder that closes the gap between the current Logback version and the versions prior to 0.9.19 that used to use Layout instances instead of the patterns.
+<configuration>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+            <outputPatternAsHeader>true</outputPatternAsHeader>
+        </encoder>
+    </appender>
+    <root level="info">
+        <appender-ref ref="console" />
+    </root>
+</configuration>
+
+
+
+
+
+
+1. Configuring Your Log Format
+2. Configuring the Destination for Your Logs (Appenders and Loggers)
+3. Logging as a Cross-Cutting Concern to Keep Your Code Clean (Using Filters and Aspects)
+
+
+
+Logging Levels
+Spring Boot supports the following log levels:
+TRACE
+DEBUG
+INFO
+WARN
+ERROR
+FATAL
+OFF
+TRACE – the lowest level of information, mostly used for very deep code debugging, usually not included in production logs.
+DEBUG – low level of information used for debugging purposes, usually not included in production logs.
+INFO – a log severity carrying information, like an operation that started or finished.
+WARN – a log level informing about an event that may require our attention, but is not critical and may be expected.
+ERROR – a log level telling that an error, expected or unexpected, usually meaning that part of the system is not working properly.
+
+
+By default, these are the colors printed on the console terminal:
+--------------------------------------------------------------------
+FATAL and ERROR – Red
+WARN – Yellow
+INFO, DEBUG and TRACE – Green
+
+
+
+Automatic configuration with logback-test.xml or logback.xml
+----------------------------------------------------------------
+configuration tag
+zero or more appender 
+zero or more logger 
+at most one root (The <root> element can contain zero or more <appender-ref> elements.)
+
+
+
+<configuration>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="file" class="ch.qos.logback.core.FileAppender">
+        <file>/tmp/logback.log</file>
+        <append>true</append>
+        <immediateFlush>true</immediateFlush>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.sematext.blog">
+        <appender-ref ref="console"/>
+    </logger>
+
+    <root level="info">
+        <appender-ref ref="file" />
+    </root>
+</configuration>
+
+
+
+<configuration>
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/tmp/logback.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <fileNamePattern>/tmp/logback.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                   class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+            <outputPatternAsHeader>true</outputPatternAsHeader>
+        </encoder>
+    </appender>
+    <root level="info">
+        <appender-ref ref="file" />
+    </root>
+</configuration>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Searches for the file logback-test.xml, logback.groovy, logback.xml in the same order. If it finds any of the file, then uses it for configuration.
+ <?xml version="1.0" encoding="UTF-8"?>
+ <configuration>
+     <property name="HOME_LOG_PATH" value="C:/logs"/>
+     <property name="PATTERN_CONSOLE" value=".%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg %n" />
+     <property name="PATTERN_ROLLING_FILE" value="%d %p %c{1.} [%t] %m%n" />
+     <property name="PATTERN_FILE" value="%-4relative [%thread] %-5level %logger{35} - %msg%n" />
+     <property name="MAX_FILE_SIZE" value="10MB" />
+     <property name="MAX_DAY_KEEP" value="60" />
+        
+     <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+         <encoder>
+             <Pattern>${PATTERN_CONSOLE}</Pattern>
+         </encoder>
+         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+             <level>TRACE</level>
+         </filter>
+     </appender>
+
+     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+         <file>${HOME_LOG_PATH}/app.log</file>
+         <append>true</append>
+         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+             <pattern>${PATTERN_FILE}</pattern>
+         </encoder>
+     </appender>
+
+     <appender name="fileRollingAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+         <file>${HOME_LOG_PATH}/app.log</file>
+
+         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+             <fileNamePattern>${HOME_LOG_PATH}/app.%d{yyyy-MM-dd_HH-mm}.%i.log</fileNamePattern>
+             <!-- each archived file, size max 10MB -->
+             <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+             <!-- total size of all archive files, if total size > 20GB,
+                 it will delete old archived file -->
+             <totalSizeCap>20GB</totalSizeCap>
+             <!-- 60 days to keep -->
+             <maxHistory>${MAX_DAY_KEEP}</maxHistory>
+         </rollingPolicy>
+
+         <encoder>
+             <pattern>${PATTERN_ROLLING_FILE}</pattern>
+         </encoder>
+     </appender>
+
+     <logger name="com.manhpd" level="debug" additivity="false">
+         <appender-ref ref="consoleAppender" />
+         <appender-ref ref="fileRollingAppender" />
+     </logger>
+
+     <root level="info">
+         <appender-ref ref="consoleAppender" />
+         <appender-ref ref="fileRollingAppender" />
+     </root>
+ </configuration>
+
+
+
+
+
+Profile Specific Logging
+The <springProfile> tag lets you define the logging configurations with respect to a particular active Spring profile.
+<springProfile name="staging">
+  <!-- configuration to be enabled when the "staging" profile is active -->
+</springProfile>
+<springProfile name="dev | staging">
+  <!-- configuration to be enabled when the "dev" or "staging" profiles are active -->
+</springProfile>
+<springProfile name="!production">
+  <!-- configuration to be enabled when the "production" profile is not active -->
+</springProfile>
+
+
+You can set the active spring profile in application.properties or environment variable. For instance, to make “dev” as an active spring profile :
+spring.profiles.active=dev
+
+As an alternative, you can also start the application with the following VM argument:
+-Dspring.profiles.active=dev
+
+
+
+
+
+=================================START========================================================
+Property	What It Means	Value If Not Set
+logging.file.max-size	maximum total size of log archive before a file is rotated	10 Mb
+logging.file.max-history	how many days worth of rotated log files to be kept	7 Days
+logging.file.total-size-cap	total size of log archives. Backups are deleted when the total size of log archives exceeds that threshold.	not specified
+logging.file.clean-history-on-start	force log archive cleanup on application startup	false
+
+---------------------------------------------------------------------------------------------
+  1)  Time and date: accurate to the millisecond
+  2)  Log level: Possible values are ERROR, WARN, INFO, DEBUG, or TRACE.
+  3)  Process ID or PID.
+  4)  Separator: --- identifies the beginning of the actual log
+  5)  Thread name: enclosed in square brackets (may be truncated console output)
+  6)  Class name with package also referred as logger name.
+  7)  Log message.
+Default log level is set to INFO.
+
+This means that DEBUG and TRACE messages will not be visible as per the below hierarchy
+ERROR –> WARN –> INFO –> DEBUG –> TRACE
+
+FATAL and ERROR – Red
+WARN – Yellow
+INFO, DEBUG and TRACE – Green
+
+It is recommended to always give absolute path in production environment to avoid any error.
+# Absolute Path
+file:/app/store/truststore.jks 
+
+# Relative Path
+file:app/store/truststore.jsk  
+
+logging.level.root=debug
+
+# Examples for Spring Boot 2.x
+logging.file.path=.             # write logs to the current directory
+logging.file.path=/home/logs    # write logs to /home/logs
+logging.file.path=/mnt/logdir   # write logs to /mnt/logdir
+
+# Or set logging.path if you're using Spring Boot 1.x
+
+# Example for Spring Boot 2.x
+logging.file.name=myapp.log
+
+# Or set logging.file if you're using Spring Boot 1.x
+
+
+OR --------------------
+
+Configuring logging using environment variables
+------------------------------------------------------------------------
+Just like most Spring Boot properties, you can set these properties using environment variables instead, if you like.
+Just convert each property to upper-case, and change dots to underscores. So you can use environment variables like this:
+
+# to change the log file path
+LOGGING_FILE_PATH=/path/to/mylogs
+# to change the log filename
+LOGGING_FILE_NAME=myapp.log
+=================================END========================================================
+
+You can find Spring Boot logback console logging pattern in defaults.xml file:
+
+    spring-boot-1.5.0.RELEASE.jar/org/springframework/boot/logging/logback/defaults.xml
+
+
+%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}
+%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t] %-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}
+ <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-{java.io.tmpdir:-/tmp}}/}spring.log}"/>
+ There are a total of 7 elements in the output content of the log, which are as follows:
+
+
+
+logback-spring.xml:
+...................................................
+ <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+ 
+    <property name="LOGS" value="./logs" />
+    <property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+    <property name="FILE_LOG_PATTERN" value="${FILE_LOG_PATTERN:-%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t] %-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+    <property name="GENERAL_LOG_PATTERN" value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+ <property name="pattern-color" value="%yellow(%d{yyyy-MM-dd HH:mm:ss.SSS}) [%thread] %highlight(%-5level) %green(%logger{50}) - %highlight(%msg) %n"/>
+    <appender name="ConsoleAppender"
+        class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable
+            </Pattern>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </layout>
+    </appender>
+ 
+    <appender name="RollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/spring-boot.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+             <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+ 
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily and when the file reaches 10 MegaBytes -->
+            <fileNamePattern>${LOGS}/archived/spring-boot-demo-%d{yyyy-MM-dd}.%i.log </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                  <maxFileSize>10MB</maxFileSize>
+                  <!--  Reservation  30  Archived log files for days  -->
+                  <maxHistory>30</maxHistory>
+                  <!--  Log file upper limit  3G The old archive log file will be deleted when it is exceeded  -->
+                  <totalSizeCap>3GB</totalSizeCap>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+     
+    <!-- LOG everything at INFO level -->
+    <root level="info">
+        <appender-ref ref="RollingFileAppender" />
+        <appender-ref ref="ConsoleAppender" />
+    </root>
+ 
+    <!-- LOG "com.example.demo*" at TRACE level -->
+    <logger name="com.example.demo" level="trace" additivity="false">
+        <appender-ref ref="RollingFileAppender" />
+        <appender-ref ref="ConsoleAppender" />
+    </logger>
+ 
+</configuration>
+
+
+
+
+=====================START==========================
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Default logback configuration provided for import, equivalent to the programmatic
+initialization performed by Boot
+-->
+
+<included>
+	<conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+	<conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
+	<conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
+	<property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+	<property name="FILE_LOG_PATTERN" value="${FILE_LOG_PATTERN:-%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t] %-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+
+	<logger name="org.apache.catalina.startup.DigesterFactory" level="ERROR"/>
+	<logger name="org.apache.catalina.util.LifecycleBase" level="ERROR"/>
+	<logger name="org.apache.coyote.http11.Http11NioProtocol" level="WARN"/>
+	<logger name="org.apache.sshd.common.util.SecurityUtils" level="WARN"/>
+	<logger name="org.apache.tomcat.util.net.NioSelectorPool" level="WARN"/>
+	<logger name="org.eclipse.jetty.util.component.AbstractLifeCycle" level="ERROR"/>
+	<logger name="org.hibernate.validator.internal.util.Version" level="WARN"/>
+</included>
+====================END===========================
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<property name="LOG_FILE" value="LogFile" />
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>/logs/application.log</file>
+
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- daily rollover -->
+			<fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.gz</fileNamePattern>
+			<!-- keep 30 days' worth of history capped at 3GB total size -->
+			<maxHistory>30</maxHistory>
+			<totalSizeCap>3GB</totalSizeCap>
+		</rollingPolicy>
+
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>5GB</maxFileSize>
+		</triggeringPolicy>
+	</appender>
+
+	<logger name="com.example.logback.service.transaction.impl"
+		level="debug" additivity="false">
+		<appender-ref ref="FILE" />
+	</logger>
+
+	<root level="info">
+		<appender-ref ref="FILE" />
+	</root>
+
+</configuration>
+
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout
+                pattern="%style{%d{ISO8601}}{black} %highlight{%-5level }[%style{%t}{bright,blue}] %style{%C{1.}}{bright,yellow}: %msg%n%throwable" />
+        </Console>
+ 
+        <RollingFile name="RollingFile"
+            fileName="./logs/spring-boot-logger-log4j2.log"
+            filePattern="./logs/$${date:yyyy-MM}/spring-boot-logger-log4j2-%d{-dd-MMMM-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <pattern>%d %p %C{1.} [%t] %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <!-- rollover on startup, daily and when the file reaches 
+                    10 MegaBytes -->
+                <OnStartupTriggeringPolicy />
+                <SizeBasedTriggeringPolicy
+                    size="10 MB" />
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+    </Appenders>
+ 
+    <Loggers>
+        <!-- LOG everything at INFO level -->
+        <Root level="info">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
+        </Root>
+ 
+        <!-- LOG "com.example.demo.*" at TRACE level -->
+        <Logger name="com.example.demo" level="trace"></Logger>
+    </Loggers>
+ 
+</Configuration>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<!--<include resource="org/springframework/boot/logging/logback/defaults.xml" />-->
+
+	<springProfile name="local">
+		<appender name="CA" class="ch.qos.logback.core.ConsoleAppender">
+			<!-- Log message format -->
+			<encoder>
+				<pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}
+					-
+					%msg%n
+				</pattern>
+			</encoder>
+		</appender>
+
+		<property name="LOG_FILE" value="C:/logs/SpringBoot.log" />
+		<appender name="RFA"
+			class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<file>${LOG_FILE}</file>
+			<encoder>
+				<pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}
+					-
+					%msg%n
+				</pattern>
+			</encoder>
+			<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<fileNamePattern>${LOG_FILE}-%d{dd-MM-yyyy}.log</fileNamePattern>
+			</rollingPolicy>
+		</appender>
+
+		<root>
+			<level value="DEBUG" />
+			<appender-ref ref="CA" />
+			<appender-ref ref="RFA" />
+		</root>
+	</springProfile>
+
+	<springProfile name="dev">
+		<property name="LOG_FILE" value="C:/logs/SpringBoot.log" />
+		<appender name="RFA"
+			class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<file>${LOG_FILE}</file>
+			<encoder>
+				<pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}
+					-
+					%msg%n
+				</pattern>
+			</encoder>
+			<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<fileNamePattern>${LOG_FILE}-%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+				<timeBasedFileNamingAndTriggeringPolicy
+					class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+					<maxFileSize>5MB</maxFileSize>
+				</timeBasedFileNamingAndTriggeringPolicy>
+			</rollingPolicy>
+		</appender>
+
+		<root>
+			<level value="INFO" />
+			<appender-ref ref="RFA" />
+		</root>
+	</springProfile>
+
+	<springProfile name="prod">
+		<property name="LOG_FILE" value="C:/logs/SpringBoot.log" />
+		<appender name="RFA"
+			class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<file>${LOG_FILE}</file>
+			<encoder>
+				<pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}
+					-
+					%msg%n
+				</pattern>
+			</encoder>
+			<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<fileNamePattern>${LOG_FILE}-%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+				<timeBasedFileNamingAndTriggeringPolicy
+					class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+					<maxFileSize>10MB</maxFileSize>
+				</timeBasedFileNamingAndTriggeringPolicy>
+			</rollingPolicy>
+		</appender>
+
+		<root>
+			<level value="INFO" />
+			<appender-ref ref="RFA" />
+		</root>
+	</springProfile>
+</configuration>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Our example console log pattern:
+%d{${LOG_DATEFORMAT_PATTERN}} %highlight{${LOG_LEVEL_PATTERN}}{TRACE=blue} %style{%pid}{Magenta} --- [%15.15t] %style{%-40.40c{1.}}{Cyan} : %m%n${sys:LOG_EXCEPTION_CONVERSION_WORD}
+The file log pattern:
+%d{${LOG_DATEFORMAT_PATTERN}} ${LOG_LEVEL_PATTERN} %pid --- [%t] %-40.40c{1.} : %m%n${sys:LOG_EXCEPTION_CONVERSION_WORD}
+
+
+
+# src/main/resources/log4j2-spring.yaml
+Configuration:
+  properties:
+    property:
+      - name: LOG_EXCEPTION_CONVERSION_WORD
+        value: "%xwEx"
+      - name: LOG_LEVEL_PATTERN
+        value: "%5p"
+      - name: LOG_DATEFORMAT_PATTERN
+        value: "yyyy-MM-dd HH:mm:ss.SSS"
+      - name: LOG_DIR
+        value: "logs"
+      - name: CONSOLE_LOG_PATTERN
+        value: "%d{${LOG_DATEFORMAT_PATTERN}} %highlight{${LOG_LEVEL_PATTERN}}{TRACE=blue} %style{%pid}{Magenta} --- [%15.15t] 
+        %style{%-40.40c{1.}}{Cyan} : %m%n${sys:LOG_EXCEPTION_CONVERSION_WORD}"
+      - name: FILE_LOG_PATTERN
+        value: "%d{${LOG_DATEFORMAT_PATTERN}} ${LOG_LEVEL_PATTERN} %pid --- [%t] %-40.40c{1.} : %m%n${sys:LOG_EXCEPTION_CONVERSION_WORD}"
+  appenders:
+    Console:
+      name: STDOUT
+      PatternLayout:
+        Pattern: ${CONSOLE_LOG_PATTERN}
+    File:
+      - name: AllFile
+        fileName: ${LOG_DIR}/all.log
+        PatternLayout:
+          Pattern: ${FILE_LOG_PATTERN}
+      - name: KeepgrowingAppFile
+        fileName: ${LOG_DIR}/app.log
+        PatternLayout:
+          Pattern: ${FILE_LOG_PATTERN}
+  Loggers:
+    logger:
+      - name: in.keepgrowing.springbootlog4j2scaffolding
+        level: info
+        additivity: false
+        AppenderRef:
+          - ref: KeepgrowingAppFile
+    Root:
+      level: info
+      AppenderRef:
+        - ref: AllFile
+        - ref: STDOUT
+
+
+
+
+
+
+# src/main/resources/log4j2-spring.yaml
+Configuration:
+  properties:
+    property:
+      …
+      - name: FILE_PATTERN
+        value: ${LOG_DIR}/$${date:yyyy-MM}/%d{yyyy-MM-dd-HH}
+  appenders:
+    …
+    RollingFile:
+      - name: AllFile
+        filePattern: ${filePattern}-all-%i.log.gz
+        fileName: ${LOG_DIR}/all.log
+        PatternLayout:
+          Pattern: ${FILE_LOG_PATTERN}
+        policies:
+          CronTriggeringPolicy:
+            schedule: "0 0 * * * ?"
+          SizeBasedTriggeringPolicy:
+            size: 20MB
+        DefaultRolloverStrategy:
+          max: 10
+  Loggers:
+    Root:
+      level: info
+      AppenderRef:
+        - ref: AllFile
+
+
+
+Root logger
+=================
+The root logger is required in every configuration. 
+It doesn’t need a name. By default it will be assigned the ERROR level and the console as its appender. 
+This logger doesn’t have a parent so we don’t specify the additivity attribute for it. In the example project it collects all entries that are at least at the INFO level and sends them to the console and the all.log file.
+
+Additivity
+====================
+We can send entries extracted by one logger to multiple appenders. By default, 
+the logger that is higher in the hierarchy will print in its appenders entries collected by all “children” loggers.
+
+
+Logback Additivity:
+Appenders are attached to the loggers. One logger may connect more than one appender. 
+The log messages are written to more than one appender, to restrict this we will use an extra attributes.
+
+Conversion characters
+Let’s start with the elements that determine the type of data. Below you can see the documentation for characters used in the example config file:
+
+d – the date of the logging event;
+p – the level of the logging event;
+pid – the process ID;
+t – the name of the thread that generated the logging event;
+c{1.} – the name of the logger that published the logging event (adding the {1.} precision specifier in our example will cause a logger name to be abbreviated from org.apache.commons.Foo to o.a.c.Foo);
+m – the message associated with the logging event;
+n – the platform dependent line separator;
+xwEx – the throwable conversion word. The ExtendedWhitespaceThrowablePatternConverter adds additional whitespace around the stack trace (Meaning of xwEx for log4j2? question on Stack Overflow).
+
+
+
+
+
+log4j2.json
+
+{
+   "Configuration": {
+      "Appenders": {
+         "Console": {
+            "PatternLayout": {
+               "pattern": "%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n"
+            },
+            "name": "Console",
+            "target": "SYSTEM_OUT"
+         },
+         "File": {
+            "PatternLayout": {
+               "pattern": "%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n"
+            },
+            "name": "File",
+            "fileName": "c:/log/app.log"
+         }
+      },
+      "Loggers": {
+         "Root": {
+            "AppenderRef": [
+               {
+                  "ref": "Console"
+               },
+               {
+                  "ref": "File"
+               }
+            ],
+            "level": "trace"
+         }
+      }
+   }
+}
+
+
+https://blog.csdn.net/jeikerxiao/article/details/82497984
+logging: 
+  config: classpath:log4j2-spring-dev.xml
+   
+
+Configutation:
+  status: warn
+
+  Appenders:
+    Console:
+      name: CONSOLE
+      target: SYSTEM_OUT
+      PatternLayout:
+        Pattern: "%d{ISO8601} %-5p [%c{3}] [%t] %m%n"
+    RollingFile:
+      - name: APPLICATION
+        fileName: ../logs/my-app.log
+        filePattern: "../logs/$${date:yyyy-MM}/my-app-%d{yyyy-MM-dd}-%i.log.gz"
+        PatternLayout:
+          Pattern: "%d{ISO8601} %-5p [%c{3}] [%t] %m%n"
+        policies:
+          TimeBasedTriggeringPolicy:
+            interval: 1
+            modulate: true
+
+  Loggers:
+      Root:
+        level: info
+        AppenderRef:
+          - ref: CONSOLE
+          - ref: APPLICATION
+      Logger:
+        - name: com.myco.myapp.Foo
+          additivity: false
+          level: info
+          AppenderRef:
+            - ref: CONSOLE
+            - ref: APPLICATION
+        - name: com.myco.myapp.Bar
+          additivity: false
+          level: debug
+          AppenderRef:
+            - ref: CONSOLE
+            - ref: APPLICATION

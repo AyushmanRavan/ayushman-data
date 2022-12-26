@@ -1,0 +1,138 @@
+server.port=8761
+
+spring.application.name=eureka-server
+
+eureka.instance.hostname=localhost
+eureka.client.register-with-eureka=false   /// The default is true.
+eureka.client.fetch-registry=false                ///The default is true.
+eureka.client.service-url.defaultZone=http://${eureka.instance.hostname}:${server.port}/eureka
+
+
+eureka:
+  client:
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8089/eureka
+    healthcheck:
+      enabled: true
+
+
+
+https://www.optdcom.net/levitate/spring-cloud-microservice-security-for-eureka-server-and-client/
+https://o7planning.org/11733/understanding-spring-cloud-eureka-server-with-example
+
+https://o7planning.org/11737/understanding-spring-cloud-discovery-eureka-client-with-example
+https://www.optdcom.net/levitate/spring-cloud-microservice-security-for-eureka-server-and-client/
+
+registerWithEureka: Preventing to registering eureka server to itself like a client.
+fetchRegistry: Preventing to getting register files for eureka server.
+
+
+Eureka Server Setup :
+=========================================
+server:
+  port: 8761 # port on which eureka server will be available
+
+spring:
+  application:
+    name: netflix-eureka-server # name of eureka server
+
+eureka:
+  client:
+    register-with-eureka: false    ////Tells not to register since application itself is Eureka Registry.
+    fetch-registry: false          ////Tells not to fetch registry since application itself is registry. 
+
+logging:
+  level:
+    com:
+      netflix:
+        eureka: OFF
+        discovery: OFF
+
+
+Eureka Client Setup :
+===============================
+server:
+  port: 8999 # port at which the service will be available
+
+spring:
+  application:
+    name: mail-service
+
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 2
+  client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:8762/eureka/, http://127.0.0.1:8761/eureka/
+    healthcheck:
+      enabled: true
+
+Services registers themselves on the Eureka server and details like name, host, and port are stored there.
+
+Details of other registered microservices become available for the registered service.
+
+client.serviceUrl.defaultZone: This property sets the network location as which Eureka server is available.
+client.healthcheck.enabled: By default, Eureka uses the client heartbeat to determine if a client is up. Unless specified otherwise, 
+the Discovery Client does not propagate the current health check status of the application, per the Spring Boot Actuator.
+
+
+
+https://www.studytonight.com/post/service-discovery-using-eureka-in-spring-microservices
+
+Setup Multiple Eureka Servers (Cluster)
+===============================================
+
+Eureka server 1 - application.properties:
+=============================================
+spring.application.name = eureka-server
+server.port = 5555
+eureka.client.fetch-registry = false
+eureka.client.register-with-eureka = false
+eureka.client.service-url.defaultZone = http://localhost:5558/eureka
+
+Eureka server 2 - application.properties:
+============================================
+spring.application.name = Eureka2
+server.port = 5558
+eureka.client.fetch-registry = false
+eureka.client.register-with-eureka = false
+eureka.client.service-url.defaultZone = http://localhost:5555/eureka
+
+
+
+
+
+
+
+
+Microservice1 - application.properties:
+==============================================
+spring.application.name = micro1
+server.port = 8080
+eureka.client.service-url.defaultZone = http://localhost:5555/eureka, http://localhost:5558/eureka
+
+Microservice2 - application.properties:
+==========================================
+spring.application.name = micro2
+server.port = 8081
+eureka.client.service-url.defaultZone = http://localhost:5555/eureka, http://localhost:5558/eureka
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

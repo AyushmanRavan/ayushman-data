@@ -1,0 +1,240 @@
+The following example will change the ownership of all files and subdirectories under the /var/www directory to a new owner and group named www-data:
+
+chown -R linuxuser:group3 /var/www
+
+
+
+https://www.securitynik.com/2022/04/installing-configuring-elasticsearch-8.html
+
+
+lenovo@lenovo-Pc:~$ sudo apt install elasticsearch -y
+[sudo] password for lenovo: 
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following NEW packages will be installed:
+  elasticsearch
+0 upgraded, 1 newly installed, 0 to remove and 1 not upgraded.
+Need to get 566 MB of archives.
+After this operation, 1,170 MB of additional disk space will be used.
+Get:1 https://artifacts.elastic.co/packages/8.x/apt stable/main amd64 elasticsearch amd64 8.4.3 [566 MB]
+Fetched 566 MB in 3min 59s (2,372 kB/s)                                                                                                                                                                   
+Selecting previously unselected package elasticsearch.
+(Reading database ... 202988 files and directories currently installed.)
+Preparing to unpack .../elasticsearch_8.4.3_amd64.deb ...
+Creating elasticsearch group... OK
+Creating elasticsearch user... OK
+Unpacking elasticsearch (8.4.3) ...
+Setting up elasticsearch (8.4.3) ...
+--------------------------- Security autoconfiguration information ------------------------------
+
+Authentication and authorization are enabled.
+TLS for the transport and HTTP layers is enabled and configured.
+
+The generated password for the elastic built-in superuser is : iDuES8clpB3XVVIulK22
+
+If this node should join an existing cluster, you can reconfigure this with
+'/usr/share/elasticsearch/bin/elasticsearch-reconfigure-node --enrollment-token <token-here>'
+after creating an enrollment token on your existing cluster.
+
+You can complete the following actions at any time:
+
+Reset the password of the elastic built-in superuser with 
+'/usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic'.
+
+Generate an enrollment token for Kibana instances with 
+ '/usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana'.
+
+Generate an enrollment token for Elasticsearch nodes with 
+'/usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s node'.
+
+-------------------------------------------------------------------------------------------------
+### NOT starting on installation, please execute the following statements to configure elasticsearch service to start automatically using systemd
+ sudo systemctl daemon-reload
+ sudo systemctl enable elasticsearch.service
+### You can start elasticsearch service by executing
+ sudo systemctl start elasticsearch.service
+lenovo@lenovo-Pc:~$ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+lenovo@lenovo-Pc:~$ sudo apt install elasticsearch -y
+[sudo] password for lenovo: 
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following NEW packages will be installed:
+  elasticsearch
+0 upgraded, 1 newly installed, 0 to remove and 1 not upgraded.
+Need to get 566 MB of archives.
+After this operation, 1,170 MB of additional disk space will be used.
+Get:1 https://artifacts.elastic.co/packages/8.x/apt stable/main amd64 elasticsearch amd64 8.4.3 [566 MB]
+Fetched 566 MB in 3min 59s (2,372 kB/s)                                                                                                                                                                   
+Selecting previously unselected package elasticsearch.
+(Reading database ... 202988 files and directories currently installed.)
+Preparing to unpack .../elasticsearch_8.4.3_amd64.deb ...
+Creating elasticsearch group... OK
+Creating elasticsearch user... OK
+Unpacking elasticsearch (8.4.3) ...
+Setting up elasticsearch (8.4.3) ...
+--------------------------- Security autoconfiguration information ------------------------------
+
+Authentication and authorization are enabled.
+TLS for the transport and HTTP layers is enabled and configured.
+
+The generated password for the elastic built-in superuser is : iDuES8clpB3XVVIulK22
+
+If this node should join an existing cluster, you can reconfigure this with
+'/usr/share/elasticsearch/bin/elasticsearch-reconfigure-node --enrollment-token <token-here>'
+after creating an enrollment token on your existing cluster.
+
+You can complete the following actions at any time:
+
+Reset the password of the elastic built-in superuser with 
+'/usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic'.
+
+Generate an enrollment token for Kibana instances with 
+ '/usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana'.
+
+Generate an enrollment token for Elasticsearch nodes with 
+'/usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s node'.
+
+-------------------------------------------------------------------------------------------------
+### NOT starting on installation, please execute the following statements to configure elasticsearch service to start automatically using systemd
+ sudo systemctl daemon-reload
+ sudo systemctl enable elasticsearch.service
+### You can start elasticsearch service by executing
+ sudo systemctl start elasticsearch.service
+ 
+lenovo@lenovo-Pc:~$ sudo grep --invert-match "^#" /etc/elasticsearch/elasticsearch.yml
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+lenovo@lenovo-Pc:~$ sudo apt update -y && sudo apt install kibana -y
+Hit:1 http://dl.google.com/linux/chrome/deb stable InRelease
+Hit:2 http://packages.microsoft.com/repos/code stable InRelease                                                                                                                                           
+Hit:3 https://download.docker.com/linux/ubuntu focal InRelease                                                                                                                                            
+Get:4 http://security.ubuntu.com/ubuntu focal-security InRelease [114 kB]                                                                                                                                 
+Hit:5 https://artifacts.elastic.co/packages/8.x/apt stable InRelease                                                                                                                                
+Hit:6 https://d3nt0h4h6pmmc4.cloudfront.net/ubuntu bionic InRelease                                                                             
+Hit:7 https://deb.nodesource.com/node_16.x focal InRelease                                                                 
+Hit:8 http://ppa.launchpad.net/serge-rider/dbeaver-ce/ubuntu focal InRelease                         
+Hit:9 http://in.archive.ubuntu.com/ubuntu focal InRelease                      
+Get:10 http://in.archive.ubuntu.com/ubuntu focal-updates InRelease [114 kB]
+Get:11 http://security.ubuntu.com/ubuntu focal-security/main amd64 DEP-11 Metadata [40.7 kB]
+Get:12 http://in.archive.ubuntu.com/ubuntu focal-backports InRelease [108 kB] 
+Get:13 http://security.ubuntu.com/ubuntu focal-security/universe amd64 DEP-11 Metadata [92.8 kB]
+Get:14 http://security.ubuntu.com/ubuntu focal-security/multiverse amd64 DEP-11 Metadata [2,464 B]
+Get:15 http://in.archive.ubuntu.com/ubuntu focal-updates/main amd64 DEP-11 Metadata [278 kB]     
+Get:16 http://in.archive.ubuntu.com/ubuntu focal-updates/universe amd64 DEP-11 Metadata [405 kB]
+Get:17 http://in.archive.ubuntu.com/ubuntu focal-updates/multiverse amd64 DEP-11 Metadata [940 B]                                                                                                         
+Get:18 http://in.archive.ubuntu.com/ubuntu focal-backports/main amd64 DEP-11 Metadata [8,000 B]                                                                                                           
+Get:19 http://in.archive.ubuntu.com/ubuntu focal-backports/universe amd64 DEP-11 Metadata [30.5 kB]                                                                                                       
+Fetched 1,194 kB in 8s (153 kB/s)                                                                                                                                                                         
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+1 package can be upgraded. Run 'apt list --upgradable' to see it.
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following NEW packages will be installed:
+  kibana
+0 upgraded, 1 newly installed, 0 to remove and 1 not upgraded.
+Need to get 285 MB of archives.
+After this operation, 680 MB of additional disk space will be used.
+Get:1 https://artifacts.elastic.co/packages/8.x/apt stable/main amd64 kibana amd64 8.4.3 [285 MB]
+Get:1 https://artifacts.elastic.co/packages/8.x/apt stable/main amd64 kibana amd64 8.4.3 [285 MB]                                                                                                         
+Fetched 266 MB in 4min 24s (1,008 kB/s)                                                                                                                                                                   
+Selecting previously unselected package kibana.
+(Reading database ... 204239 files and directories currently installed.)
+Preparing to unpack .../kibana_8.4.3_amd64.deb ...
+Unpacking kibana (8.4.3) ...
+Setting up kibana (8.4.3) ...
+Creating kibana group... OK
+Creating kibana user... OK
+Created Kibana keystore in /etc/kibana/kibana.keystore
+lenovo@lenovo-Pc:~$ 
+
+
+
+
+
+
+
+sudo /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token --scope kibana
+eyJ2ZXIiOiI4LjQuMyIsImFkciI6WyIxOTIuMTY4LjQzLjIxMzo5MjAwIl0sImZnciI6IjNlMGNlOTNlZTkxNWRhODNkN2U2MGZlMmU1ZDM1ZmYwNzg4M2ZhYmNmMTExMTJkYWZjOGE1OTQ4OWVhZDIzYzAiLCJrZXkiOiI4ZkRCQ0lRQlphd1FBdjZjc1c4Xzo2N1Z0RWJGVVNOV1E0aXd4OTFKTDNnIn0=
+
+
+
+
+
+Generate encryption keys for SavedObjects, Reports, Dashboards, etc.
+sudo /usr/share/kibana/bin/kibana-encryption-keys generate
+lenovo@lenovo-Pc:~$ sudo /usr/share/kibana/bin/kibana-encryption-keys generate
+[sudo] password for lenovo: 
+## Kibana Encryption Key Generation Utility
+
+The 'generate' command guides you through the process of setting encryption keys for:
+
+xpack.encryptedSavedObjects.encryptionKey
+    Used to encrypt stored objects such as dashboards and visualizations
+    https://www.elastic.co/guide/en/kibana/current/xpack-security-secure-saved-objects.html#xpack-security-secure-saved-objects
+
+xpack.reporting.encryptionKey
+    Used to encrypt saved reports
+    https://www.elastic.co/guide/en/kibana/current/reporting-settings-kb.html#general-reporting-settings
+
+xpack.security.encryptionKey
+    Used to encrypt session information
+    https://www.elastic.co/guide/en/kibana/current/security-settings-kb.html#security-session-and-cookie-settings
+
+
+Already defined settings are ignored and can be regenerated using the --force flag.  Check the documentation links for instructions on how to rotate encryption keys.
+Definitions should be set in the kibana.yml used configure Kibana.
+
+Settings:
+xpack.encryptedSavedObjects.encryptionKey: 733a5bee4a64bcbaa003c1a1a4ccf50d
+xpack.reporting.encryptionKey: a9114a6e18b265afd9c44a6507196728
+xpack.security.encryptionKey: 67991a8b2aa373007361a85c104668db
+
+lenovo@lenovo-Pc:~$ 
+
+
+
+
