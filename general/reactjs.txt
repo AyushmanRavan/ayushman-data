@@ -1,0 +1,80 @@
+setTimeout Gotchas
+=========================================
+Using a state property inside of a setTimeout does not use the current value of that state property.
+
+
+Take the example below: (problem statement one)
+============================
+const TimeoutExample = () => {
+  const [count, setCount] = useState(0);
+  const [countInTimeout, setCountInTimeout] = useState(0);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setCountInTimeout(count); // count is 0 here
+    }, 3000);
+    setCount(5); // Update count to be 5 after timeout is scheduled
+  }, []);
+
+  return (
+    <div>
+      Count: {count}
+      <br />
+      setTimeout Count: {countInTimeout}
+    </div>
+  );
+};
+
+imp : You would expect the value of countInTimeout to be 5, but it’s actually 0.
+because : setTimeout is a closure, therefore, when setTimeout is scheduled it uses the value of count at that exact moment in time, which is the initial value of 0.
+solutation : To solve this, use the useRef Hook:
+============
+  const [count, setCount] = useState(0);
+  const countRef = useRef(count);
+  countRef.current = count;
+
+  const getCountTimeout = () => {
+    setTimeout(() => {
+      setTimeoutCount(countRef.current);
+    }, 2000);
+  };
+
+
+
+
+
+Take the example below: (problem statement two)
+============================
+export default function App() {
+    const [email, setEmail] = useState('')
+
+    const submit = () => {
+        setTimeout(() => {
+            console.log(email)
+        }, 1000)
+    }
+
+    return (
+        <div>
+            <input onChange={event => setEmail(event.target.value)} />
+            <button onClick={submit}>Submit</button>
+        </div>
+    )
+}
+If you fill in the input and click on submit, then the value of the input will be logged to the console after one second, 
+just as expected. But what happens if you update the input field after you clicked the button?
+In this case, you will still get the value logged, but not the latest value. You will get the value logged out that was available in the input when you clicked on the button. 
+solutation : In order to get around this, we need to use refs
+==========
+   const emailRef = useRef('')
+    const [email, setEmail] = useState('')
+
+    useEffect(() => {
+        emailRef.current = email
+    }, [email])
+
+    const submit = () => {
+        setTimeout(() => {
+            console.log(emailRef.current)
+        }, 1000)
+    }

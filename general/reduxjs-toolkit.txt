@@ -1,0 +1,429 @@
+import { createSlice } from '@reduxjs/toolkit';
+
+const initialState = {};
+
+const rocketsSlice = createSlice({
+  name: 'rockets',
+  initialState,
+  reducers: {
+    // add your non-async reducers here
+    addUser: (state, action) => {},
+    getUsers: (state, action) => {},
+    updateUser: (state, action) => {},
+    deleteUser: (state, action) => {}
+  },
+  extraReducers: () => { // add your async reducers here},
+  //extraReducers: (builder) => {},
+});
+
+// Action creators
+export const { addUser, updateUser, deleteUser, getUsers } = usersSlice.actions;
+export default rocketsSlice.reducer;
+
+or
+========
+const { reducer } = rocketsSlice;
+export default reducer;
+
+
+
+import { combineReducers } from 'redux'
+const rootReducer = combineReducers({
+  tutorials: tutorialReducer,
+  auth: authReducer
+})
+
+export const store = configureStore({
+	reducer: reducer,   //OR//rootReducer,
+  devTools: true,
+	// middleware: [logger1]
+	// middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger1)
+});
+
+
+
+
+
+Handling async Redux flows
+==============================
+export const GetPosts = createAsyncThunk(
+    "post/getPosts", 
+    async () => {
+       const response = await axios.get(`${BASE_URL}/posts`)
+       return response.data;
+    }
+);
+export const CreatePost = createAsyncThunk(
+    "post/createPost",
+    async (payload) => { 
+        const response = await axios.post(`${BASE_URL}/post`, payload)
+        return response.data;
+    }
+);
+
+export const initialState = {
+  posts: [],
+  loading: false,
+  error: null,
+};
+
+export const postSlice = createSlice({
+name: "post",
+initialState: initialState,
+extraReducers: {
+   [GetPosts.pending]: (state, action) => {
+    
+   },
+   [GetPosts.fulfilled]: (state, action) => {
+     state.posts = action.payload.data;
+   },
+   [GetPosts.rejected]: (state, action) => {
+    state.posts = [];
+   },
+   [CreatePost.fulfilled]: (state, action) => {
+   state.posts.unshift(action.payload.data);
+   },
+ },
+});
+export default postSlice.reducer;
+
+
+const tutorials = useSelector(state => state.tutorials);
+const dispatch = useDispatch();
+dispatch(createTutorial(...))
+  .unwrap()
+  .then((res) => {
+    // do something
+  })
+  .catch((err) => {
+    // handle error
+  })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+npm install react-redux @reduxjs/toolkit
+
+
+http-common.js:
+=========================================
+import axios from "axios";
+
+export default axios.create({
+  baseURL: "http://localhost:8080/api",
+  headers: {
+    "Content-type": "application/json"
+  }
+});
+
+
+
+TutorialService.js
+========================================
+import http from "../http-common";
+
+const getAll = () => {
+  return http.get("/tutorials");
+};
+
+const get = id => {
+  return http.get(`/tutorials/${id}`);
+};
+
+const create = data => {
+  return http.post("/tutorials", data);
+};
+
+const update = (id, data) => {
+  return http.put(`/tutorials/${id}`, data);
+};
+
+const remove = id => {
+  return http.delete(`/tutorials/${id}`);
+};
+
+const removeAll = () => {
+  return http.delete(`/tutorials`);
+};
+
+const findByTitle = title => {
+  return http.get(`/tutorials?title=${title}`);
+};
+
+const TutorialService = {
+  getAll,
+  get,
+  create,
+  update,
+  remove,
+  removeAll,
+  findByTitle
+};
+
+export default TutorialService;
+
+
+
+
+
+tutorials.js
+========================================================
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import TutorialDataService from "../services/TutorialService";
+
+const initialState = [];
+
+export const createTutorial = createAsyncThunk(
+  "tutorials/create",
+  async ({ title, description }) => {
+    const res = await TutorialDataService.create({ title, description });
+    return res.data;
+  }
+);
+
+export const retrieveTutorials = createAsyncThunk(
+  "tutorials/retrieve",
+  async () => {
+    const res = await TutorialDataService.getAll();
+    return res.data;
+  }
+);
+
+export const updateTutorial = createAsyncThunk(
+  "tutorials/update",
+  async ({ id, data }) => {
+    const res = await TutorialDataService.update(id, data);
+    return res.data;
+  }
+);
+
+export const deleteTutorial = createAsyncThunk(
+  "tutorials/delete",
+  async ({ id }) => {
+    await TutorialDataService.remove(id);
+    return { id };
+  }
+);
+
+export const deleteAllTutorials = createAsyncThunk(
+  "tutorials/deleteAll",
+  async () => {
+    const res = await TutorialDataService.removeAll();
+    return res.data;
+  }
+);
+
+export const findTutorialsByTitle = createAsyncThunk(
+  "tutorials/findByTitle",
+  async ({ title }) => {
+    const res = await TutorialDataService.findByTitle(title);
+    return res.data;
+  }
+);
+
+const tutorialSlice = createSlice({
+  name: "tutorial",
+  initialState,
+  extraReducers: {
+    [createTutorial.fulfilled]: (state, action) => {
+      state.push(action.payload);
+    },
+    [retrieveTutorials.fulfilled]: (state, action) => {
+      return [...action.payload];
+    },
+    [updateTutorial.fulfilled]: (state, action) => {
+      const index = state.findIndex(tutorial => tutorial.id === action.payload.id);
+      state[index] = {
+        ...state[index],
+        ...action.payload,
+      };
+    },
+    [deleteTutorial.fulfilled]: (state, action) => {
+      let index = state.findIndex(({ id }) => id === action.payload.id);
+      state.splice(index, 1);
+    },
+    [deleteAllTutorials.fulfilled]: (state, action) => {
+      return [];
+    },
+    [findTutorialsByTitle.fulfilled]: (state, action) => {
+      return [...action.payload];
+    },
+  },
+});
+
+const { reducer } = tutorialSlice;
+export default reducer;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ Redux-Saga
+ ============================================
+// store.js
+=============================================
+import { configureStore } from '@reduxjs/toolkit'
+import createSagaMiddleware from 'Redux-Saga'
+import counterReducer from '../features/counter/counterSlice'
+import saga from '../sagas/saga'
+
+let sagaMiddleware = createSagaMiddleware()
+const middleware = [sagaMiddleware]
+
+export const store = configureStore({
+  reducer: {
+    counter: counterReducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(middleware),
+})
+
+
+// sagas/sagaActions.js
+============================================
+export const sagaActions = {
+  FETCH_NUMBER_SAGA: 'FETCH_NUMBER_SAGA',
+}
+
+// saga.js
+=====================================================
+import { call, takeEvery, put } from 'Redux-Saga/effects'
+import Axios from 'axios'
+import { incrementByAmount } from '../features/counter/counterSlice'
+import { sagaActions } from './sagaActions'
+
+// function uses axios to fetch data from our api
+let callAPI = async ({ url, method, data }) => {
+  return await Axios({
+    url,
+    method,
+    data,
+  })
+}
+
+export function* fetchNumberSaga() {
+  try {
+    let result = yield call(() =>
+      callAPI({
+        url: 'http://www.randomnumberapi.com/api/v1.0/random?min=100&max=1000&count=1',
+      })
+    )
+    yield put(incrementByAmount(result.data[0]))
+  } catch (e) {
+    yield put({ type: 'NUMBER_SAGA_FAILED' })
+  }
+}
+export default function* rootSaga() {
+  yield takeEvery(sagaActions.FETCH_NUMBER_SAGA, fetchNumberSaga)
+}
+
+
+
+
+
+// Counter.js
+===========================================
+import React, { useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import {
+  decrement,
+  increment,
+  incrementByAmount,
+  incrementAsync,
+  incrementIfOdd,
+  selectCount,
+} from './counterSlice'
+import styles from './Counter.module.css'
+import { sagaActions } from '../../sagas/sagaActions'
+export function Counter() {
+  const count = useSelector(selectCount)
+  const dispatch = useDispatch()
+  const [incrementAmount, setIncrementAmount] = useState('2')
+  const incrementValue = Number(incrementAmount) || 0
+
+  return (
+    <div>
+      <div className={styles.row}>
+        <button
+          className={styles.button}
+          aria-label='Decrement value'
+          onClick={() => dispatch(decrement())}
+        >
+          -
+        </button>
+        <span className={styles.value}>{count}</span>
+        <button
+          className={styles.button}
+          aria-label='Increment value'
+          onClick={() => dispatch(increment())}
+        >
+          +
+        </button>
+      </div>
+      <div className={styles.row}>
+        <input
+          className={styles.textbox}
+          aria-label='Set increment amount'
+          value={incrementAmount}
+          onChange={(e) => setIncrementAmount(e.target.value)}
+        />
+        {/* buttons */}
+        {/* add random number asynchronously with redux saga */}
+        <button
+          className={styles.button}
+          onClick={() => dispatch({ type: sagaActions.FETCH_NUMBER_SAGA })}
+        >
+          Add Random number with Saga
+        </button>
+      </div>
+    </div>
+  )
+}

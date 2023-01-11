@@ -1,3 +1,20 @@
+
+ if we want more processing power we need to have more partitions and at least as many consumers in a group subscribed to that topic, 
+ where each consumer is a separate thread. 
+ (The number of consumers can be greater or equal to the number of partitions, any excess consumers will just stand by in case one of the others breaks.)
+
+
+
+
+
+
+
+
+
+
+
+
+
 https://refactorfirst.com/spring-boot-with-kafka-communication
 
 https://www.code4copy.com/java/kafka-spring-boot-producer-consumer/

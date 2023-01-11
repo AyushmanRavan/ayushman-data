@@ -83,3 +83,33 @@ On a successful request, the auth server will return the access token back in th
 
 https://github.com/keycloak/keycloak/releases/download/20.0.1/keycloak-20.0.1.tar.gz
 https://github.com/keycloak/keycloak/releases/download/15.0.2/keycloak-15.0.2.tar.gz
+
+
+
+
+
+Roles – Role represents high-level role in system (e.g. ADMIN, MANAGER etc.), Each role can have low-level privileges.
+Privileges – The privileges define the low level authority for a Role (e.g. ADMIN can read/write/delete but MANAGER can only read/edit)
+
+1) admin 2) trainer 3) agent
+
+
+#   merchant ====   admin trainer agent
+#   vbot     ====   admin    
+  7264
+
+
+READ_AUTHORITY
+WRITE_AUTHORITY
+UPDATE_AUTHORITY
+DELETE_AUTHORITY
+hasAuthority("DELETE_AUTHORITY")
+
+
+ROLE_ADMIN
+ROLE_MANAGER
+ROLE_USER
+hasRole("CUSTOMER")
+
+1) Always add the ROLE_ while using the hasAuthority() method (e.g hasAuthority("ROLE_CUSTOMER")).
+2) While using hasRole(), do not add the ROLE_ prefix as it will be added automatically by Spring security (hasRole("CUSTOMER")).
